@@ -1,0 +1,230 @@
+
+page node in stock@pragma
+
+
+{{
+	On this page:
+	
+	node			variable-way base
+	node<#>			generic fixed-way base 
+	<t>node<#>		generic fixed-way synthetic node 
+
+	node1			specialized one-way base
+	<t>node1		specialized one-way synthetic node
+}}
+
+
+
+type node 
+{{
+	A node is a multi-link adapatable base type.
+	
+	Nodes interconnect with other nodes using indexed links.
+
+	A node can have any number of links and link allocation
+	is dynamic.  
+	
+	This node type is used when a nexus interconnects in 
+	diverse ways. 
+
+	When node dimension is known and uniform, use a node<#>
+	instead.
+}}
+{
+	nom type link_set = array< link<node> >;
+
+	general method
+	{
+		begin ( int dim [opt] )
+		{
+			ao.link_set:begin( dim );
+		}
+
+		get_link ( int i )( link<node> nl )
+		{
+			nl:begin( ao.link_set:object( i ) );
+		}
+
+		set_link [upd]( int i, link<node> nl )
+		{
+			ao:make_room( i );
+			ao.link_set:object( i ):reuse:begin( nl );
+		}
+
+		unlink [upd]( int i )
+		{
+			ao.link_set:object( i ):reuse;
+		}
+	}
+
+	misc method
+	{
+		make_room [upd]( int i )
+		{
+			ao.link_set:count()( int q );
+			i:sub( q )( =int ):add( one )( int need );
+			if ( "need |>| zero" ) ao.link_set:insert( q, need )
+		}
+	}
+
+	instance
+	{
+		link_set;
+	}
+}
+
+
+type node<#>
+{{
+	A node<#> is a generic fixed dimension node.
+	
+	node<#> linkage is uniform.  That is, a node<#> links
+	other node<#>s of the same dimension.
+
+	A node<#> is technically complete, but doesn't have any
+	practical application as an actual type. It should be 
+	used as a base type for application	types.
+
+	node<'1'> is valid, but specialized node1 is a better
+	alternative.
+}}
+{
+	nom type link_set = tuple<<#>>< link<node<<#>>>;
+
+	general method
+	{
+		begin  -- all links null
+		{
+			ao.link_set:begin;  -- all links null
+		}
+
+		get_link ( int i )( link<node<<#>>> nl ) 
+		{
+			ao.link_set:object( i ) ~nl;
+			if ( "not_null?( ~nl )" ) nl:begin( ~nl );
+		}
+
+		set_link [upd](int i, link<node<<#>>> nl )
+		{
+			ao.link_set:object( i ):reuse:begin( nl );
+		}
+
+		unlink [upd]( int i )
+		{
+			ao.link_set:object( i ):reuse;
+		}
+	}
+
+	instance
+	{
+		link_set;
+	}
+}
+
+
+type <t>node<#> from ( <t>, node<<#>> )
+{{
+	A <t>node<#> is a generic synthetic node.
+
+	<t> must be a complete type, or it can be an incomplete
+	type if it doesn't have any [tbd] abstract methods
+	(which forces the synthetic node to be incomplete).
+
+	All methods are inherited from base types.  
+
+	General :begin uses a co-routine to initialize
+	application type <t>.
+
+	Default :begin can be used if default <t>:begin
+	is available.
+
+	Synthetic nodes of the same dimension and related
+	types can interlink.
+
+	Usually, applications will turn some type <t> into
+	a linkable type by defining a particular nom type
+	for <t>.  For example
+	
+		nom type thing_node = <thing>node<'2'>.
+}}
+{
+	general method
+	{
+		begin
+		{
+			ao:base<node<<#>>>:begin;
+			ao:base<<t>>:begin;
+		}
+
+		begin with make ()( <t> )
+		{
+			ao:base<node<<#>>>:begin;
+			make()( ao:base<<t>> );
+		}
+	}
+}
+
+
+
+type node1 
+{{
+	A node1 is a specialized one-way node.
+}}
+{
+	nom type link = link<node1>;
+
+	general method
+	{
+		begin  -- null link
+		{
+		}
+
+		get_link ()( link<node1> nl )
+		{
+			if ( "not_null?( ao.link )" ) nl:begin( ao.link );
+		}
+
+		set_link [upd]( link<node1> nl )
+		{
+			ao.link:reuse:begin( nl );
+		}
+
+		unlink [upd]
+		{
+			ao.link:reuse;
+		}
+	}
+
+	instance
+	{
+		link;
+	}
+}
+
+
+
+
+type <t>node1 from ( <t>, node1 )
+{{
+	specialized synthetic node1
+}}
+{
+	general method
+	{
+		begin
+		{
+			ao:base<node1>:begin;
+			ao:base<<t>>:begin;
+		}
+
+		begin with make ()( <t> )
+		{
+			ao:base<node1>:begin;
+			make()( ao:base<<t>> );
+		}
+	}
+}
+
+
+
+

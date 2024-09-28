@@ -1,0 +1,37 @@
+
+page trace in alpha@pragma
+
+
+type trace -- instrisic,restricted
+{{	
+	A trace is a source code locator.
+
+	Type trace is restricted.  It can't be subtyped
+	or used in another type instance. 
+
+	Trace objects are created by the compiler when an
+	application quits.  If an application specifies an 
+	object type in the quit	expression, the HPM creates
+	the specified object and attaches it to the trace
+	object along with the location info.
+
+	Note: See alpha\fault for example of quit object type.
+
+	:location accesses an internal formatted expr that 
+	includes book name, page name, page file name, and 
+	line number.
+
+	The compiler pushes a trace to an internal disruption
+	object which can be accessed in any trap block.  See
+	alpha\disruption.
+
+}}
+{
+	general 
+	{
+		location = expr proxy [eval];
+
+		object = object proxy [eval];
+	}
+}
+

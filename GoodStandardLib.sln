@@ -1,0 +1,72 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32929.386
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alpha", "Alpha", "{B85B8CE5-506E-4CDE-A0BC-95C7FC02A1D4}"
+	ProjectSection(SolutionItems) = preProject
+		Alpha\access.good = Alpha\access.good
+		Alpha\addr.good = Alpha\addr.good
+		Alpha\analog.good = Alpha\analog.good
+		Alpha\array.good = Alpha\array.good
+		Alpha\ascii.good = Alpha\ascii.good
+		Alpha\bool.good = Alpha\bool.good
+		Alpha\disruption.good = Alpha\disruption.good
+		Alpha\entry.good = Alpha\entry.good
+		Alpha\enumerated.good = Alpha\enumerated.good
+		Alpha\etm.good = Alpha\etm.good
+		Alpha\expr.good = Alpha\expr.good
+		Alpha\extra.good = Alpha\extra.good
+		Alpha\fault.good = Alpha\fault.good
+		Alpha\float.good = Alpha\float.good
+		Alpha\handle.good = Alpha\handle.good
+		Alpha\index.good = Alpha\index.good
+		Alpha\indicator.good = Alpha\indicator.good
+		Alpha\int.good = Alpha\int.good
+		Alpha\link.good = Alpha\link.good
+		Alpha\lock.good = Alpha\lock.good
+		Alpha\matrix.good = Alpha\matrix.good
+		Alpha\message.good = Alpha\message.good
+		Alpha\monitor.good = Alpha\monitor.good
+		Alpha\semaphore.good = Alpha\semaphore.good
+		Alpha\signal.good = Alpha\signal.good
+		Alpha\tally.good = Alpha\tally.good
+		Alpha\thread.good = Alpha\thread.good
+		Alpha\timer.good = Alpha\timer.good
+		Alpha\trace.good = Alpha\trace.good
+		Alpha\tuple.good = Alpha\tuple.good
+		Alpha\typename.good = Alpha\typename.good
+		Alpha\unicode.good = Alpha\unicode.good
+		Alpha\utc.good = Alpha\utc.good
+		Alpha\vector.good = Alpha\vector.good
+		Alpha\word.good = Alpha\word.good
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{C788071C-52ED-4080-A44D-D33C40C53C0E}"
+	ProjectSection(SolutionItems) = preProject
+		Kernel\channel.good = Kernel\channel.good
+		Kernel\console.good = Kernel\console.good
+		Kernel\heap.good = Kernel\heap.good
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stock", "Stock", "{0A5181F7-1D23-4559-8EBE-9B0BF4D12799}"
+	ProjectSection(SolutionItems) = preProject
+		Stock\channel.good = Stock\channel.good
+		Stock\console.good = Stock\console.good
+		Stock\dialect.good = Stock\dialect.good
+		Stock\node.good = Stock\node.good
+		Stock\single_link_list.good = Stock\single_link_list.good
+		Stock\system.good = Stock\system.good
+		Stock\text.good = Stock\text.good
+		Stock\text_channel.good = Stock\text_channel.good
+		Stock\toggle.good = Stock\toggle.good
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5ABC1F7F-29AF-43CD-9BEA-4353149F4585}
+	EndGlobalSection
+EndGlobal

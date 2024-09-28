@@ -1,0 +1,69 @@
+
+page extra in alpha@pragma
+
+
+type extra from direct_access<object> -- intrinsic, restricted
+{{
+	An object of type extra contains unspecified objects
+	given to a procedure after inputs and outputs.
+
+	The compiler automatically creates and initializes
+	an extra object.
+		
+	Procedures that allow extra objects have a single
+	object list ( extra ) written after ouputs in the 
+	interface spec.
+		
+	Applications must use runtime methods to determine
+	the actual type of objects contained by extra. 
+	Generally, a definite input provides a map of the
+	objects in extra.
+
+	Note:  Because extra objects are unspecified, the 
+	compiler cannot	enforce integrity like it does for 
+	inputs and outputs.
+
+	A given extra can be forwarded to another procedure
+	by giving it as the first object in a list of extra
+	objects passed to the other procedure.
+
+	Some applications may need to delete objects before
+	forwarding.  :delete removes a specified number of 
+	objects in given order.  
+
+	New objects given after extra when forwarding are
+	added to the list received by the other procedure.
+		
+
+	@given\extra:object( i )[eval]:as<thing>
+	@given\extra:object( i )[upd]:as<thing>
+	@given\extra:object( i ):as_actual<thing>
+
+
+}}
+{
+	general
+	{
+		delete [upd]( int q [opt] );	  -- q objects from front
+	}
+
+	general  -- disinherit
+	{
+		count ()( int );
+
+		object ( int i ) = object proxy; 
+	}
+
+	abstract in direct_access<object>
+	{
+		[final] ~count ()( int n )
+		{
+			ao:count()( n );
+		}	
+
+		[final] ~object ( int i ) = object proxy ~o
+		{
+			~o -> ao:object( i );
+		} 
+	}
+}

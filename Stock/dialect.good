@@ -1,0 +1,148 @@
+
+page dialect in stock@pragma
+
+{{
+	Useful types, subroutines, and operations that comprise
+	a stock Pragma dialect.
+
+
+	Equal predicates are backed by :equal?.
+
+	Ordinal predicates are backed by :before?.
+
+	Cardinal predicates are backed by :less?.
+
+	Logical operators are backed by :and, :or, :xor, :not.
+
+	Arithmetic operators are backed by :add, :sub, :mul,
+	:div, :neg.
+
+
+	Following example demonstrates how operations
+	and formulas reduce code.  These are equivalent bool
+	object expressions:
+
+		"a |before| b"
+		"before?( a, b )"
+		a:before?( b )( =bool )
+
+
+		"( a |before| b ) |and| ( b |before| c )"
+		"and( before?( a, b ), before?( b, c ) )"
+		a:before?( b )( =bool ):and( b:before?( c )( =bool ) )
+}}
+
+
+
+
+enum type sign ( 'positive', 'negative' );
+
+
+subroutine
+{
+	choose<t1><t2> ( bool a?, <t1> a [opt], <t2> b [opt] ) = object proxy ~o 
+	{{
+		This subroutine selector chooses from two given
+		inputs a and b based on the value of a given bool
+		a?.  If a? is true, then a is chosen.  Otherwise, 
+		b is chosen.
+
+		a nd b are not evaluated and may be null.
+
+		The result proxy is indefinite and virtual, so type
+		and access must be resolved on the call-side. This
+		allows for general utility at the expense of runtime 
+		validation.
+		
+		Example:
+
+		  choose( citrus?, apple, orange )[eval]:as<fruit>
+
+		  choose( ok?, 'no error', 'failed' ):as_actual<expr>
+	}}
+	{
+		if ( a? ) ~o -> a else ~o -> b;
+	}
+
+
+	fix<t> ( <t> a [opt], <t> b [opt] ) = <t> proxy [eval] ~o
+	{{
+		This subroutine selector is used to "fix" inputs
+		that may be	null. Conceptually, the second input 
+		fixes the first input if it's null.  However, the
+		second input can also be null, so the result proxy
+		may still reference a null object.
+
+		Example:
+
+		  fix( offset, zero ) ~offset;
+	}}
+	{
+		if ( "not_null?( a )" ) ~o -> a else ~o -> b;
+	}
+
+}
+
+
+
+operation	-- equal  
+{
+	"a |=| b"		= "equal?( a, b )";
+	"a |not=| b"	= "not( equal?( a, b ) )";
+}
+
+
+operation	-- ordinal
+{
+	"a |before| b"		= "before?( a, b )";		
+	"a |after| b"		= "before?( b, a )";
+	"a |par| b"			= "not( or( before?( a, b ), before?( b, a ) ) )";
+}
+
+
+operation	-- cardinal 
+{
+	"a |<| b"		= "less?( a, b )";
+	"a |>| b"		= "less?( b, a )";
+
+	"a |not<| b"	= "not( less?( a, b ) )";
+	"a |>=| b"		= "not( less?( a, b ) )";
+
+	"a |not>| b"	= "not( less?( b, a ) )";
+	"a |<=| b"		= "not( less?( b, a ) )";  
+}
+
+
+operation	-- logical 
+{
+	"a |and| b"		= "and( a, b )";
+	"a |or| b"		= "or( a, b )";
+	"a |xor| b"		= "xor( a, b )";
+	"a |nand| b"	= "not( and( a, b ) )";
+	"a |nor| b"		= "not( or( a, b ) )";
+	"a |xnor| b"	= "not( xor( a, b ) )";
+}
+
+
+operation	-- arithmetic
+{
+	"a + b"			= "add( a, b )";
+	"a - b"			= "sub( a, b )";
+	"a * b"			= "mul( a, b )";
+	"a / b"			= "div( a, b )";
+	"-a"			= "neg( a )";
+
+	"a |+| b"		= "add( a, b )";
+	"a |-| b"		= "sub( a, b )";
+	"a |*| b"		= "mul( a, b )";
+	"a |/| b"		= "div( a, b )";
+	"|-|a"			= "neg( a )";
+
+	"a |mod| b"		= "mod( a, b)";
+}
+
+
+
+
+
+

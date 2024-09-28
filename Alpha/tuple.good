@@ -1,0 +1,74 @@
+
+page tuple in alpha@pragma
+
+
+nom type
+{
+	double<t> = tuple<'2'><<t>>;
+
+	triple<t> = tuple<'3'><<t>>;
+
+	quad<t> = tuple<'4'><<t>>;
+}
+
+
+
+type tuple<#><t> from direct_access<<t>>  -- compatible, conventional
+{{
+	A <#>tuple<t> is a fixed-size object set.
+
+	<#> is the symbolic tuple dimension. <t> is the symbolic
+	object type. The adhoc type must be a complete type.
+
+	Since object count is known at compile time, implemen-
+	tation can be optimized for a small number of objects 
+	by allocating them in the tuple instance.
+
+	Objects are created when the tuple is initialized. They 
+	(the objects) may also be intialized (or not) depending
+	on which :begin method is called.
+
+	A tuple is portable if <t> is portable. See Alpha type
+	reference for supported formats.
+
+	Generic binary 'b' is supported for any <t> that also
+	supports generic binary 'b'.
+}}
+{
+	general 
+	{
+		begin;									-- all objects null
+
+		begin ( <t> seed );						-- copy seed to all objects
+
+		begin ( tuple<<#>><<t>> other );		-- copy other  
+		
+		begin ( message [upd], expr fex )()( extra ); -- fread
+
+		fwrite ( message [upd], expr fex )()( extra );
+	}
+
+	general -- disinherit
+	{
+		count ()( int n )
+		{
+			n:begin( <#> );
+		}
+
+		object ( int i ) = <t> proxy [eval,upd]; 
+	}
+
+	abstract in direct_access<<t>>
+	{
+		[final]	~count ()( int n )
+		{
+			n:begin( <#> );
+		}	
+
+		[final] ~object ( int i ) = <t> proxy ~o
+		{
+			~o -> ao:object( i );
+		}
+	}
+}
+

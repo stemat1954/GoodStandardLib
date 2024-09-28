@@ -1,0 +1,113 @@
+
+page array in alpha@pragma
+
+
+type array_cursor<t>;
+
+
+type array<t> from dual_access<<t>>< array_cursor<<t>> > -- conventional
+{{
+	An array<t> is a resizable object set.  Objects are
+	homogeneous and logically contiguous in memory.
+
+	<t> is the symbolic object type. The adhoc type must
+	be a complete type.  
+
+	An array supports direct access via an integer position
+	index and serial access via an opaque cursor type
+	array<t>_cursor.
+		
+	Methods that require a given index fail if the index is
+	invalid. A valid index is between zero and count
+	(inclusive).  index = count is a valid insertion index.
+
+	If given index is valid, :insert always works provided 
+	there is available memory, and :delete always works by 
+	ignoring attempts to remove too many objects.
+
+	Note: delete without an index (default) when array is
+	empty doesn't do anything.
+
+	:rank determines the index of a given object in an
+	ordered array. If output unique is true, there is no
+	other object of equal (par) rank in the array, and 
+	output i indexes the insertion point to maintain proper
+	order.  Otherwise, output i indexes an object of equal
+	rank already in the array. :rank uses a binary search 
+	algorithm that depends on <t>:before?<t>.
+
+	An array<t> is portable if <t> is portable.  
+
+	Inserting and deleting at the end of an array is most
+	efficient:
+
+	a:insert:begin( x )   -- push (dup x)
+	a:insert:begin( *x )  -- push (take x)
+	a:delete()( <t> x )   -- pop (save x)
+}}
+{
+	general   
+	{
+		begin ( int reserve [opt] );					-- empty
+
+		begin ( array<<t>> other );						-- dup 
+
+		begin ( array<<t>> other [upd] );				-- take 
+
+		begin ( message [upd], expr fex )()( extra );	-- fread
+
+		fwrite ( message [upd], expr fex )()( extra );
+
+		rank ( <t> )( int i, bool unique );
+
+		copy ( int i, int q, array<<t>> other [upd], int j [opt] );
+
+		insert [upd] ( int i, int q );						-- q null objs at i
+
+		insert [upd] ( int i [opt] ) = <t> proxy [init];	-- one null obj at i (end), return access
+
+		delete [upd] ( int i, int q );						-- q objs at i, discard all
+
+		delete [upd] ( int i [opt] )( <t> );				-- one obj at i (end), save
+
+		delete [upd] ( int i [opt] );						-- one obj at i (end), discard
+				
+		resize [upd] ( int q );								-- insert or delete at end, new count = q
+
+		reduce [upd];										-- release unused memory
+	}
+
+	general -- disinherit
+	{
+		count ()( int );  
+
+		object ( int i ) = <t> proxy [eval,init];
+	}
+
+
+	abstract in dual_access<<t>>< array_cursor<<t>> >
+	{
+		[final] ~cursor_to_index ( array_cursor<<t>> )( int );
+
+		[final] ~index_to_cursor ( int )( array_cursor<<t>> );
+
+		[final] ~count ()( int n )
+		{
+			ao:count()( n );
+		}
+		
+		[final] ~object ( int i ) = <t> proxy ~o
+		{
+			~o -> ao:object( i );
+		}
+
+		[final] ~open_cursor ( int )( array_cursor<<t>> );  
+
+		[final] ~move_cursor ( array_cursor<<t>> [upd] );
+
+		[final] ~flip_cursor ( array_cursor<<t>> [upd] ); 
+
+		[final] ~object ( array_cursor<<t>> ) = <t> proxy; 
+	}
+}
+

@@ -1,0 +1,139 @@
+
+page word in alpha@pragma
+
+
+nom type		-- standard word configurations
+{
+	word1  = word<'1'>;		-- bit
+	word4  = word<'4'>;		-- nibble
+	word8  = word<'8'>;		-- byte
+	word16 = word<'16'>;	-- byte2
+	word32 = word<'32'>;	-- byte4
+	word64 = word<'64'>;	-- byte8
+}
+
+
+type word<#> -- elementary, compatible (up to word32), conventional
+{{
+	A word is a generic multibit register.  It is an object-
+	oriented generalization of a hardware machine word.
+
+	<#> is symbolic bit precision.
+		
+	Note:  The minimum adhoc precision is <#1> and the
+	maximum is <#128>.
+
+	See Alpha type reference for value expression syntax.
+
+	Note: Value expressions generally specify a	base followed
+	by a value in the specified base.  For example
+		
+	'b:1011100' (binary) 
+	'o:070165'	(octal) 
+	'd:9810'	(decimal)
+	'x:4A5F'	(hexadecimal)
+		
+	Reading left to right, bits in a value expr are	ordered 
+	most to least significant.  For	example, given a word<#4>
+	value expression 'b:1100', bits	are ordered '1', '1', '0', 
+	'0' from most to least significant.
+
+	Cross precision copy initialization is allowed. If
+	the source word is "narrower" than the target, more
+	significant bits are inserted. if input sign is 'true'
+	the source value is "sign extended."  Otherwise, zeros 
+	are inserted.  If the source word is "wider" than the 
+	target, the more significant bits in the source are not 
+	copied. 
+	
+	A word can be initialized with an integer value	given 
+	an int fex that specifies how a negative value should
+	be encoded. If the int value can't be represented by the
+	number of word bits, the method fails.
+
+	Note: This amounts to a binary int write. Similar cap-
+	ability is provided for fp<#>.  See source type defs for
+	reverse read initialization.
+		
+	Words are ranked by their values interpreted as unsigned
+	integers.
+
+	Words are portable. See Alpha type reference for
+	supported formats.  
+
+	Generic binary 'b' is supported for c-compatability.
+	If word precision is too high for the target platform, 
+	the method will quit-fail.  All platforms support at 
+	least word<#32>, so compatible pages that use word32
+	(or less) are also platform independent.
+		
+}}
+{
+	
+	general 
+	{
+		begin ( expr vex [opt] );						-- literal, default = zero
+
+		begin<wt> ( <wt> w, bool sign_extend [opt] );	-- copy w/ width conversion
+
+		begin ( int n, expr fex );						-- int conversion, int fex for encoding
+
+		begin<fpt> ( <fpt> r, expr fex );				-- fp conversion, fp fex for encoding
+
+		begin ( message [upd], expr fex );				-- fread
+
+		fwrite ( message [upd], expr fex ) ;	
+		
+
+		equal? ( word<#> w )( bool );
+
+		before? ( word<#> w )( bool );
+
+		less? ( word<#> w )( bool );
+	
+		zero? ()( bool );
+	
+		and [upd]( word<#> w );							-- bitwise
+		and [eval]( word<#> w )( word<#> );
+
+		or [upd]( word<#> w );							-- bitwise
+		or [eval]( word<#> w )( word<#> );
+
+		xor [upd]( word<#> w );							-- bitwise
+		xor [eval]( word<#> w )( word<#> );
+
+		not [upd];										-- bitwise
+		not [eval]()( word<#> );
+
+		add [upd]( word<#> w );							-- bitwise
+		add [eval]( word<#> w )( word<#> );
+
+		adc [upd]( word<#> w, word1 c [upd] );			-- add with carry, bitwise
+		adc [eval]( word<#> w, word1 c [upd] )( word<#> );
+
+		neg [upd];										-- two's complement negate 
+		neg [eval]()( word<#> );
+
+		lsl [upd]( int n );								-- logical shift left
+		lsl [eval]( int n )( word<#> );
+
+		lsr [upd]( int n );								-- logical shift right
+		lsr [eval]( int n )( word<#> );
+
+		asr [upd]( int n );								-- arithmetic shift right
+		asr [eval]( int n )( word<#> );
+
+		rol [upd]( int n );								-- rotate left 
+		rol [eval]( int n )( word<#> );
+
+		ror [upd]( int n );								-- rotate right
+		ror [eval]( int n )( word<#> );
+
+		rcl [upd]( int n, word1 c [upd] );				-- rotate thru carry left
+		rcl [eval]( int n, word1 c [upd] )( word<#> );
+
+		rcr [upd]( int n, word1 c [upd] );				-- rotate thru carry right
+		rcr [eval]( int n, word1 c [upd] )( word<#> );
+	}
+}
+

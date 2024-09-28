@@ -1,0 +1,54 @@
+
+page entry in alpha@pragma
+
+type entry [incomplete]
+/*
+	An entry is a base type for types that represent
+	application entry points.
+
+	:~run defines an application entry point.  Entry points
+	are called on concurrently executing threads.
+
+	A primary (or main) thread is started automatically by
+	the progam startup routine.  The application can start
+	additional threads by calling start_thread<t>.
+
+	Note: <t> is a symbolic type that represents some 
+	entry subtype.  start_thread<t> creates an entry point
+	object of type <t> then calls :~run. See page thread 
+	for details.
+
+	Two signals are used to coordinate execution. :~run
+	should indicate active as soon as it's ready to interact
+	with other threads and it should continuously monitor 
+	stop, returning asap when indicated.  
+	
+	Generally, :~run should internally trap disruptions	and
+	define a given output trace if the thread is disrupted.
+
+	When the application starts a thread, it can pass a
+	global object of any type using a pointer. The object is
+	optional, and generally it's used for inter-thread
+	communication. 
+	
+	Note:  An application's main entry point doesn't receive
+	an inter-thread object from the startup routine.
+*/
+{
+	general 
+	{
+		begin;
+	}
+
+	abstract -- [tbd] in subtype
+	{
+		~run ( signal active, signal stop, p<object> po [opt] )( trace );
+	}
+}
+
+
+
+
+
+
+

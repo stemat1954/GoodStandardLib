@@ -1,0 +1,15 @@
+
+page tuple in alpha@pragma
+
+
+page vector in alpha@prag
+
+type vector<#><t>
+{{
+	Linear algebra vector with <#> coordinates of numeric 
+	type <t>.
+
+	DEFINITION PENDING
+}}
+{
+}

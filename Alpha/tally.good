@@ -1,0 +1,55 @@
+
+page tally in alpha@pragma
+
+
+type tally from indicator
+{{
+	A tally is a counting indicator.
+
+	Note: See alpha\indicator for more info.
+
+	:begin sets min, max, and initial values. It also
+	sets default wait time and execution mode.
+
+	A tally is "directional".  Generally, it starts at one
+	end of the range and moves to the other. Initial level 
+	should be min or max.  A tally that starts at the min 
+	level indicates at the max level.  Conversely, a tally
+	that starts at the max level inicates at the min level.
+
+	Note:  Initial level not equal to min or max is an 
+	invalid	configuration that causes disruption.
+
+	A tally can be used to regulate how often a thread
+	reponds to asynchronous events.  One side increases or
+	decreases the tally, while another side waits for the
+	limit to be reached.  When a waiting thread is released
+	by an indicated tally, it responds and resets the tally.
+
+	The default wait time is used when :wait is called with
+	a null elapsed time.  If the default wait time is also 
+	null, :wait does not time-out.
+
+	The tally execution mode is auto-reset if input auto
+	is 'true' or null. Otherwise, execution mode is manual-
+	reset.
+
+	:inc increases the tally by one up to the max level.
+
+	:dec decreases the tally by one down to the min level.
+	
+	base :reset sets the tally back to it's initial value
+	and clears the release state.
+}}
+{
+	general
+	{
+		begin ( int min, int max, int init, etm wait [opt], bool auto [opt] );
+
+		inc [upd];
+
+		dec [upd];
+	}
+}
+
+

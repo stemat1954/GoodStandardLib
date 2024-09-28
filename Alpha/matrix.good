@@ -1,0 +1,12 @@
+
+page matrix in alpha@prag
+
+type matrix<#r><#c><t>
+{{
+	Rectangular matrix <#r> rows by <#c> columns with 
+	elements of numeric type <t>
+
+	DEFINITION PENDING
+}}
+{
+}

@@ -1,0 +1,85 @@
+
+page thread in alpha@pragma
+
+
+enum type thread_state ( 'new', 'starting', 'active', 'stopping', 'done', 'dead' );
+{{
+	A thread exists in one of six states: five normal
+	and one abnormal:
+
+	'new'		=> initialized
+	'starting'	=> start_thread called, but entry:~run has not indicated active
+	'active'	=> entry:~run has indicated active
+	'stopping'	=> :stop called, but not done
+	'done'		=> normal return from entry:~run 
+	'dead'		=> :kill called or entry:~run was trapped
+	
+	one verion of ...
+	:wait returns when the thread state is not equal 
+	to the last state it returned on, or a specified 
+	time expires. It returns when the state is not 
+	'new' the first	time.  The state that releases 
+	:wait is copied to output thread_state. If it's
+	'dead', output trace is significant.  If a time
+	limit is not specified, :wait will not expire ???
+
+	A thread cannot be incorrectly controlled. State
+	progression is well behaved.  Extraneous or redun-
+	dent control calls are ignored. Once a thread is 
+	'done' or 'dead', it cannot be restarted.
+}}
+
+
+
+type thread -- intrinsic
+{{
+	A thread object represents a system thread.  
+	It can be used to control and monitor a running
+	thread.  A p<thread> is returned by start_thread.
+}}
+{
+	general
+	{
+		begin;
+
+		stop;
+
+		kill;
+
+		wait ( thread_state, etm [opt] )( bool ); 
+
+		wait ( etm [opt] )( thread_state ); 
+
+		get_state ()( thread_state );
+
+		get_trace ()( trace );
+
+		get_id ()( expr );
+
+		get_handle ()( handle );
+	}
+}
+
+
+
+subroutine
+{
+	this_thread_id = expr proxy [eval];  
+
+	this_process_id = expr proxy [eval]; 
+
+	start_thread<ept> ( link<object> [opt] )( link<thread> ); 
+	{{
+		This subroutine creates an entry point object of 
+		type <ept> which derives from alpha\entry, then 
+		calls adaptable entry method :run on a new thread,
+		forwarding the given p<object>. The entry point 
+		object is created in the new thread's local 
+		storage.
+
+		A pointer to a thread object that controls the
+		new thread returns in an output.
+		
+	}}
+}
+

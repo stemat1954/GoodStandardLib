@@ -1,0 +1,116 @@
+
+page int in alpha@pragma
+
+
+common int
+{
+	zero:begin( '0' ) [const];
+
+	one:begin( '1' ) [const];
+
+	neg_one:begin( '-1' ) [const];
+
+	max_int:begin( 'max' ) [const];
+
+	min_int:begin( 'min' ) [const];
+
+	-- more tbd
+}
+
+
+type int -- elementary, compatible, conventional
+{{
+	An int encapsulates the higest precision integer
+	type supported by the runtime environment.
+
+	See documentation for value expressions.
+
+	An int is portable. See documentation for supported
+	formats.
+
+	Format notes...  
+
+	Generic binary 'b' is supported for c compatability.
+
+	Specific binary formats include 3 common encodings
+	that differ in negative value representation (one's
+	complement, two's complement, and sign/magnitude).
+
+	Specific binary unicode formats UTF-8, UTF-16, and
+	UTF-32 are also supported. For now, presume format 
+	exprs are 'b:utf8', 'b:utf16', 'b:utf32'.  
+			
+	https://en.wikipedia.org/wiki/UTF-8
+	https://en.wikipedia.org/wiki/UTF-16
+
+	Specific binary 'b:ascii' writes a non-negative
+	value as one byte and reads the same.
+}}
+{
+	general 		
+	{
+		begin ( expr vex [opt] );			-- literal, default '0'
+
+		begin ( int other );				-- copy
+
+		begin<wt> ( <wt> w, expr fex );		-- word conversion (direct read)
+
+		begin ( message [upd], expr fex );	-- fread
+
+		fwrite ( message [upd], expr fex );
+
+		equal? ( int n )( bool );
+
+		before? ( int n )( bool );	
+
+		less? ( int n )( bool );
+	
+		ldv [upd]( int n );
+
+		add [upd]( int n );
+		add [eval] ( int n )( int );		
+
+		sub [upd]( int n );
+		sub [eval] ( int n )( int );
+
+		mul [upd]( int n );
+		mul [eval] ( int n )( int );	
+
+		div [upd]( int n );
+		div [upd]( int n )( int r );	
+		div [eval]( int n )( int v, int r );	
+
+		mod [upd]( int n );					
+		mod [eval]( int n )( int );	
+
+		pow [upd]( int n );
+		pow [eval]( int n )( int );	
+
+		fma [upd]( int m, int b );				-- fused mul add v = m*v + b
+		fma [eval]( int m, int b )( int );
+
+		dis [upd]( int n );						-- distance between v and n (abs diff)
+		dis [eval]( int n )( int );
+
+		neg [upd];	
+		neg [eval]()( int );	
+
+		abs [upd];	
+		abs [eval]()( int );	
+
+		inc [upd];
+		inc [eval]()( int );	
+
+		dec [upd];
+		dec [eval]()( int );	
+	}
+}
+
+
+
+
+
+
+
+
+

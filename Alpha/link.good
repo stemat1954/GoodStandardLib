@@ -1,0 +1,227 @@
+
+page link in alpha@pragma
+
+
+type link<t>   -- intrinsic
+{{
+	A link<t> is a global object owner.
+
+	Links are used to create objects at runtime in global
+	storage.  The type of object created must be a complete
+	type, but the link's adhoc type can be any base type
+	of the object created.  Conversely, the type of object 
+	created by a link must be related to the link's adhoc
+	type (same type or subtype).
+		
+	Logically, a link is a runtime reference object. That
+	is, the binding of link to object is made at runtime.
+	In this sense, links are similar to proxies.  However, 
+	links are first class objects with methods (proxies
+	aren't) and access to a link's bound object requires
+	an explicit accessor call, while access to a proxy's
+	bound object is implicit.
+	
+	A link's object accessor method is called :deref.  Like
+	other accessors, :deref returns a result proxy, which
+	can be used in any object context as a reference to the
+	global object. Thus, logically, there are two levels of
+	indirection to get to a linked object.
+	
+	Note:  In a sense, :deref converts a link into a proxy.  
+	The conversion is optimized and may in fact be virtual.
+	
+	Note: :deref returns a [upd] proxy of symbolic type <t>. 
+
+	Note:  adhoc type <object> is allowed for <t> because 
+	ultimately <t> is the stated type of a result proxy
+	returned by :deref.  However, generic :begin<xt> must
+	be called with a complete adhoc type to initialize a
+	link of type <object>. 
+
+	The proxy returned by :deref is [upd] and it can be
+	used to call any method of <t> except :begin.  To
+	initialize the global object, :as_actual<t> must be
+	called to get an [init] proxy.  This is required even 
+	when <t> is the actual object type.
+
+	The object bound to a link is created when the link 
+	is initialized.  Several versions of :begin	allow for
+	various configurations of link type and	object type. 
+	
+	Note:  It's common for the link type <t> to be an 
+	adaptable base type while the created object type <xt> 
+	is an adapted subtype created by generic method 
+	:begin<xt>.
+
+	The object created by :begin is null and it must be
+	initialized before it can be used.  Thus, it's common to
+	see two levels of initialization when a link is
+	created. This expression:
+	
+	link<thing> lt:begin<widget>:deref:as_actual<widget>:begin; 
+
+	creates and initializes a link named lt, bound to an 
+	object of adhoc type widget, then accesses the object
+	as actual type widget so it can initialize the object
+	using default :begin.  Type widget is (necessarily) a
+	complete type that derives from thing.
+
+	Note:  It's important to distinquish between a null
+	link and a possibly null object referenced by the
+	link.  A null link can't be dereferenced, but a 
+	properly intialized link always points to an object
+	that may or may not be null.
+	
+	A new link can be initialized by copying an existing
+	compatible link. When links are copied, the new
+	link is bound to the existing global object. A new
+	object is not created.  
+	
+	The global object bound to a link (or links) is 
+	automatically deleted when all links that reference 
+	the object are deleted.  It is common to say that the
+	global object bound to one or more links is 
+	"reference counted."
+
+	Note:  Copying links and reference counting is
+	thread-safe. Links are essential for sharing objects
+	between threads.
+
+	An existing link is compatible with another link
+	if the two adhoc link types are related.
+	
+	For example:
+
+
+	type thing
+	{
+		general method foo [eval];
+	}
+
+	type widget from thing
+	{
+		general method goo [eval];
+	}
+
+	subroutine foo
+	{
+		link<widget> lw:begin:deref:as_actual<widget>:begin; -- new link to widget
+		link<thing> lt:begin( lw );  -- copy pw
+
+		lw:deref:foo;	-- ok (foo is inherited)
+		lw:deref:goo;	-- ok
+
+		lt:deref:foo;	-- ok
+		lt:deref:goo;	-- error! (goo not in thing)
+		lt:deref:as<widget>:goo;  -- ok
+	}
+		
+
+
+	In general, two types are related and compatible if they
+	occur in a common type hierarchy.
+
+	      A
+	     / \
+		B   C
+
+	In this (bottom-up) hierarchy, A derives from B and C.
+	A, B, and C are all related.  Note that B and C are
+	related through A, but are otherwise not related.
+
+	If la is a link to an actual object of type A,
+
+		link<A> la:begin:deref:as_actual<A>:begin;
+
+	then 
+
+		link<B> lb:begin( la );
+		link<C> lc:begin( la );
+
+		link<B> lb2:begin( lc );
+		link<C> lc2:begin( lb );
+
+	are all legit and refer to the same actual object
+	pointed to by la.
+
+	This works because 
+
+	  la:deref:base<B>
+	  la:deref:base<C>
+	  lb:deref:as<A>
+	  lc:deref:as<A>
+	  lb:deref:as<C>
+	  lc:deref:as<B>
+
+	are all legit and return valid proxies that also 
+	reference the original actual object.
+
+	Links can be used to create logically heterogenous 
+	arrays. They're also essential for creating dynamically
+	linked object collections like trees, lists, and 
+	networks.
+
+	Links are not portable.  However, since a link can
+	be created from a typename, and those ARE portable, 
+	applications can devise ways to persist	and restore
+	links.
+
+	Although a single link is relatively easy to persist, 
+	a complex network of links is significantly	more
+	difficult. In general, applications usually have to 
+	devise a scheme to store links and objects separately.
+
+	The basic idea is to create a portable link using a 
+	typename and some other portable reference, e.g. an int
+	that indexes an object in a set of objects.
+
+	A portable link of this sort can be imported as a 
+	typename and int.  The typename is used to create a	link
+	to a null object and the int can be used to lookup a 
+	copy of the object for initialization.  Of course, where 
+	objects may have multiple links, there has to be a way
+	to recognize when an original link has been restored so
+	that others can copy it.
+
+	Links can be compared using standard methods. Cross
+	type comparisions are allowed, even if the links are
+	copy-incompatible.  Comparisons are based on object 
+	storage address, so equal links reference the same 
+	object.  Furthermore, if a:before?(b) is false and
+	b:before?(a) is false, then a and b are par equal
+	( "a |par| b" is true).
+		
+	Note:  Par equality is persistent provided network 
+	linkage is properly restored using techniques already 
+	described.  However, ordinality is a completely trans-
+	ient property and any ordered collection of links 
+	is only ordered for a single runtime session.
+
+	Note: In some applications, it may be preferable to
+	compare links by passing the comparison on to the 
+	linked object.  A general solution is too complicated.
+	For particular scenarios, an application can define a 
+	new type that encapsulates a link and provides the
+	desired pass-through methods.
+
+
+}}
+{
+	general 
+	{
+		begin;						-- create and bind null <t> object, complete <t>
+
+		begin<xt>;					-- create and bind null <xt> object, <xt> complete subtype of <t> 
+
+		begin<xt> ( link<<xt>> );	-- copy compatible link, <xt> related to <t>  (may fail)
+
+		begin ( typename );			-- create and bind null object, named type is complete type or subtype of <t> (may fail)
+
+		equal<xt>? ( link<<xt>> )( bool );
+
+		before<xt>? ( link<<xt>> )( bool );
+	
+		deref = <t> proxy [upd];	-- accessor 
+	}
+}
+

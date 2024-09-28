@@ -1,0 +1,30 @@
+
+page system in stock@pragma
+
+--  SAMPLE IMPLEMENTATION (suitable for HelloWorld)
+
+
+type system
+{
+	general method
+	{
+		begin 
+		{
+			ao.console:begin;  -- system console
+		}
+
+		console = console proxy [upd] ~c
+		{
+			~c -> ao.console;
+		}
+	}
+
+	instance
+	{
+		console;
+	}
+}
+
+
+common system sys:begin;	
+

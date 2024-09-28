@@ -1,0 +1,151 @@
+
+page console in stock@pragma
+
+
+type console 
+{{
+	A console is an interactive peripheral that displays 
+	text output and accepts text input from a user. 
+
+	Console i/o text format is device specific. Applications
+	must call :make_text to initialize a device compatible 
+	output string.  Input strings are naturally device
+	compatible.
+
+	names and errors in method interfaces are platform 
+	dependent.
+
+	Note: In general, console i/o text format is different
+	from platform text format. However, they're one and the
+	same for system consoles.  Thus, the system console can
+	always dispay error text.
+}}
+{
+	general method
+	{
+		begin  -- system console
+		{
+			kernel\console_identify( no_addr, *handle hcon:begin );
+			if ( "hcon |=| no_addr" ) quit ( 'platform', 'no system console' );
+			ao:configure( hcon )( text err );
+			if ( "not_null?( err )" ) quit ( 'platform', 'system console broken' );
+			ao.ready:begin( true );
+		}
+
+		begin ( text name )( text error )  -- named console
+		{
+			text:begin( name ):add_zero:detach()( addr pname );
+			kernel\console_identify( pname, *handle hcon:begin );
+			kernel\heap_free( pname );
+
+			if ( "hcon |=| no_addr" )
+			{
+				error:begin:write( 'unknown console: ' ):write( name );
+				ao.ready:begin( false );
+			}
+			else
+			{
+				ao:configure( hcon )( error );
+				ao.ready:begin( "null?( error )" );
+			}
+		}
+
+
+		make_text ()( text )  -- i/o compatible
+		{
+			if ( ao.ready ) @given\text:begin( ao.utf, ao.endian );
+		}
+	
+				
+		read [upd]( text input [upd], int q )( text error ) -- q chars
+		{
+			if ( ao.ready )
+				ao.channel:read( *input, q )( error )
+			else
+				error:begin( not_ready );
+		}
+
+		read [upd]( text input [upd], unicode c )( text error ) -- delimiter c
+		{
+			if ( ao.ready )
+				ao.channel:read( *input, c )( error )
+			else
+				error:begin( not_ready );
+		}
+
+		read_line [upd]()( text input, text error )
+		{
+			if ( ao.ready )
+			{
+				ao:make_text()( input );
+				ao.channel:read( *input, ao.eol )( error );
+			}
+			else
+				error:begin( not_ready );
+
+		}
+
+		write [upd]( text output [upd] )( text error )  
+		{
+			if ( ao.ready )
+				ao.channel.write( *output )( error )
+			else
+				error:begin( not_ready );
+		}
+
+	}
+
+
+	misc method
+	{
+		configure [upd]( handle hcon )( text err )
+		{
+			kernel\console_open_channel( hcon, *handle hch:begin, *addr pnote:begin );
+			
+			if ( "hch |not=| no_addr" )
+			{
+				ao.channel:begin( hch ); 
+
+				kernel\console_get_protocol( hcon, *int unit:begin, *word16 bom:begin, *int eol:begin );
+
+				select ( unit )
+				{
+					case ( '1' ) ao.utf:begin ( 'UTF-8' );
+					case ( '2' ) ao.utf:begin ( 'UTF-16' );
+					case ( '4' ) ao.utf:begin ( 'UTF-32' );
+					else quit ( 'bug', 'unexpected code unit value' );
+				}
+
+				if ( "bom |=| 'x:FEFF'" ) ao.endian:begin ( 'big_endian' )
+				else if ( "bom |=| 'x:FFFE'" ) ao.endian:begin ( 'little_endian' )
+				else if ( "bom |not=| 'x:0000'" ) quit ( 'bug', 'invalid byte order mark' );
+
+				ao.eol:begin( eol );
+			}
+			else 
+			{
+				err:begin:write( 'could not open console channel [' );
+				if ( "pnote |not=| no_addr" ) err:write( text begin:attach( pnote ):trim_zero );
+				err:write( ']' );
+			}
+		}
+	}
+
+	nom type channel = read_write_text_channel;
+
+	common text not_ready:begin( 'not ready' ) [const];
+
+	instance
+	{
+		channel				[opt];
+		utf					[opt];
+		endian				[opt];  -- n/a for UTF-8
+		unicode		eol		[opt];
+
+		bool		ready;
+	}
+
+}
+
+
+

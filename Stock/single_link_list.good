@@ -1,0 +1,423 @@
+
+page single_link_list in stock@pragma
+
+{{
+	on this page:
+
+	type list_cursor
+	type single_link_list
+	type fifo_list<t>
+	type lifo_list<t>
+
+}}
+
+
+type list_cursor
+{
+	general
+	{
+		begin ( link<node1> ln [opt] )
+		{
+			if ( "not_null?( ln )" ) ao.ln:begin( ln );
+		}
+
+		move [upd]
+		{
+			if ( "not_null?( ao.ln )" ) 
+			{
+				ao.ln:deref:get_link()( link<node1> next );
+				ao.ln:reuse;
+				if ( "not_null?( next )" ) ao.ln:begin( next );
+			}
+		}
+
+		flip [upd]
+		{
+			ao.ln:reuse;  -- not supported
+		}
+
+		object = node1 proxy ~o;
+		{
+			if ( "not_null?( ao.ln )" ) ~o -> ao.ln:deref 
+		}
+	}
+
+	instance
+	{
+		link<node1> ln [opt];
+	}
+}
+
+
+type single_link_list from serial_access<node1><list_cursor>
+{{
+	One-way linked list with heterogenous nodes.
+
+	There are five named list positions: "front", "first",
+	"last",	"current", and "next".  
+
+	front is a nominal position before the first node.
+	It always exists in principle.  The other positions
+	designate nodes that may or may not exist.  If the 
+	list has at least one node, first and last exist and
+	are well-defined.  
+	
+	An internal link designates the current position. 
+	
+	Generally, the next node follows the current position.
+	If the last node is current, the next node doesn't 
+	exist.  If the front position is current, next refers 
+	to the first node.
+
+	The current node can be set using :go methods. 
+
+	:go_front makes the front position current.
+	
+	:go_first makes the first node current if it exists.
+
+	:go_last makes the last node current if it exists.
+
+	:go_next makes the next node current if it exists.
+
+	:go_here makes a given node current.  The given node
+	link must reference a node in the list.  Use :get_next
+	or :get_current to get a valid link.
+
+	NOTE! This method can really screw things up if the
+	link doesn't reference a node in the list.
+
+	:insert and :remove_next are the essential methods 
+	used to build a list.  
+
+	:insert adds a node link after the current position.
+	The current position doesn't change.  The given node 
+	should be a new (unlinked) node, but the method clears
+	the link just in case.
+
+	NOTE! It's possible to re-insert (move) a node in the
+	list if it's removed before reinserting.  Failure to
+	properly unlink a node that was previously linked in
+	the same (or any other) list will make a real mess of
+	things.
+
+	:remove_next removes the next node from the list if it
+	exists. It does this by linking the current node to 
+	the node after the next node, if it exists.  current 
+	position doesn't change.
+	
+	A [const] list can be traversed using :get methods.
+	:get methods copy a named link if it exists.  If
+	:get_current doesn't copy a link (output is null), the
+	list is empty and the front position is current.
+}}
+{
+	general method
+	{
+		begin  -- original empty
+		{
+			ao:base<serial_access<node1><link<node1>>:begin;
+		}
+
+		begin ( single_link_list other [upd] )  -- var copy 
+		{
+			if ( "not_null?( other.first )" )
+			{
+				-- ignore current in other
+				ao.first:begin( other.first );  
+				ao.last:begin( other.last );
+				other.first:reuse;
+				other.last:reuse;
+				other.current:reuse;  -- go front
+			}
+		}
+
+		empty? ()( bool yes )
+		{
+			ao.first:null?()( yes );
+		}
+
+		go_front [upd]  -- before first
+		{
+			ao.current:reuse;
+		}
+
+		go_first [upd]
+		{
+			if ( "not_null?( ao.first )" ) ao.current:reuse:begin( ao.first );
+		}
+
+		go_last [upd]
+		{
+			if ( "not_null?( ao.last )" ) ao.current:reuse:begin( ao.last );
+		}
+
+		go_next [upd]
+		{
+			if ( "null?( ao.current )" )
+			{
+				if ( "not_null?( ao.first )" ) ao.current:reuse:begin( ao.first );
+			}
+			else
+			{
+				ao.current:deref[const]:get_link()( link<node1> ln ); 
+				if ( "not_null?( ln )" ) ao.current:reuse:begin( ln );
+			}
+		}
+
+		go_here [upd]( link<node1> ln )  
+		{
+			ao.current:reset:begin( ln );
+		}
+		
+		
+		get_first ()( link<node1> ln )
+		{
+			if ( "not_null?( ao.first )" ) ln:begin( ao.first );
+		}
+
+		get_last ()( link<node1> ln )
+		{
+			if ( "not_null?( ao.last )" ) ln:begin( ao.last );
+		}
+
+		get_current ()( link<node1> ln )
+		{
+			if ( "not_null?( ao.current )" ) ln:begin( ao.current );
+		}
+
+		get_next ()( link<node1> ln ) 
+		{
+			if ( "not_null?( ao.current )" ) ao.current:deref[const]:get_link()( ln );
+		}
+
+
+		insert [upd]( link<node1> ln )  -- after current  
+		{
+			ln:deref:unlink;  -- just in case
+			if ( "not_null?( ao.current )" )  
+			{
+				-- after current
+				ao.current:deref:get_link()( link<node> before ):set_link( ln ); 
+				if ( "null?( before )" )
+					ao.last:reuse:begin( ln )
+				else
+					ln:deref:set_link( before );
+			}
+			else if ( "not_null?( ao.first )" )
+			{
+				-- front (before first)
+				ln:deref:set_link( ao.first );
+				ao.first:reuse:begin( ln );
+			}
+			else 
+			{
+				-- first and only node
+				ao.first:begin( ln );
+				ao.last:begin( ln );
+			}
+		}
+	
+		remove_next [upd]
+		{
+			if ( "not_null?( ao.current )" ) 
+			{
+				-- node after current
+				ao.current:deref:get_link()( link<node1> next );
+				if ( "not_null?( next )" ) 
+				{
+					next:deref:get_link()( link<node1> next_next ):unlink;
+					if ( "null?( next_next )" )
+						ao.last:reuse:begin( ao.current ) -- new last
+					else 
+						ao.current:deref:set_link( next_next );
+				}
+			}
+			else if ( "not_null?( ao.first )" ) 
+			{
+				-- first node
+				ao.first:deref:get_link()( link<node> next_next ):unlink;
+				if ( "null?( next_next )" )
+				{
+					-- list is empty now
+					ao.first:reuse;
+					ao.last:reuse;
+				}
+				else
+				{
+					ao.first:reuse:begin( next_next );  -- new first
+				}
+			}
+		}
+	}
+
+
+	general method  -- typed nodes: complete <t> derived from node1
+	{
+		insert<t> [upd] with make ()( <t> )  -- after current
+		{
+			link<node1> ln:begin<<t>>;
+			make()( ln:deref:as_actual<<t>> );
+			ao:insert( ln );
+		}
+		
+		copy_next_eval<t> ()( <t> next )  -- null possible
+		{
+			ao:get_next()( link<node1> ln );
+			if ( "not_null?( ln )" ) next:begin( ln:deref:as<<t>> );
+		}
+
+		copy_next_upd<t> ()( <t> next )  -- null possible
+		{
+			ao:get_next()( link<node1> ln );
+			if ( "not_null?( ln )" ) next:begin( *ln:deref:as<<t>> );
+		}
+
+		current<t> = <t> proxy [init] ~n   -- void possible
+		{
+			if ( "not_null?( ao.current )" ) ~n -> ao.current.deref:as_actual<<t>>;
+		}
+	}
+
+
+	abstract in serial_access<node1><list_cursor>
+	{
+		[final] ~open_cursor ( int step )( list_cursor c )
+		{	
+			if ( "step |=| one" ) c:begin( ao.first ) else c:begin;
+		}  
+
+		[final] ~move_cursor ( list_cursor c [upd] )
+		{
+			c:move;
+		}
+
+		[final] ~flip_cursor ( list_cursor c [upd] )
+		{
+			c:flip;
+		}
+
+		[final] ~object ( list_cursor c ) = node1 proxy ~o   
+		{
+			~o -> c:object;
+		}
+	}
+	
+	instance
+	{
+		link<node1> first   [opt];
+		link<node1> last    [opt];
+		link<node1> current [opt];  
+	}
+	
+}
+
+
+type lifo_list<t> from single_link_list  -- typed stack
+{{
+	<t> derived from node1
+
+	insert (push) and remove (pull) where front node is
+	always current.
+
+	NOTE!  Implementation assumes current node starts at
+	front and doesn't change.  Application must restore
+	current node if base methods are called. 
+
+	Example usage:
+
+	nom type thing_stack = lifo_list< <thing>node1 >;
+
+	suboutine init_thing (( int, int, int ))()( thing );
+
+	thing_stack my_stack:begin;
+
+	my_stack:push<thing> with init_thing (( a, b, c ));
+
+	my_stack:pull_const()( thing t );
+	my_stack:pull_var()( thing t );
+	my_stack:pull;
+	
+}}
+{
+	general method
+	{
+		begin
+		{
+			ao:base<single_link_list>:begin;
+		}
+
+		push with make ()( <t> node )
+		{
+			ao:insert with make ()( node );  
+		}
+
+		pull_eval [upd] ()( <t> node )  -- eval copy
+		{
+			ao:copy_next_eval()( node ):remove_next;
+		}
+
+		pull_upd [upd] ()( <t> node )  -- upd copy
+		{
+			ao:copy_next_upd()( node ):remove_next;
+		}
+
+		pull [upd] -- no copy
+		{
+			ao:remove_next;
+		}
+	}
+}
+
+
+type fifo_list<t> from single_link_list  -- typed queue
+{{
+	<t> derived from node1
+
+	insert last node (push) and remove first node (pull).
+
+	Example usage:
+
+	nom type thing_queue = fifo_list< <thing>node1 >;
+
+	suboutine init_thing (( int, int, int ))()( thing );
+
+	thing_queue my_queue:begin;
+	my_queue:push<thing> with init_thing (( a, b, c ));
+	my_queue:pull_const()( thing t );
+	my_queue:pull_var()( thing t );
+	my_queue:pull;
+	
+}}
+{
+	general method
+	{
+		begin
+		{
+			ao:base<single_link_list>:begin;
+		}
+
+		push [upd] with make ()( <t> node )
+		{
+			ao:go_last:insert with make ()( node );  
+		}
+
+		pull_eval [upd] ()( <t> node )  -- eval copy
+		{
+			ao:go_front:copy_next_eval()( node ):remove_next;
+		}
+
+		pull_upd [upd] ()( <t> node )  -- upd copy
+		{
+			ao:go_front:copy_next_upd()( node ):remove_next;
+		}
+
+		pull [upd]  -- no copy
+		{
+			ao:go_front:remove_next;
+		}
+	}
+}
+
+
+
+
