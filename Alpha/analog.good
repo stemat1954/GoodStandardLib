@@ -1,5 +1,5 @@
 
-page analog in alpha@pragma
+page analog in alpha@good
 
 
 type analog  -- intrinsic,restricted
@@ -14,7 +14,7 @@ type analog  -- intrinsic,restricted
 	analog captures the proxy's state at the point of 
 	creation and it may change.
 
-	There are no :begin methods.  The HPM initializes an
+	There are no :begin methods.  The HGM initializes an
 	analog when it's created.
 }}
 {

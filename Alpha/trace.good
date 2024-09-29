@@ -1,5 +1,5 @@
 
-page trace in alpha@pragma
+page trace in alpha@good
 
 
 type trace -- instrisic,restricted
@@ -11,7 +11,7 @@ type trace -- instrisic,restricted
 
 	Trace objects are created by the compiler when an
 	application quits.  If an application specifies an 
-	object type in the quit	expression, the HPM creates
+	object type in the quit	expression, the HGM creates
 	the specified object and attaches it to the trace
 	object along with the location info.
 

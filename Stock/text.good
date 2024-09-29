@@ -1,5 +1,5 @@
 
-page text in stock@pragma
+page text in stock@good
 
 
 enum type match_mode ( 'exact', 'similar', 'regex' );

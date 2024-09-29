@@ -1,5 +1,5 @@
 
-page utc in alpha@pragma
+page utc in alpha@good
 
 
 common double<int> utc_origin [const];	

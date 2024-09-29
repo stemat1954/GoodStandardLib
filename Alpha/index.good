@@ -1,5 +1,5 @@
 
-page index in alpha@pragma
+page index in alpha@good
 
 type <t>index  -- intrinsic, restricted
 {{
@@ -7,9 +7,9 @@ type <t>index  -- intrinsic, restricted
 	definitions and select expressions.
 
 	indexes are allocated in common storage and auto-
-	matically initialized at startup by the HPM using an
-	associated pragma object that defines individual
-	mappings from <t> to int for every item in the index.
+	matically initialized at startup by the HGM using an
+	associated object that defines individual mappings 
+	from <t> to int for every item in the index.
 	The <t> values must be unique and rankable using 
 	standard method :before?;
 	

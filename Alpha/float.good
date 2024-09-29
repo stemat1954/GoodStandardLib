@@ -1,5 +1,5 @@
 
-page float in alpha@pragma
+page float in alpha@good
 
 
 nom type fp2 = fp<'2'>;

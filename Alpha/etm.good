@@ -1,5 +1,5 @@
 
-page etm in alpha@pragma
+page etm in alpha@good
 
 common etm max_etm:begin( 'max' ) [const];
 

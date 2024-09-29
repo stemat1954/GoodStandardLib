@@ -1,5 +1,5 @@
 
-page fault in alpha@pragma
+page fault in alpha@good
 
 
 enum type fault_category ( 'bug', 'format', 'value', 'access', 'resource', 'platform', 'system' );
