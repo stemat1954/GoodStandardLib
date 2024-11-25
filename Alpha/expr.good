@@ -7,7 +7,7 @@ type expr -- intrinsic, conventional
 	An expr is a source code literal.
 		
 	Exprs are ascii character strings that have no inherent 
-	meaning in Pragma.  Applications use exprs to define 
+	meaning in Good.  Applications use exprs to define 
 	object values, define tokens, identify external formats,
 	and to otherwise create lexical elements that can be
 	expressed in source code.
@@ -53,12 +53,12 @@ type expr -- intrinsic, conventional
 	expressions, documenting or publishing the syntax and
 	semantics.  
 		
-	The Pragma compiler doesn't know anything about	expr
+	The Good compiler doesn't know anything about	expr
 	syntax or semantics, so object methods take over the
 	task of parsing and compilation.  Expr errors are
 	generally runtime, not compile-time, errors.
 
-	Note:  However, the Pragma compiler is capable of
+	Note:  However, the Good compiler is capable of
 	executing certain :begin( expr ) methods at compile
 	time to pre-initialize objects and catch failures.
 

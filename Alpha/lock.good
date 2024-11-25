@@ -131,9 +131,9 @@ type lock
 	for globally significant failures, option (2) is a 
 	simple and effective way to deal with this problem.
 
-	Note: Pragma types will only quit when runtime
+	Note: Good types will only quit when runtime
 	system resources are depleted, provided the app-
-	lication is	properly coded.  However, most Pragma
+	lication is	properly coded.  However, most Good
 	types have built-in integrity checks (bug checks)
 	that can cause disruption.  Thus, in effect, residual
 	bugs are global application failures.  

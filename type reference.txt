@@ -22,10 +22,9 @@ general method
 
 	reuse [term];	 
 
+	is<t>? [eval]()( bool );  
 
 	base<t> [eval] = <t> proxy [eval,upd,init];	-- special attribution for internal use 
-
-	is<t>? [eval]()( bool );  
 
 	as<t> [eval]= <t> proxy [eval,upd];	
 

@@ -15,7 +15,7 @@ type bool  -- elementary, intrinsic, compatible, conventional
 {{
 	A bool object encapsulates a boolean logic value.
 		
-	Type bool has special status in Pragma.  bool objects 
+	Type bool has special status in Good.  bool objects 
 	are evaluated in executable forms to control execution.
 
 	A bool can be initialized with a literal vex of	'true'

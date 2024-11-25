@@ -36,7 +36,7 @@ type fp< # > -- elementary, compatible (fp2), conventional
 
 	NARRATIVE PENDING...
 
-	what does Pragma guarantee about conversion 
+	what does Good guarantee about conversion 
 	to int and decomposition into parts?  Hmmm
 
 	conversion is subject to quit-fail and app

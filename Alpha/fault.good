@@ -9,7 +9,7 @@ enum type fault_category ( 'bug', 'format', 'value', 'access', 'resource', 'plat
 		Use 'bug' to categorize invalid inputs and logical 
 		inconsistencies.  In a perfect world, bugs will
 		never occur in a tested app, but of course, this
-		is rarely true in reality.	Pragma does not have
+		is rarely true in reality.	Good does not have
 		any provision for removing bug-related quits
 		(no provision for debug/release builds).
 

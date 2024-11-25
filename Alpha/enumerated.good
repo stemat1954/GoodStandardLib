@@ -27,7 +27,7 @@ type enumerated  -- intrinsic
 	Some enumerated types may define arithmetic and other 
 	int relationships between objects.  
 		
-	Pragma enum type definitions are translated into general
+	Good enum type definitions are translated into general
 	enumerated subtypes.  Alpha type ascii is also an enum-
 	erated subtype.  
 	

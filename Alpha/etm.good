@@ -32,7 +32,7 @@ type etm  -- conventional
 
 	Note:  Time ticks are assumed to have 63 bits of 
 	unsigned precision.  Etms have 64 bits of signed
-	precision.  All Pragma implementations support no
+	precision.  All Good implementations support no
 	less than 32 bits of int precision, but some may
 	support no more than 32 bits.
 

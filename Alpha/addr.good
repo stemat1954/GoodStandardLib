@@ -15,7 +15,7 @@ type addr 	-- compatible
 	An application can originate an addr using default
 	:begin.  These addresses are recognized	as undefined
 	by compatible subroutines which cannot otherwise recog-
-	nize a Pragma null object.
+	nize a Good null object.
 		
 	Once initialized, an addr can't be modified.
 
