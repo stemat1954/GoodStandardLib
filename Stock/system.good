@@ -10,12 +10,12 @@ type system
 	{
 		begin 
 		{
-			ao.console:begin;  -- system console
+			io.console:begin;  -- system console
 		}
 
 		console = console proxy [upd] ~c
 		{
-			~c -> ao.console;
+			~c -> io.console;
 		}
 	}
 

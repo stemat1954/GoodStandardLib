@@ -4,9 +4,9 @@
 Universal methods are special methods that can
 can be called for any object.  They're intrinsic
 to the language and have special status because
-they evaluate the otherwise internal representation
-of objects.  In particular, universal methods can be
-called for null objects without causing disruption.
+they evaluate construction of an object rather
+than it's value. In particular, universal methods
+can be called for null objects without causing disruption.
 
 Note:  The compiler may reject certain calls if
 it can determine that a runtime result will be moot.
@@ -14,43 +14,36 @@ it can determine that a runtime result will be moot.
 
 general method
 {
-	null? [eval]()( bool );
+	is_null? [eval]()( bool );
 
-	not_null? [eval]()( bool );
+	is_not_null? [eval]()( bool );
 
-	typename [eval] = typename proxy [eval];   
+	use_typename [eval] = typename proxy [eval];   
+
+	use_handle [eval] = handle proxy [eval];
 
 	reuse [term];	 
 
-	is<t>? [eval]()( bool );  
+	is<t>? [eval]()( bool );  runtime
 
-	base<t> [eval] = <t> proxy [eval,upd,init];	-- special attribution for internal use 
+	as<t> [eval]= <t> proxy [eval,upd];	-- runtime, may be void
 
-	as<t> [eval]= <t> proxy [eval,upd];	
+	as_base<t> [eval] = <t> proxy [eval,upd]; -- verified at compile-time, [init] access when called from fraternal method
 
-	as_actual<t> [eval] = <t> proxy [init];
+	as_actual<t> [eval] = <t> proxy [init];  -- runtime, may be void
 }
 
 
-Generic methods are sub-object type translation methods.
+:as_base<t> is a "static" type translation that can
+be verified at compile time.  It's used to resolve a
+specific external sub-object when inheritance rules
+would otherwise hide a base method, or when the 
+programmer wants to call an abstract method non-
+virtually, or when an external subobject :begin or
+:reuse method needs to be called from a fraternal 
+method in a subtype.  In the latter case, the result
+proxy has [init] access.
 
-:base<t> is a "static" translation that can be verified
-at compile time.  It's used to resolve a typed base 
-sub-object when inheritance rules would otherwise
-hide a base type method, or when the programmer
-wants to make intent clear.  In particular, :base<t>
-is often used to call :begin for instance sub-objects,
-and to call a particular base method in an adaptable
-type hierarchy.
-
-The other type translation methods are "dynamic" 
-translation methods that only have pratical use
-when the lead object is referenced by proxy.  
-In effect, they are proxy conversion methods. 
-When the lead object is a direct (static) reference
-to an object, the dynamic translation methods revert
-to static (base) translations that can be verified
-and optimized.
 
 A proxy has an internal double-link representation
 that can generally point to two sub-objects. 

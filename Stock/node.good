@@ -31,29 +31,29 @@ type node
 	instead.
 }}
 {
-	nom type link_set = array< link<node> >;
+	nom type link_set = array< linked<node> >;
 
 	general method
 	{
 		begin ( int dim [opt] )
 		{
-			ao.link_set:begin( dim );
+			io.link_set:begin( dim );
 		}
 
-		get_link ( int i )( link<node> nl )
+		get_link ( int i )( linked<node> nl )
 		{
-			nl:begin( ao.link_set:object( i ) );
+			nl:begin( io.link_set:use( i ) );
 		}
 
-		set_link [upd]( int i, link<node> nl )
+		set_link [upd]( int i, linked<node> nl )
 		{
-			ao:make_room( i );
-			ao.link_set:object( i ):reuse:begin( nl );
+			io:make_room( i );
+			io.link_set:use( i ):reuse:begin( nl );
 		}
 
 		unlink [upd]( int i )
 		{
-			ao.link_set:object( i ):reuse;
+			io.link_set:use( i ):reuse;
 		}
 	}
 
@@ -61,9 +61,9 @@ type node
 	{
 		make_room [upd]( int i )
 		{
-			ao.link_set:count()( int q );
+			io.link_set:count()( int q );
 			i:sub( q )( =int ):add( one )( int need );
-			if ( "need |>| zero" ) ao.link_set:insert( q, need )
+			if ( "need |>| zero" ) io.link_set:insert( q, need )
 		}
 	}
 
@@ -89,29 +89,29 @@ type node<#>
 	alternative.
 }}
 {
-	nom type link_set = tuple<<#>>< link<node<<#>>>;
+	nom type link_set = tuple<<#>>< linked<node<<#>>>;
 
 	general method
 	{
 		begin  -- all links null
 		{
-			ao.link_set:begin;  -- all links null
+			io.link_set:begin;  -- all links null
 		}
 
-		get_link ( int i )( link<node<<#>>> nl ) 
+		get_link ( int i )( linked<node<<#>>> nl ) 
 		{
-			ao.link_set:object( i ) ~nl;
+			io.link_set:use( i ) ~nl;
 			if ( "not_null?( ~nl )" ) nl:begin( ~nl );
 		}
 
-		set_link [upd](int i, link<node<<#>>> nl )
+		set_link [upd](int i, linked<node<<#>>> nl )
 		{
-			ao.link_set:object( i ):reuse:begin( nl );
+			io.link_set:use( i ):reuse:begin( nl );
 		}
 
 		unlink [upd]( int i )
 		{
-			ao.link_set:object( i ):reuse;
+			io.link_set:use( i ):reuse;
 		}
 	}
 
@@ -152,14 +152,14 @@ type <t>node<#> from ( <t>, node<<#>> )
 	{
 		begin
 		{
-			ao:base<node<<#>>>:begin;
-			ao:base<<t>>:begin;
+			io:as_base< node<<#>> >:begin;
+			io:as_base< <t> >:begin;
 		}
 
 		begin with make ()( <t> )
 		{
-			ao:base<node<<#>>>:begin;
-			make()( ao:base<<t>> );
+			io:as_base< node<<#>> >:begin;
+			make()( io:as_base< <t> > );
 		}
 	}
 }
@@ -171,7 +171,7 @@ type node1
 	A node1 is a specialized one-way node.
 }}
 {
-	nom type link = link<node1>;
+	nom type link = linked<node1>;
 
 	general method
 	{
@@ -179,19 +179,19 @@ type node1
 		{
 		}
 
-		get_link ()( link<node1> nl )
+		get_link ()( linked<node1> nl )
 		{
-			if ( "not_null?( ao.link )" ) nl:begin( ao.link );
+			if ( "not_null?( io.link )" ) nl:begin( io.link );
 		}
 
-		set_link [upd]( link<node1> nl )
+		set_link [upd]( linked<node1> nl )
 		{
-			ao.link:reuse:begin( nl );
+			io.link:reuse:begin( nl );
 		}
 
 		unlink [upd]
 		{
-			ao.link:reuse;
+			io.link:reuse;
 		}
 	}
 
@@ -213,14 +213,14 @@ type <t>node1 from ( <t>, node1 )
 	{
 		begin
 		{
-			ao:base<node1>:begin;
-			ao:base<<t>>:begin;
+			io:as_base<node1>:begin;
+			io:as_base<<t>>:begin;
 		}
 
 		begin with make ()( <t> )
 		{
-			ao:base<node1>:begin;
-			make()( ao:base<<t>> );
+			io:as_base<node1>:begin;
+			make()( io:as_base<<t>> );
 		}
 	}
 }

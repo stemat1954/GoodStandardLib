@@ -59,7 +59,6 @@ type ascii from enumerated
 	120  'x'   'y'	'z'   '{'   '|'   '}'   '~'   'DEL'	
 
 
-
 	Standard printable characters have labels that print as
 	the character they label (e.g. the label for character A 
 	is 'A').
@@ -73,9 +72,9 @@ type ascii from enumerated
 	extended character 255 is '^255' and how it prints is
 	device dependent).
 
-	Most classification methods apply only to standard char-
-	acters. That is, they'll never indicate a true condition
-	for extended characters.
+	Most classification methods apply only to standard 
+	characters. That is, they'll never indicate a true 
+	condition for extended characters.
 		
 	select ( c ) -- type ascii
 	{
@@ -108,47 +107,47 @@ type ascii from enumerated
 
 	general	
 	{
-		begin ( expr label );			-- vex  
+		begin ( expr label );	-- vex  
 
-		begin ( int code );				-- enum value
+		begin ( int code );		-- enum value
 		
-		begin ( ascii other );			-- copy
+		begin ( ascii other );	-- copy
 
 		begin ( message [upd], expr fex )()( extra );	--fread
 
 		fwrite ( message [upd], expr fex )()( extra );
 
 
-		equal? ( ascii other )( bool ) ;
+		is_equal? ( ascii other )( bool ) ;
 
-		before? ( ascii other )( bool );
+		is_before? ( ascii other )( bool );
 
 
-		label = expr proxy [eval];
+		use_label = expr proxy [eval];
 
-		standard? ()( bool );		-- not extended
+		is_standard? ()( bool );		-- not extended
 
-		extended? ()( bool );		-- not standard
+		is_extended? ()( bool );		-- not standard
 
-		control? ()( bool );		-- not printable, not space
+		is_control? ()( bool );			-- not printable, not space
 
-		letter? ()( bool );			-- either case
+		is_letter? ()( bool );			-- either case
 
-		uc_letter? ()( bool );		-- uppercase
+		is_uc_letter? ()( bool );		-- uppercase
 
-		lc_letter? ()( bool );		-- lowercase
+		is_lc_letter? ()( bool );		-- lowercase
 
-		bin_digit? ()( bool );		-- 0-1
+		is_bin_digit? ()( bool );		-- 0-1
 
-		dec_digit? ()( bool );		-- 0-9
+		is_dec_digit? ()( bool );		-- 0-9
 
-		hex_digit? ()( bool );		-- 0-9 aA-fF
+		is_hex_digit? ()( bool );		-- 0-9 aA-fF
 
-		punctuation? ()( bool );	-- !"#%&'()*,-./:;?@[\]_{}
+		is_punctuation? ()( bool );		-- !"#%&'()*,-./:;?@[\]_{}
 
-		symbol? ()( bool );			-- $+-<>^!|~
+		is_symbol? ()( bool );			-- $+-<>^!|~
 
-		in? ( expr )( bool );
+		is_in? ( expr )( bool );
 
 	}
 }

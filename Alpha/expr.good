@@ -53,7 +53,7 @@ type expr -- intrinsic, conventional
 	expressions, documenting or publishing the syntax and
 	semantics.  
 		
-	The Good compiler doesn't know anything about	expr
+	The Good compiler doesn't know anything about expr
 	syntax or semantics, so object methods take over the
 	task of parsing and compilation.  Expr errors are
 	generally runtime, not compile-time, errors.
@@ -69,7 +69,8 @@ type expr -- intrinsic, conventional
 	text.  See stock\text for a general solution.
 
 	Several methods are provided for expr analysis: 
-	:length, :equal? and :before?, :read, :find and :scan.
+	:count, :is_equal? and :is_before?, :extract, :find,
+	and :scan.
 	
 	:extract methods extract ascii character objects. See
 	alpha\ascii for details.
@@ -96,25 +97,27 @@ type expr -- intrinsic, conventional
 {
 	general 	
 	{
-		begin ( direct_access<ascii> );			-- synthetic
+		begin ( array<ascii> );  -- synthetic
 
-		begin ( serial_access<ascii> );			-- synthetic
+		begin ( direct_access<ascii> );	-- synthetic
 
-		begin ( expr other );					-- copy
+		begin ( serial_access<ascii> );	-- synthetic
 
-		begin ( message [upd], expr fex );		-- fread
+		begin ( expr other );	-- copy
+
+		begin ( message [upd], expr fex );	-- fread
 
 		fwrite ( message [upd], expr fex ) ;
 
-		equal? ( expr other, int q [opt] )( bool ); 
+		is_equal? ( expr other, int q [opt] )( bool ); 
 
-		before? ( expr other )( bool );
+		is_before? ( expr other )( bool );
 
-		length = int proxy [eval];
+		count ()( int );
 
-		extract ( int i, int q )( expr );			-- sub-expression
+		extract ( int i, int q )( expr );	-- sub-expression
 
-		extract ( int i )( ascii );					-- one char 
+		extract ( int i )( ascii );	 -- one char 
 
 		extract ( int i [opt], int q [opt] )( array<ascii> );  -- multiple chars
 

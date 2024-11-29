@@ -27,11 +27,11 @@ subroutine
 	is empty, output preq equals no_addr on return.
 }}
 {
-	channel_queue_create ( handle hs, handle hq [var] );
+	channel_queue_create ( handle hs, handle hq [upd] );
 
 	channel_queue_delete ( handle hq );
 
-	channel_queue_read ( handle hq, addr preq [var] );
+	channel_queue_read ( handle hq, addr preq [upd] );
 }
 
 

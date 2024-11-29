@@ -27,9 +27,9 @@ type console
 		{
 			kernel\console_identify( no_addr, *handle hcon:begin );
 			if ( "hcon |=| no_addr" ) quit ( 'platform', 'no system console' );
-			ao:configure( hcon )( text err );
+			io:configure( hcon )( text err );
 			if ( "not_null?( err )" ) quit ( 'platform', 'system console broken' );
-			ao.ready:begin( true );
+			io.ready:begin( true );
 		}
 
 		begin ( text name )( text error )  -- named console
@@ -41,44 +41,44 @@ type console
 			if ( "hcon |=| no_addr" )
 			{
 				error:begin:write( 'unknown console: ' ):write( name );
-				ao.ready:begin( false );
+				io.ready:begin( false );
 			}
 			else
 			{
-				ao:configure( hcon )( error );
-				ao.ready:begin( "null?( error )" );
+				io:configure( hcon )( error );
+				io.ready:begin( "null?( error )" );
 			}
 		}
 
 
 		make_text ()( text )  -- i/o compatible
 		{
-			if ( ao.ready ) @given\text:begin( ao.utf, ao.endian );
+			if ( io.ready ) @given\text:begin( io.utf, io.endian );
 		}
 	
 				
 		read [upd]( text input [upd], int q )( text error ) -- q chars
 		{
-			if ( ao.ready )
-				ao.channel:read( *input, q )( error )
+			if ( io.ready )
+				io.channel:read( *input, q )( error )
 			else
 				error:begin( not_ready );
 		}
 
 		read [upd]( text input [upd], unicode c )( text error ) -- delimiter c
 		{
-			if ( ao.ready )
-				ao.channel:read( *input, c )( error )
+			if ( io.ready )
+				io.channel:read( *input, c )( error )
 			else
 				error:begin( not_ready );
 		}
 
 		read_line [upd]()( text input, text error )
 		{
-			if ( ao.ready )
+			if ( io.ready )
 			{
-				ao:make_text()( input );
-				ao.channel:read( *input, ao.eol )( error );
+				io:make_text()( input );
+				io.channel:read( *input, io.eol )( error );
 			}
 			else
 				error:begin( not_ready );
@@ -87,8 +87,8 @@ type console
 
 		write [upd]( text output [upd] )( text error )  
 		{
-			if ( ao.ready )
-				ao.channel.write( *output )( error )
+			if ( io.ready )
+				io.channel.write( *output )( error )
 			else
 				error:begin( not_ready );
 		}
@@ -104,23 +104,23 @@ type console
 			
 			if ( "hch |not=| no_addr" )
 			{
-				ao.channel:begin( hch ); 
+				io.channel:begin( hch ); 
 
 				kernel\console_get_protocol( hcon, *int unit:begin, *word16 bom:begin, *int eol:begin );
 
 				select ( unit )
 				{
-					case ( '1' ) ao.utf:begin ( 'UTF-8' );
-					case ( '2' ) ao.utf:begin ( 'UTF-16' );
-					case ( '4' ) ao.utf:begin ( 'UTF-32' );
+					case ( '1' ) io.utf:begin ( 'UTF-8' );
+					case ( '2' ) io.utf:begin ( 'UTF-16' );
+					case ( '4' ) io.utf:begin ( 'UTF-32' );
 					else quit ( 'bug', 'unexpected code unit value' );
 				}
 
-				if ( "bom |=| 'x:FEFF'" ) ao.endian:begin ( 'big_endian' )
-				else if ( "bom |=| 'x:FFFE'" ) ao.endian:begin ( 'little_endian' )
+				if ( "bom |=| 'x:FEFF'" ) io.endian:begin ( 'big_endian' )
+				else if ( "bom |=| 'x:FFFE'" ) io.endian:begin ( 'little_endian' )
 				else if ( "bom |not=| 'x:0000'" ) quit ( 'bug', 'invalid byte order mark' );
 
-				ao.eol:begin( eol );
+				io.eol:begin( eol );
 			}
 			else 
 			{

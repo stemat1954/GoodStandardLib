@@ -12,14 +12,9 @@ common
 	endian	platform_endian [const];  
 	utf		platform_utf [const];
 
-	endian	default_endian;
-	utf		default_utf;    
-
-	begin;  -- set initial defaults to platform
+	endian	default_endian; 
+	utf		default_utf;
 }
-
-
-subroutine set_default_message_format ( endian [opt], utf [opt] );
 
 
 
@@ -258,16 +253,16 @@ type message
 
 	general 
 	{
-		begin ( endian [opt], utf [opt] );		-- original, common defaults
+		begin ( endian [opt], utf [opt] );	-- empty, defaults in common
 
-		begin ( message source [upd] );			-- move source
+		begin ( message other [upd] );	   -- take
 
-		begin ( message source );				-- copy source
+		begin ( message other );		   -- dup 
 
 
-		byte_order = endian proxy [eval];
+		use_endian = endian proxy [eval];
 
-		text_encoding = utf proxy [eval];
+		use_utf = utf proxy [eval];
 
 
 		attach [upd]( addr pmem, int size [opt] );

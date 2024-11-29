@@ -1,8 +1,6 @@
 
 page etm in alpha@good
 
-common etm max_etm:begin( 'max' ) [const];
-
 
 type etm  -- conventional
 {{
@@ -14,9 +12,9 @@ type etm  -- conventional
 	reference point in two directions.
 
 	Note:  Etms are used to express realtime synchro-
-	nization points such as timer periods and wait 
-	time-outs.  They're also used to express the diff-
-	erence between two realtime clock ticks (e.g utc).  
+	nization points such as timer periods and wait time-
+	outs.  They're also used to express the difference 
+	between two realtime clock ticks (e.g utc).  
 
 	Logically, an etm is a signed integer that has an
 	implicit unit of measure (millisec).  There are two
@@ -30,19 +28,18 @@ type etm  -- conventional
 	across various other time units. This makes etm 
 	convenient.
 
-	Note:  Time ticks are assumed to have 63 bits of 
-	unsigned precision.  Etms have 64 bits of signed
-	precision.  All Good implementations support no
-	less than 32 bits of int precision, but some may
-	support no more than 32 bits.
+	Note:  Time ticks are assumed to have 63 bits of un-
+	signed precision.  Etms have 64 bits of signed 
+	precision.  All Good implementations support no less
+	than 32 bits of int precision, but some may support
+	no more than 32 bits.
 
-	Formality notwithstanding, many if not most real
-	etms can be represented by an int.  :to_int 
-	converts the etm to an int if it can be represent-
-	ed.  Otherwise, the output is null.
+	Formality notwithstanding, many if not most real etms 
+	can be represented by an int.  :as_int returns access to
+	int etm if it exists.  Otherwise the result is void.
 
-	Note: Native subroutines require integer time-outs,
-	so this is one application of :to_int.
+	Note: Compatible subroutines require integer time-outs,
+	so this is one application of :as_int.
 
 	Basic integer arithmetic methods are provided as are
 	common numeric comparison methods.
@@ -68,24 +65,24 @@ type etm  -- conventional
 {
 	general 		
 	{
-		begin ( expr vex );					-- literal
+		begin ( expr vex );	 -- literal
 
 		begin ( int ms, int s [opt], int m [opt], int h [opt], int d [opt] );	-- synthetic
 
-		begin ( etm other );					-- dup
+		begin ( etm other );	-- copy
 
 		begin ( message [upd], expr fex );		-- fread	
 
 		fwrite ( message [upd], expr fex );	
 
-		equal? ( etm other )( bool );
+		is_equal? ( etm other )( bool );
 
-		before? ( etm other )( bool );
+		is_before? ( etm other )( bool );
 		
-		less? ( etm other )( bool );
+		is_less? ( etm other )( bool );
 	
 
-		as_int = int proxy [eval];	
+		as_int = int proxy [eval];	-- may be void
 
 		set [upd]( etm other );	
 

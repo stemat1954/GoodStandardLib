@@ -60,8 +60,8 @@ type indicator  -- restricted
 	:reset clears the release state.  This method is used
 	by types that don't automatically reset.
 
-	:handle returns the indicator's internal system resource
-	handle for transfer to kernel subroutines.
+	:use_handle returns the indicator's internal system
+	resource handle for transfer to kernel subroutines.
 }}
 {
 	general 
@@ -72,7 +72,7 @@ type indicator  -- restricted
 
 		reset [upd];
 
-		handle = handle proxy [eval];
+		use_handle = handle proxy [eval];
 	}
 }
 

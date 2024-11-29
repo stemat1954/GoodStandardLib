@@ -2,20 +2,10 @@
 page tuple in alpha@good
 
 
-nom type
-{
-	double<t> = tuple<'2'><<t>>;
-
-	triple<t> = tuple<'3'><<t>>;
-
-	quad<t> = tuple<'4'><<t>>;
-}
-
-
 
 type tuple<#><t> from direct_access<<t>>  -- compatible, conventional
 {{
-	A <#>tuple<t> is a fixed-size object set.
+	A tuple<#><t> is a fixed-size object array.
 
 	<#> is the symbolic tuple dimension. <t> is the symbolic
 	object type. The adhoc type must be a complete type.
@@ -37,38 +27,29 @@ type tuple<#><t> from direct_access<<t>>  -- compatible, conventional
 {
 	general 
 	{
-		begin;									-- all objects null
+		begin;	-- all objects null
 
-		begin ( <t> seed );						-- copy seed to all objects
+		begin ( <t> seed );	-- copy seed to all objects
 
-		begin ( tuple<<#>><<t>> other );		-- copy other  
+		begin ( tuple<<#>><<t>> other ); -- copy 
 		
 		begin ( message [upd], expr fex )()( extra ); -- fread
 
 		fwrite ( message [upd], expr fex )()( extra );
 	}
 
-	general -- disinherit
+	general -- similar in direct_access<<t>>
 	{
-		count ()( int n )
-		{
-			n:begin( <#> );
-		}
+		count ()( int n );
 
-		object ( int i ) = <t> proxy [eval,upd]; 
+		use ( int i ) = <t> proxy [eval,upd]; 
 	}
 
 	abstract in direct_access<<t>>
 	{
-		[final]	~count ()( int n )
-		{
-			n:begin( <#> );
-		}	
+		[final]	~count ()( int n );
 
-		[final] ~object ( int i ) = <t> proxy ~o
-		{
-			~o -> ao:object( i );
-		}
+		[final] ~use ( int i ) = <t> proxy;
 	}
 }
 

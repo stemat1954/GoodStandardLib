@@ -35,6 +35,68 @@ page dialect in stock@good
 
 
 
+common
+{
+	bool true:begin( 'true' ) [const];
+
+	bool false:begin( 'false' ) [const];
+
+	addr no_addr:begin [const];	 
+
+	etm max_etm:begin( 'max' ) [const];
+
+	handle no_handle:begin [const];		
+
+}
+	
+common fp2
+{
+	fp2_max:begin( 'max' ) [const];
+	-- MORE TBD
+}
+
+
+common fp10
+{
+	fp10_max:begin( 'max' ) [const];
+	-- MORE TBD
+}
+
+
+common int
+{
+	zero:begin( '0' ) [const];
+
+	one:begin( '1' ) [const];
+
+	neg_one:begin( '-1' ) [const];
+
+	max_int:begin( 'max' ) [const];
+
+	min_int:begin( 'min' ) [const];
+
+	-- more tbd
+}
+
+
+
+nom type
+{
+	double<t> = tuple<'2'><<t>>;
+	triple<t> = tuple<'3'><<t>>;
+	quad<t> = tuple<'4'><<t>>;
+
+	word1  = word<'1'>;		-- bit
+	word4  = word<'4'>;		-- nibble
+	word8  = word<'8'>;		-- byte
+	word16 = word<'16'>;	-- byte2
+	word32 = word<'32'>;	-- byte4
+	word64 = word<'64'>;	-- byte8
+
+}
+
+
+
 enum type sign ( 'positive', 'negative' );
 
 

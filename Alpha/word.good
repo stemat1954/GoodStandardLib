@@ -2,17 +2,6 @@
 page word in alpha@good
 
 
-nom type		-- standard word configurations
-{
-	word1  = word<'1'>;		-- bit
-	word4  = word<'4'>;		-- nibble
-	word8  = word<'8'>;		-- byte
-	word16 = word<'16'>;	-- byte2
-	word32 = word<'32'>;	-- byte4
-	word64 = word<'64'>;	-- byte8
-}
-
-
 type word<#> -- elementary, compatible (up to word32), conventional
 {{
 	A word is a generic multibit register.  It is an object-
@@ -85,13 +74,13 @@ type word<#> -- elementary, compatible (up to word32), conventional
 		fwrite ( message [upd], expr fex ) ;	
 		
 
-		equal? ( word<#> w )( bool );
+		is_equal? ( word<#> w )( bool );
 
-		before? ( word<#> w )( bool );
+		is_before? ( word<#> w )( bool );
 
-		less? ( word<#> w )( bool );
+		is_less? ( word<#> w )( bool );
 	
-		zero? ()( bool );
+		is_zero? ()( bool );
 	
 		and [upd]( word<#> w );							-- bitwise
 		and [eval]( word<#> w )( word<#> );

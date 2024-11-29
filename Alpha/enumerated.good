@@ -8,30 +8,20 @@ type enumerated  -- intrinsic
 	An enumerated object is associated with a unique
 	identical integer value.  The value must be greater
 	than or equal to zero, and it must uniquely identify
-	one, and only one, object in a set of the same 
-	enumerated type.
+	one, and only one object in a set of objects of the
+	same enumerated type.
 
-	Note:  Best practice is to assign ints contiguously
-	from zero.
+	Best practice is to assign ints contiguously from zero.
 
-	Note:  Technically, enumerated is a complete type, but
-	there's no point in instantiating an object	with an 
-	actual type of enumerated.
+	The good compiler fabricates and derives app enum types
+	from enumerated.
 
-	An enumerated object's int value can be used to 
-	efficiently compare and sort objects in lieu of type-
-	specific methods.  Applications convert the	object to
-	int using method :as_int and then use int methods to 
-	evaluate objects for equivalance and relative order.  
+	alpha types ascii and unicode are enumerated subtypes.
 
-	Some enumerated types may define arithmetic and other 
-	int relationships between objects.  
-		
-	Good enum type definitions are translated into general
-	enumerated subtypes.  Alpha type ascii is also an enum-
-	erated subtype.  
+	Technically, enumerated is a complete type, but there's
+	no point in instantiating an object	with an actual type
+	of enumerated.
 	
-	Application can define other enumerated subtypes.
 }}
 {
 	general 
@@ -40,4 +30,5 @@ type enumerated  -- intrinsic
 
 		as_int = int proxy [eval];
 	}
+
 }

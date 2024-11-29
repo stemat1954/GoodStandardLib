@@ -12,7 +12,7 @@ type disruption from direct_access<trace>  -- intrinsic, restricted
 	a trap block.
 
 	Every time an application quits, a trace is added to 
-	the	the disruption. 
+	the internal disruption object. 
 
 	Note:  See alpha\trace for details.
 		
@@ -28,29 +28,20 @@ type disruption from direct_access<trace>  -- intrinsic, restricted
 	exists, but trying to access a trace that does not
 	exist will fail.
 	
-	:trace and :count are immediate methods that avoid base
-	method abstraction.
-
 	A disruption is not portable. 
 }}
 {
-	general  -- disinherit
+	general  -- similar in direct_access<t>
 	{
-		count = int proxy [eval];
+		count ()( int );
 
-		object ( int i ) = trace proxy [eval]; 
+		use ( int i ) = trace proxy [eval]; 
 	}
 
 	abstract in direct_access<trace>
 	{
-		[final] ~count ()( int n )
-		{
-			ao:count()( n );
-		}
+		[final] ~count ()( int n );
 
-		[final] ~object ( int i ) = trace proxy ~t
-		{
-			~t -> ao:object( i );
-		}
+		[final] ~use ( int i ) = trace proxy;
 	}
 }

@@ -14,16 +14,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alpha", "Alpha", "{B85B8CE5
 		Alpha\disruption.good = Alpha\disruption.good
 		Alpha\entry.good = Alpha\entry.good
 		Alpha\enumerated.good = Alpha\enumerated.good
+		Alpha\enumerator.good = Alpha\enumerator.good
 		Alpha\etm.good = Alpha\etm.good
 		Alpha\expr.good = Alpha\expr.good
 		Alpha\extra.good = Alpha\extra.good
 		Alpha\fault.good = Alpha\fault.good
 		Alpha\float.good = Alpha\float.good
 		Alpha\handle.good = Alpha\handle.good
-		Alpha\index.good = Alpha\index.good
 		Alpha\indicator.good = Alpha\indicator.good
 		Alpha\int.good = Alpha\int.good
-		Alpha\link.good = Alpha\link.good
+		Alpha\linked.good = Alpha\linked.good
 		Alpha\lock.good = Alpha\lock.good
 		Alpha\matrix.good = Alpha\matrix.good
 		Alpha\message.good = Alpha\message.good
@@ -60,6 +60,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stock", "Stock", "{0A5181F7
 		Stock\text.good = Stock\text.good
 		Stock\text_channel.good = Stock\text_channel.good
 		Stock\toggle.good = Stock\toggle.good
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{A1583D7D-F03C-4F40-BDDF-61F98FFC8801}"
+	ProjectSection(SolutionItems) = preProject
+		Sample\good_entity.good = Sample\good_entity.good
 	EndProjectSection
 EndProject
 Global

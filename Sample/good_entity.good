@@ -1,0 +1,136 @@
+
+page good_entity in good_compiler@steveware
+
+
+{{
+	This page is a translation of original code written in C++ 
+	(good_entity.h and good_entity.cpp in Good compiler project).
+}}
+
+
+enum type permission ( 'eval', 'upd', 'init' );
+
+enum type visibility ( 'internal', 'fraternal', 'external' );
+
+enum type opcode ( 'adhoc scan', 'adhoc copy' );
+
+
+nom type entity_array = alpha\array< linked<good_entity> >;
+
+nom type copy_record = stock\mapping< linked<good_entity> >to< linked<good_entity> >;
+
+
+
+type good_entity from descriptive
+{
+	general method
+	{
+		begin -- anon
+		{
+			io:as_base<descriptive>:begin;
+		}
+
+		begin ( good_name name, source_guid guid ) 
+		{
+			io:as_base<descriptive>:begin;
+			io.name:begin( name );
+			io.guid:begin( guid );
+		}
+
+		begin ( good_entity other )
+		{
+			io:as_base<descriptive>:begin;
+			if ( "is_not_null?( other.name )" ) io.name:begin( other.name );
+			if ( "is_not_null?( other.guid )" ) io.guid:begin( other.guid );
+		}
+
+		has_name? ()( bool yes )
+		{
+			io.name:is_not_null?()( yes );
+		}
+
+		use_name = good_name proxy [eval] ~name
+		{
+			~name -> io.name;
+		}
+
+		has_guid? ()( bool yes )
+		{
+			io.guid:is_not_null?()( yes );
+		}
+
+		use_guid = source_guid proxy [eval] ~guid
+		{
+			~guid -> io.guid;
+		}
+
+		copy ( copy_record [upd] )
+		{
+			io:~copy( *@given\copy_record );
+		}
+
+		review [upd] ( page_reviewer reviewer [upd], opcode )( bool ok )
+		{
+			io:~review( *reviewer, @given\opcode )( ok );
+		}
+	}
+
+
+	abstract method
+	{
+		~copy ( copy_record [upd] ) -- same name
+		{
+			quit fault ( 'bug', 'no adaptor' );
+		}
+
+		~copy ( good_name name, copy_record [upd] ) -- new name
+		{
+			quit fault ( 'bug', 'no adaptor' );
+		}
+
+		~review [upd] ( page_reviewer reviewer [upd], opcode )( bool ok )
+		{
+			ok:begin( true );  -- skip
+		}
+	}
+
+	
+	abstract method in descriptive
+	{
+		[new] ~get_descriptor ()( text )
+		{
+			@given\text.begin( 'entity' );
+		}
+
+		[new] ~get_description ()( text descr )
+		{
+			descr:begin:write( io:get_descriptor()( =text ) ); 
+
+			if ( "is_null?( io.name )" )
+				descr:write( '(anon)' )
+			else if ( "is_adhoc?( io.name )" ) 
+				descr:write( io.name:use_key )
+			else 
+				descr:write( io.name:get_sid()( =text ) );
+
+			if ( "is_not_null?( io.guid )" )
+				descr:write( '/' ):write( io.guid:get_page_name()( =text ) ):write( io.guid:get_spot()( =text ) );
+			
+			descr:write( ' ' ):fwrite( io:uid );
+
+			if ( "is_adhoc?( io.name )" ) descr:write( ' = ' ):write( io.name:use_comment );
+		}
+
+		[pwd] ~describe ( double<int> inset, text label, array<text> description [upd ] );
+
+	}
+
+
+	instance
+	{
+		good_name		name [opt];
+		source_guid		guid [opt];
+	}
+
+}
+

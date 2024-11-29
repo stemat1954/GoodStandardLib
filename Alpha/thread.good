@@ -50,13 +50,13 @@ type thread -- intrinsic
 
 		wait ( etm [opt] )( thread_state ); 
 
-		get_state ()( thread_state );
+		use_state = thread_state proxy [eval];
 
-		get_trace ()( trace );
+		use_trace = trace proxy [eval]; 
 
-		get_id ()( expr );
+		use_id = expr proxy [eval];
 
-		get_handle ()( handle );
+		use_handle = handle proxy [eval];
 	}
 }
 
@@ -68,18 +68,16 @@ subroutine
 
 	this_process_id = expr proxy [eval]; 
 
-	start_thread<ept> ( link<object> [opt] )( link<thread> ); 
+	start_thread<ept> ( linked<object> [opt] )( linked<thread> ); 
 	{{
 		This subroutine creates an entry point object of 
 		type <ept> which derives from alpha\entry, then 
 		calls adaptable entry method :run on a new thread,
-		forwarding the given p<object>. The entry point 
-		object is created in the new thread's local 
-		storage.
+		forwarding the given linked object. The entry point 
+		object is created in the new thread's local storage.
 
-		A pointer to a thread object that controls the
-		new thread returns in an output.
-		
+		A linked thread object that controls the new thread
+		is returned in an output.
 	}}
 }
 

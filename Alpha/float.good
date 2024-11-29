@@ -2,39 +2,22 @@
 page float in alpha@good
 
 
-nom type fp2 = fp<'2'>;
-nom type fp10 = fp<'10'>;
+{{
+	There are two elementary float types: fp2 (base 2)
+	and fp10 (base 10).  Their interfaces are similar
+	if not identical, but the type is not generic.  
+	
+	This page is a work in progress.  Eventually, there
+	should be two type defs on the page.
+}}
 
 
-common fp2
-{
-	fp2_max:begin( 'max' ) [const];
-	-- MORE TBD
-}
-
-
-common fp10
-{
-	fp10_max:begin( 'max' ) [const];
-	-- MORE TBD
-}
-
-
-
-type fp< # > -- elementary, compatible (fp2), conventional
+type fp_ -- elementary, compatible (fp2), conventional
 {{
 	fp is a generic floating point number type.
 		
-	<#> is the symbolic floating point radix.
 
-	Note: Only adhoc <#2> and <#10> are allowed. 
-	Applications should use the predefind synonyms for
-	adhoc type configuration.
-
-	Generic binary 'b' is supported for c compatability.
-
-
-	NARRATIVE PENDING...
+	THOUGHTS...
 
 	what does Good guarantee about conversion 
 	to int and decomposition into parts?  Hmmm
@@ -87,91 +70,92 @@ type fp< # > -- elementary, compatible (fp2), conventional
 
 	general
 	{
-		begin ( expr vex [opt] );			-- literal, default = 0
+		begin ( expr vex [opt] );	-- literal, default = 0
 
-		begin ( fp2 x );	
+		begin ( fp_ x );  -- copy same
 
-		begin ( fp10 x );
+		begin ( fp_ x );  -- copy conversion
 
-		begin ( message [upd], expr fex );	-- fread
+		begin<wt> ( <wt> w, expr fex );	-- fread from word
 
-		begin<wt> ( <wt> w, expr fex );		-- word conversion (direct read)
-
-		fwrite ( message [upd], expr fex );		
+		begin ( message [upd], expr fex );	-- fread from message
 
 		fwrite<wt> ( <wt> w [upd], expr fex );
 
-		equal? ( fp<#> x )( bool );
+		fwrite ( message [upd], expr fex );	
+
+
+		is_equal? ( fp_ x )( bool );
 		
-		before? ( fp<#> x )( bool );	
+		is_before? ( fp_ x )( bool );	
 
-		less? ( fp<#> x )( bool );
+		is_less? ( fp_ x )( bool );
 
-		precise? ( fp<#> u )( bool );
+		is_precise? ( fp_ u )( bool );
 
 		to_int ()( int n );	
 
-		ldv [upd]( fp<#> x );
+		set [upd]( fp_ x );  -- replace
 
-		add [upd]( fp<#> x );								
-		add [eval]( fp<#> x )( fp<#> );	
+		add [upd]( fp_ x );								
+		add [eval]( fp_ x )( fp_ );	
 
-		sub [upd]( fp<#> x );
-		sub [eval]( fp<#> x )( fp<#> );
+		sub [upd]( fp_ x );
+		sub [eval]( fp_ x )( fp_ );
 
-		mul [upd]( fp<#> x );
-		mul [eval]( fp<#> x )( fp<#> );		
+		mul [upd]( fp_ x );
+		mul [eval]( fp_ x )( fp_ );		
 
-		div [upd]( fp<#> x );
-		div [eval]( fp<#> x )( fp<#> );
-		div [eval]( fp<#> x )( fp<#> q, fp<#> r );	--  q = "rpn( v/x )", r = "v - q * x" 
+		div [upd]( fp_ x );
+		div [eval]( fp_ x )( fp_ );
+		div [eval]( fp_ x )( fp_ q, fp_ r );	--  q = "rpn( v/x )", r = "v - q * x" 
 
-		rem [upd]( fp<#> x );								-- "v - ( rpn( v/x ) * x )" 
-		rem [eval]( fp<#> x )( fp<#> );		
+		rem [upd]( fp_ x );								-- "v - ( rpn( v/x ) * x )" 
+		rem [eval]( fp_ x )( fp_ );		
 
-		pow [upd]( fp<#> x );								-- v to x power
+		pow [upd]( fp_ x );								-- v to x power
 		pow [upd]( int n, int d );							-- v to (n/d) power 
-		pow [eval]( fp<#> x )( fp<#> );
-		pow [eval]( int n, int d )( fp<#> );
+		pow [eval]( fp_ x )( fp_ );
+		pow [eval]( int n, int d )( fp_ );
 
 		scl [upd]( int n );									-- "v * pow( #, n )"
-		scl [eval]( int n )( fp<#> );
+		scl [eval]( int n )( fp_ );
 
-		fma [upd]( fp<#> m, fp<#> b );						-- fused mul add 
-		fma [eval]( fp<#> m, fp<#> b )( fp<#> );
+		fma [upd]( fp_ m, fp_ b );						-- fused mul add 
+		fma [eval]( fp_ m, fp_ b )( fp_ );
 
-		dis [upd]( fp<#> x );								-- distance between v and x (abs diff)
-		dis [eval]( fp<#> x )( fp<#> );
+		dis [upd]( fp_ x );								-- distance between v and x (abs diff)
+		dis [eval]( fp_ x )( fp_ );
 
 		neg [upd];									
-		neg [eval]()( fp<#>);
+		neg [eval]()( fp_);
 
 		abs [upd];
-		abs [eval]()( fp<#> );
+		abs [eval]()( fp_ );
 
 		inc [upd];											--  v + epsilon
-		inc [eval]()( fp<#> );
+		inc [eval]()( fp_ );
 
 		dec [upd];											--  v - epsilon
-		dec [eval]()( fp<#> );
+		dec [eval]()( fp_ );
 
-		rpu [upd]( fp<#> u [opt] );							-- round to precision up	
-		rpu [eval]( fp<#> u [opt] )( fp<#> );
+		rpu [upd]( fp_ u [opt] );							-- round to precision up	
+		rpu [eval]( fp_ u [opt] )( fp_ );
 
-		rpd [upd]( fp<#> u [opt] );							-- round to precision down 
-		rpd [eval]( fp<#> u [opt] )( fp<#> );
+		rpd [upd]( fp_ u [opt] );							-- round to precision down 
+		rpd [eval]( fp_ u [opt] )( fp_ );
 
-		rpi [upd]( fp<#> u [opt] );							-- round to precision in
-		rpi [eval]( fp<#> u [opt] )( fp<#> );
+		rpi [upd]( fp_ u [opt] );							-- round to precision in
+		rpi [eval]( fp_ u [opt] )( fp_ );
 
-		rpo [upd]( fp<#> u [opt] );							-- round to precision out
-		rpo [eval]( fp<#> u [opt] )( fp<#> );
+		rpo [upd]( fp_ u [opt] );							-- round to precision out
+		rpo [eval]( fp_ u [opt] )( fp_ );
 		
-		rpn [upd]( fp<#> u [opt] );							-- round to precision near 
-		rpn [eval]( fp<#> u [opt] )( fp<#> );	
+		rpn [upd]( fp_ u [opt] );							-- round to precision near 
+		rpn [eval]( fp_ u [opt] )( fp_ );	
 
-		rpn [upd]( fp<#> u [opt] ) with rh ( fp<#> x, fp<#> u )( fp<#> );			-- co-routine for .5
-		rpn [eval]( fp<#> u [opt] )( fp<#> ) with rh ( fp<#> x, fp<#> u )( fp<#> );
+		rpn [upd]( fp_ u [opt] ) with rh ( fp_ x, fp_ u )( fp_ );			-- co-routine for .5
+		rpn [eval]( fp_ u [opt] )( fp_ ) with rh ( fp_ x, fp_ u )( fp_ );
 	}
 
 }

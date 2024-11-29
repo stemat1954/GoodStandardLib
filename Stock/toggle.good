@@ -36,17 +36,17 @@ type toggle
 	{
 		begin
 		{
-			ao.semaphore:begin( zero, one );
+			io.semaphore:begin( zero, one );
 		}
 
 		wait [upd]
 		{
-			ao.semaphore:add_wait( neg_one ); 
+			io.semaphore:add_wait( neg_one ); 
 		}
 
 		release [upd]
 		{
-			ao.semaphore:add_no_wait( one ); -- ignore output
+			io.semaphore:add_no_wait( one ); -- ignore output
 		}
 	}
 

@@ -3,8 +3,8 @@ page entry in alpha@good
 
 type entry [incomplete]
 /*
-	An entry is a base type for types that represent
-	application entry points.
+	An entry is a base type for types that represent app-
+	lication entry points.
 
 	:~run defines an application entry point.  Entry points
 	are called on concurrently executing threads.
@@ -21,14 +21,14 @@ type entry [incomplete]
 	Two signals are used to coordinate execution. :~run
 	should indicate active as soon as it's ready to interact
 	with other threads and it should continuously monitor 
-	stop, returning asap when indicated.  
+	stop, returning when indicated.  
 	
 	Generally, :~run should internally trap disruptions	and
 	define a given output trace if the thread is disrupted.
 
-	When the application starts a thread, it can pass a
-	global object of any type using a pointer. The object is
-	optional, and generally it's used for inter-thread
+	When the application starts a thread, it can pass a 
+	global object of any type using a link. A linked object
+	is optional, and generally it's used for inter-thread
 	communication. 
 	
 	Note:  An application's main entry point doesn't receive
@@ -40,9 +40,9 @@ type entry [incomplete]
 		begin;
 	}
 
-	abstract -- [tbd] in subtype
+	abstract -- [tbd] in subtype, not fundamental
 	{
-		~run ( signal active, signal stop, p<object> po [opt] )( trace );
+		~run ( signal active, signal stop, linked<object> lo [opt] )( trace );
 	}
 }
 

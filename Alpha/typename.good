@@ -47,11 +47,11 @@ type typename -- intrinsic
 
 		fwrite ( message [upd], expr fex );
 
-		is<t>? ()( bool );			-- iff actual <t>
+		is<t>? ()( bool );		-- iff actual <t>
 
-		equal? ( typename other )( bool );
+		is_equal? ( typename other )( bool );
 
-		before? ( typename other )( bool );
+		is_before? ( typename other )( bool );
 	}
 }
 

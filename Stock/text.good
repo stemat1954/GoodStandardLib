@@ -101,30 +101,30 @@ type text from message
 	{
 		begin ( utf f [opt], endian e [opt] )  -- original, empty
 		{
-			ao:base<message>:begin( e, f );
-			describe_utf( f )( ao.code_unit, ao.code_fex );
+			io:as_base<message>:begin( e, f );
+			describe_utf( f )( io.code_unit, io.code_fex );
 		}
 
 		begin ( text other [upd] )		-- var copy
 		{
 			other:get_encoding()( utf f, endian e );
-			ao:base<message>:begin( e, f );
+			io:as_base<message>:begin( e, f );
 
-			describe_utf( f )( ao.code_unit, ao.code_fex );
+			describe_utf( f )( io.code_unit, io.code_fex );
 
 			other:detach()( addr pmem, int size );
-			ao:attach( pmem, size );
+			io:attach( pmem, size );
 		}
 
 		begin ( text other )			-- const copy
 		{
 			other:get_encoding()( utf f, endian e );
-			ao:base<message>:begin( e, f );
+			io:as_base<message>:begin( e, f );
 
-			describe_utf( f )( ao.code_unit, ao.code_fex );
+			describe_utf( f )( io.code_unit, io.code_fex );
 
-			ao:copy( other, zero ); -- all
-			ao:set_wp( zero );
+			io:copy( other, zero ); -- all
+			io:set_wp( zero );
 		}
 
 		begin ( expr source )			-- expr conversion
@@ -137,8 +137,8 @@ type text from message
 
 		get_encoding ()( utf f, endian e )
 		{
-			f:begin( ao:text_encoding );
-			e:begin( ao:byte_order );
+			f:begin( io:use_utf );
+			e:begin( io:use_endian );
 		}
 
 		compatible? ( text other [opt] )( bool yes ) -- compare to platform if other null
@@ -152,17 +152,17 @@ type text from message
 			}
 			else
 			{
-				~f -> other:text_encoding;
-				~e -> other:byte_order;
+				~f -> other:use_utf;
+				~e -> other:use_endian;
 			}
-			yes:begin( "ao:text_encoding |=| ~f" );
+			yes:begin( "io:use_utf |=| ~f" );
 			if ( "not( yes )" ) return;
-			yes:and( "ao:byte_order |=| ~e" );
+			yes:and( "io:use_endian |=| ~e" );
 		}
 
 		make ()( text t )		-- compatible
 		{
-			t:begin( ao:text_encoding, ao:byte_order );
+			t:begin( io:use_utf, io:use_endian );
 		}
 		
 
@@ -170,24 +170,24 @@ type text from message
 
 		import [upd]( int q, message m [upd] )
 		{
-			describe_utf( m:text_encoding )( null, expr m_fex );
-			ao:set_size( zero ):set_wp( zero );
+			describe_utf( m:use_utf )( null, expr m_fex );
+			io:set_size( zero ):set_wp( zero );
 			int q2:begin;
 			loop ( "q2 |<| q" )
 			{
 				m:fread<int>( m_fex )( int n );
-				ao:base<message>:fwrite<int>( n, ao.code_fex );
+				io:as_base<message>:fwrite<int>( n, io.code_fex );
 				q2:inc;
 			}
 		}
 
 		export [upd]( message m [upd] )
 		{
-			describe_utf( m:text_encoding )( null, expr m_fex );
-			ao:set_rp( zero );
+			describe_utf( m:use_utf )( null, expr m_fex );
+			io:set_rp( zero );
 			loop ( "not( rp_end?( ao ) )" )
 			{
-				ao:base<message>:fread<int>( ao.code_fex )( int n );
+				io:as_base<message>:fread<int>( io.code_fex )( int n );
 				m:fwrite<int>( n, m_fex );
 			}
 		}
@@ -195,12 +195,12 @@ type text from message
 		merge [upd]( text other [upd], int q [opt] )( int q2 )  -- using current pointers 
 		{
 			fix( q, int_max ) ~q;
-			describe_utf( other:text_encoding )( null, expr other_fex );
+			describe_utf( other:use_utf )( null, expr other_fex );
 			q2:begin;
 			loop ( "( q2 |<| ~q ) |and| not( rp_end?( other ) )" )
 			{
-				other:base<message>:fread<int>( other_fex )( int n );
-				ao:base<message>:fwrite<int>( n, ao.code_fex );
+				other:as_base<message>:fread<int>( other_fex )( int n );
+				io:as_base<message>:fwrite<int>( n, io.code_fex );
 				q2:inc;
 			}
 		}
@@ -216,7 +216,7 @@ type text from message
 			additional space for characters that are longer than one unit.
 		}}
 		{
-			ao:get_size()( int size ):set_size( "size + ao.code_unit" );
+			io:get_size()( int size ):set_size( "size + io.code_unit" );
 		}
 
 		reserve [upd]()( bool ok ) 
@@ -233,9 +233,9 @@ type text from message
 			not necessary.
 		}}
 		{
-			ao:get_size()( int size ):set_rp( "size - ao.code_unit" ):predict_next_rp()( int new_size ):set_rp( size ); 
+			io:get_size()( int size ):set_rp( "size - io.code_unit" ):predict_next_rp()( int new_size ):set_rp( size ); 
 			ok:begin( "new_size |>| size" );
-			if ( ok ) ao:set_size( new_size );
+			if ( ok ) io:set_size( new_size );
 		}
 
 
@@ -243,12 +243,12 @@ type text from message
 		 
 		add_zero [upd] 
 		{
-			ao:set_wp_end:write<int>( zero, ao.code_fex );
+			io:set_wp_end:write<int>( zero, io.code_fex );
 		}
 		
 		trim_zero [upd]
 		{
-			ao:set_rp( zero ):seek_chr<unicode>( zero, 'positive' ):set_size_rp;
+			io:set_rp( zero ):seek_chr<unicode>( zero, 'positive' ):set_size_rp;
 		}
 		
 			
@@ -256,63 +256,63 @@ type text from message
 
 		write [upd]( unicode c )
 		{
-			ao:write_chr( c );
+			io:write_chr( c );
 		}
 		
 		write [upd]( ascii c )
 		{
-			ao:write_chr( c );
+			io:write_chr( c );
 		}
 				
 		write [upd]( direct_access<unicode> s )
 		{
-			ao:write_str( s );
+			io:write_str( s );
 		}
 
 		write [upd]( direct_access<ascii> s )
 		{
-			ao:write_str( s );
+			io:write_str( s );
 		}
 
 		write<t> [upd]( serial_access<unicode><<t>> s )  -- <t> cursor type
 		{
-			ao:write_str( s );
+			io:write_str( s );
 		}
 		
 		write<t> [upd]( serial_access<ascii><<t>> s )  -- <t> cursor type
 		{
-			ao:write_str( s );
+			io:write_str( s );
 		}
 
 		write [upd]( expr e ) 
 		{
-			ao:write_str( e:extract()( =array<ascii> ) );
+			io:write_str( e:extract()( =array<ascii> ) );
 		}
 
 		write [upd]( text t ) -- compatible only
 		{
 			if ( "not( compatible?( ao, t ) )" ) quit fault ( 'bug', 'incompatible text' );
-			ao:base<message>:copy( t, null, zero ); -- all
+			io:as_base<message>:copy( t, null, zero ); -- all
 		}
 
 		write [upd]( text t [upd] ) -- any encoding
 		{
 			if ( "compatible?( ao, t )" ) 
-				ao:base<message>:copy( t, null, zero ); 
+				io:as_base<message>:copy( t, null, zero ); 
 			else
-				ao:merge( *t );
+				io:merge( *t );
 		}
 			
 		fwrite<t> [upd]( <t> x, expr fex [opt] )		-- single fex
 		{
 			fix( fex, 't' ) ~fex;	
-			ao:base<message>:fwrite<t>( x, ~fex );
+			io:as_base<message>:fwrite<t>( x, ~fex );
 		}
 
 		fwrite<t> [upd]( <t> x, expr fex [opt] )()( extra etc )  -- multiple fex
 		{
 			fix( fex, 't' ) ~fex;
-			ao:base<message>:fwrite<t>( x, ~fex )()( etc );
+			io:as_base<message>:fwrite<t>( x, ~fex )()( etc );
 		}
 							
 			
@@ -320,40 +320,40 @@ type text from message
 
 		read [upd]()( unicode c )
 		{
-			ao:read_chr()( c );
+			io:read_chr()( c );
 		}
 
 		read [upd]()( ascii c )  
 		{
-			ao:read_chr( c );
+			io:read_chr( c );
 		}
 
 		read [upd]( int q )( array<unicode> s )
 		{
-			ao:read_str( q )( s );
+			io:read_str( q )( s );
 		}
 
 		read [upd]( int q )( array<ascii> s )  
 		{
-			ao:read_str( q )( s );
+			io:read_str( q )( s );
 		}
 
 		fread<t> [upd]( expr fex [opt] )( <t> x )	-- single fex
 		{
 			fix( fex, 't' ) ~fex;
-			ao:base<message>:fread<t>( ~fex )( x );
+			io:as_base<message>:fread<t>( ~fex )( x );
 		}
 
 		fread<t> [upd]( expr fex [opt] )( <t> x )( extra etc ) -- multiple fex
 		{
 			fix( fex, 't' ) ~fex;
-			ao:base<message>:fread<t>( ~fex )( x )( etc );
+			io:as_base<message>:fread<t>( ~fex )( x )( etc );
 		}
 				
 		skip [upd]( expr pattern, match_mode [opt] )  -- strict (quits)
 		{
-			ao:copy_pattern( pattern )( text pattern2 );
-			ao:skip( *pattern2, @given\match_mode );
+			io:copy_pattern( pattern )( text pattern2 );
+			io:skip( *pattern2, @given\match_mode );
 		}
 		
 		skip [upd]( text pattern [upd], match_mode [opt] ) -- strict (quits)
@@ -363,20 +363,20 @@ type text from message
 			bool ok; int rp;
 			select ( ~mode )
 			{
-				case ( 'exact' )   ao:skip( *pattern )( ok, null, rp ) with exact_match?;
-				case ( 'similar' ) ao:skip( *pattern )( ok, null, rp ) with similar_match?;
-				case ( 'regex' )   ao:skip( *pattern )( ok, null, rp ) with regex_match?;
+				case ( 'exact' )   io:skip( *pattern )( ok, null, rp ) with exact_match?;
+				case ( 'similar' ) io:skip( *pattern )( ok, null, rp ) with similar_match?;
+				case ( 'regex' )   io:skip( *pattern )( ok, null, rp ) with regex_match?;
 			}
 			if ( ok:not ) quit fault ( 'format', 'skip pattern mismatch' );
-			ao:set_rp( rp );
+			io:set_rp( rp );
 		}
 
 		skip [upd]( text pattern [upd] )( bool ok, int q, int rp )  -- general
 		 with match? ( text pattern [upd], unicode, sign, expr fex )( bool )
 		{
 			if ( "not( compatible?( ao, pattern ) )" ) quit fault ( 'bug', 'incompatible pattern' );
-			ao:match( *pattern, 'positive' )( ok, q, rp ) with match?;  
-			if ( ok ) ao:set_rp( rp );
+			io:match( *pattern, 'positive' )( ok, q, rp ) with match?;  
+			if ( ok ) io:set_rp( rp );
 		}
 
 
@@ -392,7 +392,7 @@ type text from message
 				loop ( "( n2 |<| n ) |and| not( rp_end?( ao ) )" )
 				{	
 					n2:inc;
-					ao:inc_rp;
+					io:inc_rp;
 				}
 			}
 			else if ( "n |<| zero" )
@@ -400,25 +400,25 @@ type text from message
 				loop ( "( n2 |>| n ) |and| not( rp_end?( ao ) )" )
 				{	
 					n2:dec;
-					ao:dec_rp;
+					io:dec_rp;
 				}
 			}
 		}
 		
 		seek [upd]( ascii c, sign d [opt] )( bool ok )
 		{
-			ao:seek_chr( c, d )( ok );
+			io:seek_chr( c, d )( ok );
 		}
 
 		seek [upd]( unicode c, sign d [opt] )( bool ok )
 		{
-			ao:seek_chr( c, d )( ok );
+			io:seek_chr( c, d )( ok );
 		}
 
 		seek [upd]( expr pattern, sign d [opt], match_mode [opt] )( int q ) -- q = chars matched (zero = no match)
 		{
-			ao:copy_pattern( pattern )( text pattern2 );
-			ao:seek( *pattern2, d, @given\match_mode )( q );
+			io:copy_pattern( pattern )( text pattern2 );
+			io:seek( *pattern2, d, @given\match_mode )( q );
 		}
 
 		seek [upd]( text pattern [upd], sign d [opt], match_mode [opt] )( int q ) -- q = chars matched (zero = no match)
@@ -426,9 +426,9 @@ type text from message
 			fix( @given\match_mode, 'exact' ) ~mode;
 			select ( ~mode  )
 			{
-				case ( 'exact' )   ao:seek( *pattern, d )( q ) with exact_match?;
-				case ( 'similar' ) ao:seek( *pattern, d )( q ) with similar_match?;
-				case ( 'regex' )   ao:seek( *pattern, d )( q ) with regex_match?;
+				case ( 'exact' )   io:seek( *pattern, d )( q ) with exact_match?;
+				case ( 'similar' ) io:seek( *pattern, d )( q ) with similar_match?;
+				case ( 'regex' )   io:seek( *pattern, d )( q ) with regex_match?;
 			}
 		}
 			
@@ -439,12 +439,12 @@ type text from message
 			fix( d, 'positive' ) ~d;
 			loop 
 			{
-				ao:match( *pattern, ~d )( bool ok, q:reuse, int rp ) with match?;
+				io:match( *pattern, ~d )( bool ok, q:reuse, int rp ) with match?;
 
 				if ( ok ) return;
 				if ( "null?( rp )" ) return after q:reuse:begin( zero );
 
-				ao:set_rp( rp );  -- next unmatched char
+				io:set_rp( rp );  -- next unmatched char
 			}
 		}
 
@@ -493,22 +493,22 @@ type text from message
 	{
 		write_chr<t> [upd]( <t> c )  
 		{
-			c:fwrite( ao, 'code' )()( ao.code_fex );
+			c:fwrite( ao, 'code' )()( io.code_fex );
 		}
 
 		write_str<t> [upd]( direct_access<<t>> s ) 
 		{
-			for ( ~c in s ) ~c:fwrite( ao, 'code' )()( ao.code_fex );
+			for ( ~c in s ) ~c:fwrite( ao, 'code' )()( io.code_fex );
 		}
 
 		write_str<t><u> [upd]( serial_access<<t>><<u>> s ) 
 		{
-			for ( ~c in s ) ~c:fwrite( ao, 'code' )()( ao.code_fex );
+			for ( ~c in s ) ~c:fwrite( ao, 'code' )()( io.code_fex );
 		}
 
 		read_chr<t> [upd]()( <t> c )
 		{
-			ao:base<message>:fread<int>( ao.code_fex )( int n );
+			io:as_base<message>:fread<int>( io.code_fex )( int n );
 			c:begin( n );
 		}
 
@@ -518,7 +518,7 @@ type text from message
 			int q2:begin( q );
 			loop ( "( q2 |>| zero ) |and| not( rp_end?( ao ) )" ) 
 			{
-				ao:base<message>:fread<int>( ao.code_fex )( int n );
+				io:as_base<message>:fread<int>( io.code_fex )( int n );
 				s:insert:begin( n );
 				q2:dec;
 			}
@@ -527,7 +527,7 @@ type text from message
 		copy_pattern [upd]( expr x )( text t )
 		{
 			if ( "x:length |=| zero" ) quit fault ( 'bug', 'no pattern' );  
-			ao:make()( =t ):base<message>:fwrite<expr>( x, 't' );
+			io:make()( =t ):as_base<message>:fwrite<expr>( x, 't' );
 		}
 				
 
@@ -550,18 +550,18 @@ type text from message
 		{
 			if ( "d |=| 'positive'" ) pattern:set_rp( zero ) else pattern:set_rp_last;
 
-			ao:get_rp()( int mark );
+			io:get_rp()( int mark );
 			q:begin;
 
 			loop ( "not( rp_end?( ao ) )" )
 			{
 				unicode c;
 				if ( "d |=| 'positive'" )
-					ao:read_chr()( c )
+					io:read_chr()( c )
 				else
-					ao:get_rp()( int mark2 ):read_chr()( c ):set_rp( mark2 ):dec_rp;
+					io:get_rp()( int mark2 ):read_chr()( c ):set_rp( mark2 ):dec_rp;
 
-				match?( *pattern, c, d, ao.code_fex )( ok ); 
+				match?( *pattern, c, d, io.code_fex )( ok ); 
 				if ( "not_null?( ok )" ) escape;
 
 				q:inc; -- result pending
@@ -570,7 +570,7 @@ type text from message
 			if ( "null?( ok )" ) ok:begin( false );
 			else if ( ok ) q:inc; -- account for final match
 
-			ao:get_rp()( rp ):set_rp( mark );
+			io:get_rp()( rp ):set_rp( mark );
 		}
 
 
@@ -583,7 +583,7 @@ type text from message
 			{
 				loop
 				{
-					ao:base<message>:fread<int>( ao.code_fex )( int n )
+					io:as_base<message>:fread<int>( io.code_fex )( int n )
 					if ( "n |=| cn" ) return after ok:begin( 'true' );
 					if ( "rp_end?( ao )" ) return after ok:begin( 'false' );
 				}
@@ -592,10 +592,10 @@ type text from message
 			{
 				loop
 				{
-					ao:base<message>:get_rp()( int mark ):fread<int>( ao.code_fex )( int n );
+					io:as_base<message>:get_rp()( int mark ):fread<int>( io.code_fex )( int n );
 					if ( "n |=| cn" ) return after ok:begin( 'true' );
 					if ( "rp_end?( ao )" ) return after ok:begin( 'false' );
-					ao:set_rp( mark ):dec_rp;
+					io:set_rp( mark ):dec_rp;
 				}
 			}
 		}
@@ -603,7 +603,7 @@ type text from message
 
 		inc_rp [upd] -- next code point
 		{
-			ao:predict_next_rp()( int rp ):set_rp( rp );
+			io:predict_next_rp()( int rp ):set_rp( rp );
 		}
 
 
@@ -615,30 +615,30 @@ type text from message
 			rp_end? can be used to test limit in either direction.
 		}}
 		{
-			ao:get_rp()( int rp ); 
+			io:get_rp()( int rp ); 
 			if ( "rp |=| zero" )
 			{
-				ao:set_rp_end;
+				io:set_rp_end;
 			}
-			else if ( "ao.code_unit |=| two" )
+			else if ( "io.code_unit |=| two" )
 			{
 				rp:sub( two );  -- prev code point
-				ao:base<message>:set_rp( rp ):fread( 'b' )( word16 w );  
+				io:as_base<message>:set_rp( rp ):fread( 'b' )( word16 w );  
 				if ( "(w |>=| xDC00 ) |and| ( w |<=| xDFFF )" ) rp:sub( two );  -- sub 2 more if surrogate
-				ao:set_rp( rp ); 
+				io:set_rp( rp ); 
 			}
-			else if ( "ao.code_unit |=| one" )
+			else if ( "io.code_unit |=| one" )
 			{
 				loop
 				{
 					rp:dec;
-					ao:base<message>:set_rp( rp ):fread( 'b' )( word8 w ):set_rp( rp );
+					io:as_base<message>:set_rp( rp ):fread( 'b' )( word8 w ):set_rp( rp );
 					if ( "( w |and| xC0 ) |not=| x80" ) escape;		-- if not 10xx xxxx
 				}
 			}
-			else -- "ao.code_unit |=| four"
+			else -- "io.code_unit |=| four"
 			{
-				ao:set_rp( rp:sub( four ) ); 
+				io:set_rp( rp:sub( four ) ); 
 			}
 		}
 
@@ -652,18 +652,18 @@ type text from message
 			predicted output rp or original message rp).
 		}}
 		{
-			ao:get_rp()( rp ); 
-			if ( "ao.code_unit |=| two" )
+			io:get_rp()( rp ); 
+			if ( "io.code_unit |=| two" )
 			{
-				ao:base<message>:fread<word16>( 'b' )( word16 w );
+				io:as_base<message>:fread<word16>( 'b' )( word16 w );
 				if ( "(w |<| xD800 ) |or| ( w |>| xDFFF )" )
 					rp:add( two )
 				else
 					rp:add( four );
 			}
-			else if ( "ao.code_unit |=| one" )
+			else if ( "io.code_unit |=| one" )
 			{
-				ao:base<message>:fread<word8>( 'b' )( word8 w );
+				io:as_base<message>:fread<word8>( 'b' )( word8 w );
 				if ( "w |<| x80" )					-- 0xxx xxxx
 					rp:inc
 				else if ( "zero?( w |and| x20 )" )	-- 110x xxxx
@@ -673,7 +673,7 @@ type text from message
 				else								-- 1111 0xxx
 					rp:add( four );
 			}
-			else -- "ao.code_unit |=| four"
+			else -- "io.code_unit |=| four"
 			{
 				rp:add( four );
 			}

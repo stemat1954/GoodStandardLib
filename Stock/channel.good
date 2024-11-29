@@ -14,29 +14,6 @@ page channel in stock@good
 
 
 
-enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 'error', 'other' );
-{{
-	good: all data was transferred as requested; deficit = 0.
-
-	pending:  async request was queued; deficit = size.
-
-	busy: channel is busy, sync request timed out; deficit > 0.  
-		
-	closed:  deficit = size.
-
-	retry:	The requested amount was not transferred, but retry
-	is possible; deficit > 0.
-		
-	end:  A fixed limit was reached and retry is not possible; 
-	deficit > 0.
-
-	error:  deficit > 0.
-
-	other:  unrecognized report from channel
-}}
-	
-
-
 [aux] type request
 {{
 	This is an i/o request data structure.  
@@ -51,30 +28,30 @@ enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 
 	{
 		begin	
 		{
-			ao.action:begin;
-			ao.pdata:begin;
-			ao.offset:begin;
-			ao.size:begin;
-			ao.seek:begin;
-			ao.id:begin;
-			ao.deficit:begin;
-			ao.report:begin;
-			ao.pnote:begin;
+			io.action:begin;
+			io.pdata:begin;
+			io.offset:begin;
+			io.size:begin;
+			io.seek:begin;
+			io.id:begin;
+			io.deficit:begin;
+			io.report:begin;
+			io.pnote:begin;
 		}
 
 
 		begin ( ascii action, addr pdata, int offset, int size, int seek [opt], int id [opt] )
 		{
 			if ( "( action |not=| 'r' ) |and| ( action |not=| 'w' )" ) quit fault ( 'bug', 'invalid i/o action' );
-			ascii_to_word( action )( ao.action );
-			ao.pdata:begin( pdata );
-			ao.offset:begin( offset );
-			ao.size:begin( size );
-			ao.seek:begin( fix( seek, zero ) );
-			ao.id:begin( fix( id, zero ) );
-			ao.deficit:begin;
-			ao.report:begin;
-			ao.pnote:begin;
+			ascii_to_word( action )( io.action );
+			io.pdata:begin( pdata );
+			io.offset:begin( offset );
+			io.size:begin( size );
+			io.seek:begin( fix( seek, zero ) );
+			io.id:begin( fix( id, zero ) );
+			io.deficit:begin;
+			io.report:begin;
+			io.pnote:begin;
 		}
 
 		begin ( message [upd], expr fex );			-- per image
@@ -83,19 +60,19 @@ enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 
 
 		get_group1 ()( ascii action, addr pdata, int offset, int size, int seek, int id )
 		{
-			word_to_ascii( ao.action )( action );
-			pdata:begin( ao.pdata );
-			offset:begin( ao.offset );
-			size:begin( ao.size );
-			seek:begin( ao.seek );
-			id:begin( ao.id );
+			word_to_ascii( io.action )( action );
+			pdata:begin( io.pdata );
+			offset:begin( io.offset );
+			size:begin( io.size );
+			seek:begin( io.seek );
+			id:begin( io.id );
 		}
 
 
 		get_group2 [upd] ()( int deficit, channel_report cr, text note ) -- invalidates pnote
 		{
-			deficit:begin( ao.deficit );
-			select ( word_to_ascii( ao.report )( =ascii ) )
+			deficit:begin( io.deficit );
+			select ( word_to_ascii( io.report )( =ascii ) )
 			{
 				case ( 'NUL' )	cr:begin( 'good' );
 				case ( 'p' )	cr:begin( 'pending' );
@@ -106,10 +83,10 @@ enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 
 				case ( 'x' )	cr:begin( 'error' );
 				else			cr:begin( 'other' );
 			}
-			if ( "ao.pnote |not=| no_addr" )
+			if ( "io.pnote |not=| no_addr" )
 			{
-				note:begin:attach( ao.pnote ):trim_zero;  -- note owns the pointer
-				ao.pnote:reuse:begin;  -- prevent another attachment
+				note:begin:attach( io.pnote ):trim_zero;  -- note owns the pointer
+				io.pnote:reuse:begin;  -- prevent another attachment
 			}
 		}
 	}
@@ -144,7 +121,7 @@ enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 
 	}
 
 
-	image 'b' [primitive,aligned] 
+	image 'b' [compat,align] 
 	{
 		action	( 'b' );
 		pdata	( 'b' );
@@ -180,6 +157,30 @@ enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 
 	}
 }
 
+
+
+
+enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 'error', 'other' );
+{{
+	good: all data was transferred as requested; deficit = 0.
+
+	pending:  async request was queued; deficit = size.
+
+	busy: channel is busy, sync request timed out; deficit > 0.  
+		
+	closed:  deficit = size.
+
+	retry:	The requested amount was not transferred, but retry
+	is possible; deficit > 0.
+		
+	end:  A fixed limit was reached and retry is not possible; 
+	deficit > 0.
+
+	error:  deficit > 0.
+
+	other:  unrecognized report from channel
+}}
+	
 
 
 subroutine attach_async_message ( addr preq, message m [upd] )( int id, channel_report report, text note ) -- final preq
@@ -243,22 +244,22 @@ type channel [incomplete]
 	{
 		begin ( handle hch )
 		{
-			ao.hch:begin( hch );	
-			ao.lock:begin;
-			ao.open:begin( true );
+			io.hch:begin( hch );	
+			io.lock:begin;
+			io.open:begin( true );
 		}
 		
 		close [upd]( text note [opt] )( text other )
 		{
 			fix( note, normal_close ) ~note;
-			ao:internal_close( ~note )( other );
+			io:internal_close( ~note )( other );
 		}
 
 		check [upd] ()( text note ) 
 		{
-			ao.lock:wait;
-			if ( "not( ao.open )" ) note:begin( ao.note );  -- why closed
-			ao.lock:reset;
+			io.lock:wait;
+			if ( "not( io.open )" ) note:begin( io.note );  -- why closed
+			io.lock:reset;
 		}
 	}
 
@@ -267,13 +268,13 @@ type channel [incomplete]
 	{
 		exec_sync_io [upd]( etm wait [opt], ascii action, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			ao:check()( note );
+			io:check()( note );
 			if ( "null?( note )" ) -- if not closed
 			{
 				fix( wait, max_int as etm ) ~wait;
 				format_request( request:begin( action, pdata, offset, size, seek, null ) )( addr pr );
-				kernel\channel_sync_io( ao.hch, pr, ~wait:as_int );
-				ao:finish( pr )( deficit, report, note );
+				kernel\channel_sync_io( io.hch, pr, ~wait:as_int );
+				io:finish( pr )( deficit, report, note );
 			}
 			else
 			{
@@ -284,12 +285,12 @@ type channel [incomplete]
 
 		exec_async_io [upd]( int id, handle hq, ascii action, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			ao:check()( note );
+			io:check()( note );
 			if ( "null?( note )" ) -- if not closed
 			{
 				format_request( request:begin( action, pdata, offset, size, seek, id ) )( addr pr );
-				kernel\channel_async_io( ao.hch, pr, hq );
-				ao:finish( pr )( deficit, report, note );
+				kernel\channel_async_io( io.hch, pr, hq );
+				io:finish( pr )( deficit, report, note );
 			}
 			else
 			{
@@ -300,18 +301,18 @@ type channel [incomplete]
 										
 		internal_close [upd]( text note )( text other )
 		{
-			ao.lock:wait;
-			if ( ao.open )
+			io.lock:wait;
+			if ( io.open )
 			{
-				ao.open:not;
-				ao.note:begin( note );
-				ao.lock:reset;
-				kernel\channel_close( ao.hch ); 
+				io.open:not;
+				io.note:begin( note );
+				io.lock:reset;
+				kernel\channel_close( io.hch ); 
 			}
 			else
 			{
-				ao.lock:reset;
-				other:begin( ao.note );
+				io.lock:reset;
+				other:begin( io.note );
 			}
 		}
 	}
@@ -320,7 +321,7 @@ type channel [incomplete]
 	{
 		end
 		{
-			if ( ao.open ) kernel\channel_close( ao.hch ); 
+			if ( io.open ) kernel\channel_close( io.hch ); 
 		}
 
 		finish [upd] ( addr pr )( int deficit, channel_report report, text note )
@@ -329,7 +330,7 @@ type channel [incomplete]
 			if ( "report |=| 'error' " )
 			{
 				fix( note, unspecified_error ) ~note;
-				ao:internal_close( ~note )( text first );
+				io:internal_close( ~note )( text first );
 				if ( "not_null?( first )" ) note:reuse:begin( first );
 			}
 		}
@@ -382,7 +383,7 @@ type sync_channel_reader [incomplete]
 	{
 		begin ( etm wait [opt] )
 		{
-			if ( "not_null?( wait )" ) ao.wait:begin( wait );
+			if ( "not_null?( wait )" ) io.wait:begin( wait );
 		}
 	
 		read [upd]( message m [upd], int seek [opt], etm wait [opt] )( channel_report report, text note ) 
@@ -391,7 +392,7 @@ type sync_channel_reader [incomplete]
 			if ( "rsize |>| zero" )
 			{
 				m:detach()( addr pdata );
-				ao:~read( fix( wait, ao.wait ), seek, pdata, offset, rsize )( int deficit, report, note ); 
+				io:~read( fix( wait, io.wait ), seek, pdata, offset, rsize )( int deficit, report, note ); 
 				attach( *m, pdata, offset, rsize, deficit, 'r' );
 			}
 			else
@@ -441,7 +442,7 @@ type sync_channel_writer [incomplete]
 	{
 		begin ( etm wait [opt] )
 		{
-			if ( "not_null?( wait )" ) ao.wait:begin( wait );
+			if ( "not_null?( wait )" ) io.wait:begin( wait );
 		}
 	
 		write [upd]( message m [upd], int seek [opt], etm wait [opt] )( channel_report report, text note ) 
@@ -450,7 +451,7 @@ type sync_channel_writer [incomplete]
 			if ( "rsize |>| zero" )
 			{
 				m:detach()( addr pdata );
-				ao:~write( fix( wait, ao.wait ), seek, pdata, offset, rsize )( int deficit, report, note ); 
+				io:~write( fix( wait, io.wait ), seek, pdata, offset, rsize )( int deficit, report, note ); 
 				attach( *m, pdata, offset, rsize, deficit, 'w' );
 			}
 			else 
@@ -487,7 +488,7 @@ type async_channel_reader [incomplete]
 			if (" rsize |>| zero ")
 			{
 				m:detach()( addr pdata );
-				ao:~read( id, hq, seek, pdata, offset, rsize )( int deficit, report, note ); 
+				io:~read( id, hq, seek, pdata, offset, rsize )( int deficit, report, note ); 
 				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) attach( *m, pdata, offset, rsize, deficit, 'r' );
 			}
 			else
@@ -517,7 +518,7 @@ type async_channel_writer [incomplete]
 			if ( "rsize |>| zero" )
 			{
 				m:detach()( addr pdata );
-				ao:~write( id, hq, seek, pdata, offset, rsize )( int deficit, report, note ); 
+				io:~write( id, hq, seek, pdata, offset, rsize )( int deficit, report, note ); 
 				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) attach( *m, pdata, offset, rsize, deficit, 'w' );
 			}
 			else
@@ -542,8 +543,8 @@ type sync_read_only_channel from ( channel, sync_channel_reader )
 	{
 		begin ( handle hch, etm wait [opt] )
 		{
-			ao:base<channel>:begin( hch );
-			ao:base<sync_channel_reader>:begin( wait );
+			io:as_base<channel>:begin( hch );
+			io:as_base<sync_channel_reader>:begin( wait );
 		}
 	}
 
@@ -551,7 +552,7 @@ type sync_read_only_channel from ( channel, sync_channel_reader )
 	{
 		[final] ~read [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			ao:base<channel>:exec_sync_io( wait, 'r', seek, pdata, offset, size )( deficit, report, note );
+			io:as_base<channel>:exec_sync_io( wait, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 }
@@ -564,8 +565,8 @@ type sync_write_only_channel from ( channel, sync_channel_writer )
 	{
 		begin ( handle hch, etm wait [opt] )
 		{
-			ao:base<channel>:begin( hch );
-			ao:base<sync_channel_writer>:begin( wait );
+			io:as_base<channel>:begin( hch );
+			io:as_base<sync_channel_writer>:begin( wait );
 		}
 	}
 
@@ -573,7 +574,7 @@ type sync_write_only_channel from ( channel, sync_channel_writer )
 	{
 		[final] ~write [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			ao:base<channel>:exec_sync_io( wait, 'w', seek, pdata, offset, size )( deficit, report, note );
+			io:as_base<channel>:exec_sync_io( wait, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 }
@@ -585,9 +586,9 @@ type sync_read_write_channel from ( channel, sync_channel_reader, sync_channel_w
 	{
 		begin ( handle hch, etm wait [opt] )
 		{
-			ao:base<channel>:begin( hch );
-			ao:base<sync_channel_reader>:begin( wait );
-			ao:base<sync_channel_writer>:begin( wait );
+			io:as_base<channel>:begin( hch );
+			io:as_base<sync_channel_reader>:begin( wait );
+			io:as_base<sync_channel_writer>:begin( wait );
 		}
 	}
 
@@ -595,7 +596,7 @@ type sync_read_write_channel from ( channel, sync_channel_reader, sync_channel_w
 	{
 		[final] ~read [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			ao:base<channel>:exec_sync_io( wait, 'r', seek, pdata, offset, size )( deficit, report, note );
+			io:as_base<channel>:exec_sync_io( wait, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 
@@ -603,7 +604,7 @@ type sync_read_write_channel from ( channel, sync_channel_reader, sync_channel_w
 	{
 		[final] ~write [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			ao:base<channel>:exec_sync_io( wait, 'w', seek, pdata, offset, size )( deficit, report, note );
+			io:as_base<channel>:exec_sync_io( wait, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 }
@@ -616,8 +617,8 @@ type async_read_only_channel from ( channel, async_channel_reader )
 	{
 		begin ( handle hch )
 		{
-			ao:base<channel>:begin( hch );
-			ao:base<async_channel_reader>:begin;
+			io:as_base<channel>:begin( hch );
+			io:as_base<async_channel_reader>:begin;
 		}
 	}
 
@@ -625,7 +626,7 @@ type async_read_only_channel from ( channel, async_channel_reader )
 	{
 		[final] ~read [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			ao:base<channel>:exec_async_io( id, hq, 'r', seek, pdata, offset, size )( deficit, report, note );
+			io:as_base<channel>:exec_async_io( id, hq, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
 		
 	}
@@ -638,8 +639,8 @@ type async_write_only_channel from ( channel, async_channel_writer )
 	{
 		begin ( handle hch )
 		{
-			ao:base<channel>:begin( hch );
-			ao:base<async_channel_writer>:begin;
+			io:as_base<channel>:begin( hch );
+			io:as_base<async_channel_writer>:begin;
 		}
 	}
 
@@ -647,7 +648,7 @@ type async_write_only_channel from ( channel, async_channel_writer )
 	{
 		[final] ~write [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			ao:base<channel>:exec_async_io( id, hq, 'w', seek, pdata, offset, size )( deficit, report, note );
+			io:as_base<channel>:exec_async_io( id, hq, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 }
@@ -660,9 +661,9 @@ type async_read_write_channel from ( channel, async_channel_reader, async_channe
 	{
 		begin ( handle hch )
 		{
-			ao:base<channel>:begin( hch );
-			ao:base<async_channel_reader>:begin;
-			ao:base<async_channel_writer>:begin;
+			io:as_base<channel>:begin( hch );
+			io:as_base<async_channel_reader>:begin;
+			io:as_base<async_channel_writer>:begin;
 		}
 	}
 
@@ -670,7 +671,7 @@ type async_read_write_channel from ( channel, async_channel_reader, async_channe
 	{
 		[final] ~read [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			ao:base<channel>:exec_async_io( id, hq, 'r', seek, pdata, offset, size )( deficit, report, note );
+			io:as_base<channel>:exec_async_io( id, hq, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
 		
 	}
@@ -679,7 +680,7 @@ type async_read_write_channel from ( channel, async_channel_reader, async_channe
 	{
 		[final] ~write [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			ao:base<channel>:exec_async_io( id, hq, 'w', seek, pdata, offset, size )( deficit, report, note );
+			io:as_base<channel>:exec_async_io( id, hq, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 }

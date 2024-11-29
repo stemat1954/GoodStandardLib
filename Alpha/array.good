@@ -5,7 +5,7 @@ page array in alpha@good
 type array_cursor<t>;
 
 
-type array<t> from dual_access<<t>>< array_cursor<<t>> > -- conventional
+type array<t> from direct_access<<t>>, from serial_access<<t>><array_cursor<<t>>>  -- conventional
 {{
 	An array<t> is a resizable object set.  Objects are
 	homogeneous and logically contiguous in memory.
@@ -15,7 +15,7 @@ type array<t> from dual_access<<t>>< array_cursor<<t>> > -- conventional
 
 	An array supports direct access via an integer position
 	index and serial access via an opaque cursor type
-	array<t>_cursor.
+	array_cursor<t>.
 		
 	Methods that require a given index fail if the index is
 	invalid. A valid index is between zero and count
@@ -48,13 +48,13 @@ type array<t> from dual_access<<t>>< array_cursor<<t>> > -- conventional
 {
 	general   
 	{
-		begin ( int reserve [opt] );					-- empty
+		begin ( int reserve [opt] ); -- empty
 
-		begin ( array<<t>> other );						-- dup 
+		begin ( array<<t>> other );	-- dup other
 
-		begin ( array<<t>> other [upd] );				-- take 
+		begin ( array<<t>> other [upd] ); -- take other
 
-		begin ( message [upd], expr fex )()( extra );	-- fread
+		begin ( message [upd], expr fex )()( extra ); -- fread
 
 		fwrite ( message [upd], expr fex )()( extra );
 
@@ -77,37 +77,31 @@ type array<t> from dual_access<<t>>< array_cursor<<t>> > -- conventional
 		reduce [upd];										-- release unused memory
 	}
 
-	general -- disinherit
+	general -- similar in direct_access<t>
 	{
 		count ()( int );  
 
-		object ( int i ) = <t> proxy [eval,init];
+		use ( int i ) = <t> proxy [eval,init];
 	}
 
 
-	abstract in dual_access<<t>>< array_cursor<<t>> >
+	abstract in direct_access<<t>>
 	{
-		[final] ~cursor_to_index ( array_cursor<<t>> )( int );
-
-		[final] ~index_to_cursor ( int )( array_cursor<<t>> );
-
-		[final] ~count ()( int n )
-		{
-			ao:count()( n );
-		}
+		[final] ~count ()( int n );
 		
-		[final] ~object ( int i ) = <t> proxy ~o
-		{
-			~o -> ao:object( i );
-		}
+		[final] ~use ( int i ) = <t> proxy;
+	}
 
+
+	abstract in serial_access<<t>><array_cursor<<t>>>
+	{
 		[final] ~open_cursor ( int )( array_cursor<<t>> );  
 
 		[final] ~move_cursor ( array_cursor<<t>> [upd] );
 
 		[final] ~flip_cursor ( array_cursor<<t>> [upd] ); 
 
-		[final] ~object ( array_cursor<<t>> ) = <t> proxy; 
+		[final] ~use ( array_cursor<<t>> ) = <t> proxy; 
 	}
 }
 

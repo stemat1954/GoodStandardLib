@@ -19,9 +19,9 @@ type monitor
 	does not expire.
 		
 	Note: Any side effect of waiting on an individual
-	indicator will be reproduced if, and only if, a
-	indicator is identified.  In particular, a indicator's
-	release state is reset only if it is identified.
+	indicator will be reproduced if, and only if an
+	indicator is identified.  In particular, an indicator's
+	release state is reset only if it's identified.
 }}
 
 {
@@ -29,13 +29,13 @@ type monitor
 	{
 		begin;
 
-		add [upd]( link<indicator>, int rid );
+		add [upd]( linked<indicator>, int id );
 
-		delete [upd]( int rid );
+		delete [upd]( int id );
 
-		move [upd]( int rid, int d );
+		move [upd]( int id, int d );
 
-		wait ( etm [opt] )( int rid );	
+		wait ( etm [opt] )( int id );	
 	}
 
 }

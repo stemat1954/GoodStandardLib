@@ -2,9 +2,15 @@
 page link in alpha@good
 
 
-type link<t>   -- intrinsic
+type linked<t>   -- intrinsic
 {{
-	A link<t> is a global object owner.
+	A linked<t> object is a link object that creates and/or 
+	accesses another object of type <t> in global storage.
+
+	Note:  Conceptually, a linked<t> object is a generic
+	type that derives from an internal and universal link
+	type.  The term "link" applies to any adhoc linked 
+	object.
 
 	Links are used to create objects at runtime in global
 	storage.  The type of object created must be a complete
@@ -21,56 +27,44 @@ type link<t>   -- intrinsic
 	an explicit accessor call, while access to a proxy's
 	bound object is implicit.
 	
-	A link's object accessor method is called :deref.  Like
-	other accessors, :deref returns a result proxy, which
+	A link's object accessor method is called :use.  Like
+	other accessors, :use returns a result proxy, which
 	can be used in any object context as a reference to the
 	global object. Thus, logically, there are two levels of
 	indirection to get to a linked object.
 	
-	Note:  In a sense, :deref converts a link into a proxy.  
+	Note:  In a sense, :use converts a link into a proxy.  
 	The conversion is optimized and may in fact be virtual.
 	
-	Note: :deref returns a [upd] proxy of symbolic type <t>. 
-
 	Note:  adhoc type <object> is allowed for <t> because 
 	ultimately <t> is the stated type of a result proxy
-	returned by :deref.  However, generic :begin<xt> must
-	be called with a complete adhoc type to initialize a
-	link of type <object>. 
+	returned by :use.  
 
-	The proxy returned by :deref is [upd] and it can be
-	used to call any method of <t> except :begin.  To
-	initialize the global object, :as_actual<t> must be
-	called to get an [init] proxy.  This is required even 
-	when <t> is the actual object type.
+	The proxy returned by :use has [upd] access and it can 
+	be used to call any method of <t> except :begin.  To
+	initialize the global object, call :use_new to get an
+	[init] proxy.
 
 	The object bound to a link is created when the link 
-	is initialized.  Several versions of :begin	allow for
-	various configurations of link type and	object type. 
+	is initialized. 
 	
-	Note:  It's common for the link type <t> to be an 
-	adaptable base type while the created object type <xt> 
-	is an adapted subtype created by generic method 
-	:begin<xt>.
-
 	The object created by :begin is null and it must be
-	initialized before it can be used.  Thus, it's common to
-	see two levels of initialization when a link is
+	initialized before it can be used.  Thus, it's common 
+	to see two levels of initialization when a link is
 	created. This expression:
 	
-	link<thing> lt:begin<widget>:deref:as_actual<widget>:begin; 
+		linked<thing> lt begin:use_new:begin; 
 
-	creates and initializes a link named lt, bound to an 
-	object of adhoc type widget, then accesses the object
-	as actual type widget so it can initialize the object
-	using default :begin.  Type widget is (necessarily) a
-	complete type that derives from thing.
+	creates and initializes a link named lt, bound to a
+	global object of adhoc type thing, then accesses the 
+	object with :use_new to initialize the global object
+	using default :begin.  
 
 	Note:  It's important to distinquish between a null
-	link and a possibly null object referenced by the
-	link.  A null link can't be dereferenced, but a 
-	properly intialized link always points to an object
-	that may or may not be null.
+	link and a possibly null object accessed by the link.
+	A null link can't be dereferenced, but a properly 
+	intialized link always binds an object that may or may
+	not be null.
 	
 	A new link can be initialized by copying an existing
 	compatible link. When links are copied, the new
@@ -80,8 +74,8 @@ type link<t>   -- intrinsic
 	The global object bound to a link (or links) is 
 	automatically deleted when all links that reference 
 	the object are deleted.  It is common to say that the
-	global object bound to one or more links is 
-	"reference counted."
+	global object bound to one or more links is "reference
+	counted."
 
 	Note:  Copying links and reference counting is
 	thread-safe. Links are essential for sharing objects
@@ -105,15 +99,15 @@ type link<t>   -- intrinsic
 
 	subroutine foo
 	{
-		link<widget> lw:begin:deref:as_actual<widget>:begin; -- new link to widget
-		link<thing> lt:begin( lw );  -- copy pw
+		linked<widget> lw:begin:use_new:begin; -- new link to widget
+		linked<thing> lt:begin( lw );  -- copy pw
 
-		lw:deref:foo;	-- ok (foo is inherited)
-		lw:deref:goo;	-- ok
+		lw:use:foo;	-- ok (foo is inherited)
+		lw:use:goo;	-- ok
 
-		lt:deref:foo;	-- ok
-		lt:deref:goo;	-- error! (goo not in thing)
-		lt:deref:as<widget>:goo;  -- ok
+		lt:use:foo;	-- ok
+		lt:use:goo;	-- error! (goo not in thing)
+		lt:use:as<widget>:goo;  -- ok
 	}
 		
 
@@ -131,27 +125,27 @@ type link<t>   -- intrinsic
 
 	If la is a link to an actual object of type A,
 
-		link<A> la:begin:deref:as_actual<A>:begin;
+		linked<A> la:begin:use_new:begin;
 
 	then 
 
-		link<B> lb:begin( la );
-		link<C> lc:begin( la );
+		linked<B> lb:begin( la );
+		linked<C> lc:begin( la );
 
-		link<B> lb2:begin( lc );
-		link<C> lc2:begin( lb );
+		linked<B> lb2:begin( lc );
+		linked<C> lc2:begin( lb );
 
 	are all legit and refer to the same actual object
 	pointed to by la.
 
 	This works because 
 
-	  la:deref:base<B>
-	  la:deref:base<C>
-	  lb:deref:as<A>
-	  lc:deref:as<A>
-	  lb:deref:as<C>
-	  lc:deref:as<B>
+	  la:use:base<B>
+	  la:use:base<C>
+	  lb:use:as<A>
+	  lc:use:as<A>
+	  lb:use:as<C>
+	  lc:use:as<B>
 
 	are all legit and return valid proxies that also 
 	reference the original actual object.
@@ -187,8 +181,8 @@ type link<t>   -- intrinsic
 	type comparisions are allowed, even if the links are
 	copy-incompatible.  Comparisons are based on object 
 	storage address, so equal links reference the same 
-	object.  Furthermore, if a:before?(b) is false and
-	b:before?(a) is false, then a and b are par equal
+	actual object.  Furthermore, if a:before?(b) is false 
+	and b:before?(a) is false, then a and b are par equal
 	( "a |par| b" is true).
 		
 	Note:  Par equality is persistent provided network 
@@ -211,17 +205,17 @@ type link<t>   -- intrinsic
 	{
 		begin;						-- create and bind null <t> object, complete <t>
 
-		begin<xt>;					-- create and bind null <xt> object, <xt> complete subtype of <t> 
-
-		begin<xt> ( link<<xt>> );	-- copy compatible link, <xt> related to <t>  (may fail)
-
 		begin ( typename );			-- create and bind null object, named type is complete type or subtype of <t> (may fail)
 
-		equal<xt>? ( link<<xt>> )( bool );
-
-		before<xt>? ( link<<xt>> )( bool );
+		begin<xt> ( linked<<xt>> );	-- copy compatible link, <xt> related to <t>  (may fail)
 	
-		deref = <t> proxy [upd];	-- accessor 
+		use_new = <t> proxy [init]; -- void if <t> not actual
+
+		use = <t> proxy [upd];	
+
+		is_equal<xt>? ( linked<<xt>> )( bool );
+
+		is_before<xt>? ( linked<<xt>> )( bool );
 	}
 }
 

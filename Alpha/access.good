@@ -1,64 +1,46 @@
 
 page access in alpha@good
 
-{{
-	This page defines 2 adaptable and generic base types:
-
-	direct_access<t>
-	serial_acess<t><c>
-
-	Unlike most alpha types, these types don't have any
-	fundamental methods.  All methods are complete as written.
-}}
 
 
 type direct_access<t> [incomplete] -- intrinsic
 {{
-	direct_access<t> is a base type for generic object
-	collections that support direct access to objects.
+	direct_access<t> is a generic base type for collections
+	that provide direct access to objects in the collection.
 		
 	<t> is the symbolic object type. 
 
-	Objects that derive from direct_access<t> manage a
-	countable collection of objects.  Individual objects 
-	can be directly	accessed by a numeric position
-	index.
+	Collections that derive from direct_access<t> manage a
+	countable set of objects.  Individual objects are
+	directly accessed by a numeric position index.
 
 	Valid indexes range from zero to count - 1.
 
-	:object returns an indefinite proxy. If the index is out
-	of range, the proxy will be void.
+	:use returns a deferred-access proxy. If the index is
+	out	of range, the proxy will be void.
 
-	Direct access objects are naturally ordered by index,
-	but there is no presumption that objects with a	lesser
-	index are "before" or "less" than those with a greater
-	index.
+	Direct access collections are naturally ordered by index,
+	but there is no presumption objects with a lesser index
+	are less than or before objects with a greater index.
 
-	direct_access collections can be scanned in a for-loop.
+	direct_access collections can be scanned in a Good for
+	loop.
 }}
 {
 	general 
 	{
-		begin
-		{
-		}
+		begin;
 
-		count ()( int n )
-		{
-			ao:~count()( n );
-		}
+		count ()( int n );
 
-		object ( int i ) = <t> proxy ~o
-		{
-			~o -> ao:~object( i );
-		}
+		use ( int i ) = <t> proxy;
 	}
 
 	abstract -- [tbd] in subtype (not fundamental)
 	{
 		~count ()( int );	
 
-		~object ( int i ) = <t> proxy; 
+		~use ( int i ) = <t> proxy; 
 	}
 }
 
@@ -66,25 +48,25 @@ type direct_access<t> [incomplete] -- intrinsic
 
 type serial_access<t><c> [incomplete] -- intrinsic
 {{
-	serial_access<t><c> is a base type for generic object
-	collections that support serialized access to objects.
+	serial_access<t> is a generic base type for collections
+	that provide serial access to objects in the collection.
+		
+	<t> is the symbolic object type and <c> is the symbol 
+	cursor type. 
+	
+	Collections that derive from serial_access<t><c> manage
+	an ordered collection of objects.  Individual objects 
+	are accessed in serial order using a bespoke cursor.
 
-	<t> is the symbolic object type and <c> is the symbolic
-	cursor type.
-
-	Objects that derive from serial_access<t><c> manage an
-	ordered collection of objects.  Individual objects can
-	be accessed in order using a bespoke cursor.
-
-	In general, access to objects starts by opening a cursor
+	Access to a serial collection starts by opening a cursor
 	positioned at either end of the collection. The	cursor
-	moves toward the other end in increments or steps. A 
+	moves toward the other end in increments or steps.  A 
 	positive or negative step determines direction and 
 	resolution of the cursor. 
 	
-	Generally, a cursor must have an inoperable or final 
-	state that doesn't provide access to a collection object.
-	A cursor in final state must be accepted by all methods.
+	Generally, a serial cursor must have a final inoperable
+	state that doesn't provide access to an object. An in-
+	operable cursor must be accepted by all methods.
 
 	:open_cursor( step ) creates an original cursor placed 
 	at either end of the set.  If step is positive, the 
@@ -93,55 +75,46 @@ type serial_access<t><c> [incomplete] -- intrinsic
 	the last object and moves toward the first.  step = 0 
 	is invalid.  The default step is one.
 
+	Note: If a collection doesn't support step < 0 or |step|
+	> 1, the output cursor is inoperable.
+
 	:move_cursor updates the position of a given cursor.
 	
 	:flip_cursor reverses the direction of a given cursor.
 
-	:object accesses a collection object given a cursor.  
-	If the cursor is inoperable, the result is void.
+	Note: If a cursor can't be flipped, the given cursor
+	will be made inoperable.
 
-	serial_access collections can be scanned in a for-loop.
+	:access returns a deferred-access proxy. If the cursor
+	is inoperable, the proxy will be void.
+
+	serial_access collections can be scanned in a Good for
+	loop.
 }}
 {
 	general
 	{
-		begin
-		{
-		}
+		begin;
 
-		open_cursor ( int step [opt] )( <c> c )
-		{
-			if ( "is_null?( step )" ) ao:~open_cursor( '1' )( c )
-			else if ( "step |=| zero" ) quit fault ( 'bug', 'invalid cursor step' )
-			else ao:~open_cursor( step )( c );
-		}
+		open_cursor ( int step [opt] )( <c> );
 
-		move_cursor ( <c> c [upd] )
-		{
-			ao:~move_cursor( *c );
-		}
+		move_cursor ( <c> [upd] );
 
-		flip_cursor ( <c> c [upd] )
-		{
-			ao:~flip_cursor( *c )( ok );
-		}  
+		flip_cursor ( <c> [upd] );
 
-		object ( <c> c ) = <t> proxy ~o
-		{
-			~o -> ao:~object( c );
-		}
+		use ( <c> ) = <t> proxy;
 	}
 
 
 	abstract  -- [tbd] in subtype (not fundamental)
 	{
-		~open_cursor ( int step )( <c> c );  
+		~open_cursor ( int )( <c> );  
 
-		~move_cursor ( <c> c [upd] );
+		~move_cursor ( <c> [upd] );
 
-		~flip_cursor ( <c> c [upd]);
+		~flip_cursor ( <c> [upd]);
 
-		~object ( <c> c ) = <t> proxy; 
+		~use ( <c> ) = <t> proxy; 
 	}
 
 }

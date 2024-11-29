@@ -2,15 +2,6 @@
 page bool in alpha@good
 
 
-common
-{
-	bool true:begin( 'true' ) [const];
-
-	bool false:begin( 'false' ) [const];
-}
-
-
-
 type bool  -- elementary, intrinsic, compatible, conventional
 {{
 	A bool object encapsulates a boolean logic value.
@@ -21,9 +12,6 @@ type bool  -- elementary, intrinsic, compatible, conventional
 	A bool can be initialized with a literal vex of	'true'
 	or 'false'. Interpretation is obvious.
 
-	Note: true and false are public pure constants that
-	can be used in lieu of corresponding exprs.
-
 	A bool value is portable. See documentation for
 	supported formats.
 
@@ -33,15 +21,15 @@ type bool  -- elementary, intrinsic, compatible, conventional
 {
 	general
 	{
-		begin ( expr vex [opt] );		-- literal, default = 'false'
+		begin ( expr vex [opt] );	-- original, default = 'false'
 
-		begin ( bool other );			-- dup
+		begin ( bool other );		-- dup
 
 		begin ( message [upd], expr fex );	-- fread
 
 		fwrite ( message [upd], expr fex );
 
-		equal? ( bool other )( bool );
+		is_equal? ( bool other )( bool );
 	
 		and [upd]( bool other );
 		and	[eval]( bool other )( bool );

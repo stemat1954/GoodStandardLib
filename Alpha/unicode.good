@@ -37,10 +37,10 @@ type unicode from enumerated
 
 		fwrite ( message m [upd], expr fex )()( extra ); 
 
-		equal? ( unicode )( bool );
+		is_equal? ( unicode )( bool );
 
-		before? ( unicode )( bool );
+		is_before? ( unicode )( bool );
 
-		label = expr proxy [eval];
+		use_label = expr proxy [eval];
 	}
 }

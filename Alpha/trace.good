@@ -17,7 +17,7 @@ type trace -- instrisic,restricted
 
 	Note: See alpha\fault for example of quit object type.
 
-	:location accesses an internal formatted expr that 
+	:use_location accesses an internal formatted expr that 
 	includes book name, page name, page file name, and 
 	line number.
 
@@ -29,9 +29,9 @@ type trace -- instrisic,restricted
 {
 	general 
 	{
-		location = expr proxy [eval];
+		use_location = expr proxy [eval];
 
-		object = object proxy [eval];
+		use_quit_object = object proxy [eval];
 	}
 }
 

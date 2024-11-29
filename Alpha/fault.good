@@ -2,7 +2,7 @@
 page fault in alpha@good
 
 
-enum type fault_category ( 'bug', 'format', 'value', 'access', 'resource', 'platform', 'system' );
+enum type fault_category ( 'bug', 'format', 'value', 'timeout', 'resource', 'platform', 'system' );
 {{
 	'bug' - a programming error was detected
 
@@ -10,19 +10,19 @@ enum type fault_category ( 'bug', 'format', 'value', 'access', 'resource', 'plat
 		inconsistencies.  In a perfect world, bugs will
 		never occur in a tested app, but of course, this
 		is rarely true in reality.	Good does not have
-		any provision for removing bug-related quits
-		(no provision for debug/release builds).
+		any provision for removing bug-related quits (no
+		provision for debug/release builds).
 
 	'format' - a data format error was detected
 
-		Use 'format' to categorize formatting errors in
+		Use 'format' to indicate formatting errors in
 		external data.  Alpha portability methods are the 
 		primary	source for this fault.
 
-	'access' - access to a shared resource was blocked
+	'timeout' - access to a shared resource timed out
 
-		Use 'access' when concurrent contention for a
-		shared resource will not resolve.
+		Use 'timeout' when concurrent contention for a
+		shared resource will not resolve in time.
 
 	'resource' - a dynamic resource was depleted
 
@@ -79,12 +79,12 @@ type fault  -- intrinsic
 	idea is to broadly classify faults so that an application 
 	might decide to retry rather than leave.
 		
-	Note: Even this strategy is perhaps too ambiguous.
-	It's more likely that an application will choose to
-	retry or leave based on where a disruption is trapped
-	rather than what kind of fault was sent.  However, it
-	may be possible to rule-out certain kinds of faults for
-	retry (e.g. 'bug' ).
+	Note: Even this strategy is perhaps too ambiguous. It's 
+	more likely that an application will choose to retry or 
+	leave based on where a disruption is trapped rather than 
+	what kind of fault was sent.  However, it may be possible
+	to rule-out certain kinds of faults for retry (e.g. 
+	'bug' ).
 
 	fault accessors return void proxies if there is no
 	corresponding information provided when the fault is
@@ -96,8 +96,8 @@ type fault  -- intrinsic
 	{
 		begin ( fault_category [opt], expr comment [opt] );
 
-		category = fault_category proxy [eval];
+		use_category = fault_category proxy [eval];
 
-		comment = expr proxy [eval];
+		use_comment = expr proxy [eval];
 	}
 }
