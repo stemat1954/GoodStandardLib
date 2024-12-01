@@ -2,9 +2,9 @@
 page disruption in alpha@good
 
 
-type disruption from direct_access<trace>  -- intrinsic, restricted
+type disruption from uniform_set<trace>  -- intrinsic, restricted
 {{
-	A disruption is a collection of trace objects.
+	A disruption is a uniform collection of trace objects.
 
 	A global disruption object is automatically created 
 	when an application quits during normal execution. It
@@ -16,32 +16,32 @@ type disruption from direct_access<trace>  -- intrinsic, restricted
 
 	Note:  See alpha\trace for details.
 		
-	The current disruption object can only be referenced 
-	from a trap block using proxy name ~disruption.  This 
+	The current disruption list can only be referenced 
+	from a trap block using proxy alias ~disruption.  This 
 	alias only exists in the local scope of a trap block 
-	and all the usual proxy rules apply. The disruption
+	and all the usual proxy rules apply. The disruption	
 	proxy has [eval] permission which implies that individual
 	trace proxies also have [eval] permission.
 
 	Trace objects occur in quit order.  Thus, the original
 	trace is first (index = 0).  The first trace always
-	exists, but trying to access a trace that does not
-	exist will fail.
+	exists, but trying to access a trace that doesn't exist
+	will return a void proxy.
 	
 	A disruption is not portable. 
 }}
 {
-	general  -- similar in direct_access<t>
+	general  -- similar in uniform_set<t>
 	{
 		count ()( int );
 
-		use ( int i ) = trace proxy [eval]; 
+		use_object ( int i ) = trace proxy [eval]; 
 	}
 
-	abstract in direct_access<trace>
+	abstract in uniform_set<trace>
 	{
 		[final] ~count ()( int n );
 
-		[final] ~use ( int i ) = trace proxy;
+		[final] ~use_object ( int i ) = object proxy;
 	}
 }

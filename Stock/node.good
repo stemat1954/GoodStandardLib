@@ -31,29 +31,29 @@ type node
 	instead.
 }}
 {
-	nom type link_set = array< linked<node> >;
+	nom type linkage = array< linked<node> >;
 
 	general method
 	{
 		begin ( int dim [opt] )
 		{
-			io.link_set:begin( dim );
+			io.linkage:begin( dim );
 		}
 
 		get_link ( int i )( linked<node> nl )
 		{
-			nl:begin( io.link_set:use( i ) );
+			nl:begin( io.linkage:use( i ) );
 		}
 
 		set_link [upd]( int i, linked<node> nl )
 		{
 			io:make_room( i );
-			io.link_set:use( i ):reuse:begin( nl );
+			io.linkage:use( i ):reuse:begin( nl );
 		}
 
 		unlink [upd]( int i )
 		{
-			io.link_set:use( i ):reuse;
+			io.linkage:use( i ):reuse;
 		}
 	}
 
@@ -61,15 +61,15 @@ type node
 	{
 		make_room [upd]( int i )
 		{
-			io.link_set:count()( int q );
+			io.linkage:count()( int q );
 			i:sub( q )( =int ):add( one )( int need );
-			if ( "need |>| zero" ) io.link_set:insert( q, need )
+			if ( "need |>| zero" ) io.linkage:insert( q, need )
 		}
 	}
 
 	instance
 	{
-		link_set;
+		linkage;
 	}
 }
 
@@ -78,8 +78,8 @@ type node<#>
 {{
 	A node<#> is a generic fixed dimension node.
 	
-	node<#> linkage is uniform.  That is, a node<#> links
-	other node<#>s of the same dimension.
+	node<#> linkage is uniform.  That is, all nodes in a
+	<#n> nexus are of the same dimension.
 
 	A node<#> is technically complete, but doesn't have any
 	practical application as an actual type. It should be 
@@ -89,35 +89,35 @@ type node<#>
 	alternative.
 }}
 {
-	nom type link_set = tuple<<#>>< linked<node<<#>>>;
+	nom type linkage = tuple<<#>>< linked<node<<#>>>;
 
 	general method
 	{
 		begin  -- all links null
 		{
-			io.link_set:begin;  -- all links null
+			io.linkage:begin;  -- all links null
 		}
 
 		get_link ( int i )( linked<node<<#>>> nl ) 
 		{
-			io.link_set:use( i ) ~nl;
-			if ( "not_null?( ~nl )" ) nl:begin( ~nl );
+			io.linkage:use( i ) ~nl;
+			if ( "is_not_null?( ~nl )" ) nl:begin( ~nl );
 		}
 
 		set_link [upd](int i, linked<node<<#>>> nl )
 		{
-			io.link_set:use( i ):reuse:begin( nl );
+			io.linkage:use( i ):reuse:begin( nl );
 		}
 
 		unlink [upd]( int i )
 		{
-			io.link_set:use( i ):reuse;
+			io.linkage:use( i ):reuse;
 		}
 	}
 
 	instance
 	{
-		link_set;
+		linkage;
 	}
 }
 
@@ -181,7 +181,7 @@ type node1
 
 		get_link ()( linked<node1> nl )
 		{
-			if ( "not_null?( io.link )" ) nl:begin( io.link );
+			if ( "is_not_null?( io.link )" ) nl:begin( io.link );
 		}
 
 		set_link [upd]( linked<node1> nl )

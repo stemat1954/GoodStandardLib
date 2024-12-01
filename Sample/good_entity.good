@@ -12,7 +12,7 @@ enum type permission ( 'eval', 'upd', 'init' );
 
 enum type visibility ( 'internal', 'fraternal', 'external' );
 
-enum type opcode ( 'adhoc scan', 'adhoc copy' );
+enum type opcode ( 'adhoc-scan', 'adhoc-copy' );
 
 
 nom type entity_array = alpha\array< linked<good_entity> >;

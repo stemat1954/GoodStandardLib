@@ -1,0 +1,214 @@
+
+page array in stock@good
+
+{{
+	Using the generic types on this page, application arrays
+	can be combined and configured in various ways.
+
+	On this page:
+
+	ordered<ax>
+	<ax>_with_copy
+	<ax>_with_relay
+	portable<ax>
+	extra_portable<ax>
+
+	where <ax> is an adhoc array<t> ref
+
+	examples:
+
+	nom type thing_array = <<portable<<ordered<array<thing>>>_with_copy>_with_relay>
+
+	permutation order doesn't matter wrt to available
+	methods, but different orders yield different adhoc 
+	copies, so consistency is best practice.
+}}
+
+
+type ordered<ax> from <ax>
+{
+	general method
+	{
+		begin ( int reserve [opt] )
+		{
+			io:as_base<<ax>>:begin( reserve );
+		}
+
+		rank ( <t> obj )( int i, bool unique ) -- find ordered insertion point
+		{
+			io:as_base<<ax>> >:rank( obj )( i, unique );
+		}
+	}
+
+	abstract in array<<t>>
+	{
+		[pwd] ~copy ( <t> )( <t> );
+
+		[pwd] ~relay ( <t> [upd] )( <t> );
+		
+		[pwd] ~fread ( message [upd], expr fex )( <t> )( extra );
+
+		[pwd] ~fwrite ( message [upd], expr fex, <t> )()( extra );
+
+		[new] ~before? ( <t> a, <t> b )( bool yes )
+		{
+			a:is_before?( b )( yes );
+		}
+	}
+}
+
+
+
+type portable<ax> from <ax>
+{
+	general_method
+	{
+		begin ( int reserve [opt] )
+		{
+			io:as_base<<ax>>:begin( reserve );
+		}
+
+		fread [upd] ( message m [upd], expr fex )()( extra )
+		{
+			io:as_base<<ax>>:fread( m, fex )()( @given\extra );
+		}
+
+		fwrite ( message m [upd], expr fex )()( extra )
+		{
+			io:as_base<<ax>>:fwrite( m, fex )()( @given\extra );
+		}
+	}
+
+	abstract in <ax>
+	{
+		[pwd] ~copy ( <t> a )( <t> b );
+
+		[pwd] ~relay ( <t> a [upd] )( <t> b );
+		
+		[new] ~fread ( message m [upd], expr fex )( <t> obj )( extra )
+		{
+			obj:begin( *m, fex );  -- ignore extra
+		}
+
+		[new] ~fwrite ( message m [upd], expr fex, <t> obj )()( extra )
+		{
+			obj:fwrite( *m, fex );  -- ignore extra
+		}
+		
+		[pwd] ~before? ( <t> a, <t> b )( bool yes );
+
+	}
+}
+
+
+type extra_portable<ax> from <ax>
+{
+	general_method
+	{
+		begin ( int reserve [opt] )
+		{
+			io:as_base<<ax>>:begin( reserve );
+		}
+
+		fread [upd] ( message m [upd], expr fex )()( extra )
+		{
+			io:as_base<<ax>>:fread( m, fex )()( @given\extra );
+		}
+
+		fwrite ( message m [upd], expr fex )()( extra )
+		{
+			io:as_base<<ax>>:fwrite( m, fex )()( @given\extra );
+		}
+	}
+
+	abstract in <ax>
+	{
+		[pwd] ~copy ( <t> a )( <t> b );
+
+		[pwd] ~relay ( <t> a [upd] )( <t> b );
+		
+		[new] ~fread ( message m [upd], expr fex )( <t> obj )( extra )
+		{
+			obj:begin( *m, fex )()( @given\extra ); 
+		}
+
+		[new] ~fwrite ( message m [upd], expr fex, <t> obj )()( extra )
+		{
+			obj:fwrite( *m, fex )()( @given\extra );  
+		}
+
+		[pwd] ~before? ( <t> a, <t> b )( bool yes );
+	}
+}
+
+
+
+type <ax>_with_copy from <ax>
+{
+	general_method
+	{
+		begin ( int reserve [opt] )
+		{
+			io:as_base<<ax>>:begin( reserve );
+		}
+
+		copy [upd] ( int i, int q, array<<t>> other, int j [opt] )
+		{
+			io:as_base<<ax>>:copy( i, q, other, j );
+		}
+	}
+
+	abstract in <ax>
+	{
+		[new] ~copy ( <t> a )( <t> b )
+		{
+			b:begin( a );
+		}
+
+		[pwd] ~relay ( <t> [upd] )( <t> );
+		
+		[pwd] ~fread ( message [upd], expr fex )( <t> )( extra );
+
+		[pwd] ~fwrite ( message [upd], expr fex, <t> )()( extra );
+
+		[pwd] ~before? ( <t> a, <t> b )( bool yes );
+	}
+}
+
+
+type <ax>_with_relay from <ax>
+{
+	general_method
+	{
+		begin ( int reserve [opt] )
+		{
+			io:as_base<<ax>>:begin( reserve );
+		}
+
+		relay [upd] ( int i, int q, array<<t>> other [upd], int j [opt] )
+		{
+			io:as_base<<ax>>:relay( i, q, *other, j );
+		}
+	}
+
+	abstract in <ax>
+	{
+		[pwd] ~copy ( <t> )( <t> );
+
+		[new] ~relay ( <t> a [upd] )( <t> b )
+		{
+			b:begin( *a );
+		};
+		
+		[pwd] ~fread ( message [upd], expr fex )( <t> )( extra );
+
+		[pwd] ~fwrite ( message [upd], expr fex, <t> )()( extra );
+
+		[pwd] ~before? ( <t> a, <t> b )( bool yes );
+	}
+}
+
+
+
+
+

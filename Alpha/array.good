@@ -5,17 +5,13 @@ page array in alpha@good
 type array_cursor<t>;
 
 
-type array<t> from direct_access<<t>>, from serial_access<<t>><array_cursor<<t>>>  -- conventional
+type array<t> from ( uniform_set<<t>>, serial_set<<t>>< array_cursor<<t>>> ) -- conventional
 {{
 	An array<t> is a resizable object set.  Objects are
-	homogeneous and logically contiguous in memory.
+	uniform and logically contiguous in memory.
 
 	<t> is the symbolic object type. The adhoc type must
 	be a complete type.  
-
-	An array supports direct access via an integer position
-	index and serial access via an opaque cursor type
-	array_cursor<t>.
 		
 	Methods that require a given index fail if the index is
 	invalid. A valid index is between zero and count
@@ -28,72 +24,91 @@ type array<t> from direct_access<<t>>, from serial_access<<t>><array_cursor<<t>>
 	Note: delete without an index (default) when array is
 	empty doesn't do anything.
 
-	:rank determines the index of a given object in an
-	ordered array. If output unique is true, there is no
-	other object of equal (par) rank in the array, and 
-	output i indexes the insertion point to maintain proper
-	order.  Otherwise, output i indexes an object of equal
-	rank already in the array. :rank uses a binary search 
-	algorithm that depends on <t>:before?<t>.
-
-	An array<t> is portable if <t> is portable.  
-
 	Inserting and deleting at the end of an array is most
-	efficient:
+	efficient.
 
-	a:insert:begin( x )   -- push (dup x)
-	a:insert:begin( *x )  -- push (take x)
-	a:delete()( <t> x )   -- pop (save x)
+	<t> dependent base methods supporting initialization,
+	external portability, and ordered insertion are pro-
+	vided.  They're adapted via an associated abstract 
+	interface.  
+	
+	Note:  See page array in stock@good for permutable 
+	array types.
 }}
 {
-	general   
+	general method
 	{
 		begin ( int reserve [opt] ); -- empty
 
-		begin ( array<<t>> other );	-- dup other
+		insert [upd] ( int i, int q );		-- q null objs at i
 
-		begin ( array<<t>> other [upd] ); -- take other
+		insert [upd] ( int i [opt] ) = <t> proxy [init];  -- one null obj at i (end), return access
 
-		begin ( message [upd], expr fex )()( extra ); -- fread
+		delete [upd] ( int i, int q );		-- q objs at i, discard all
 
-		fwrite ( message [upd], expr fex )()( extra );
-
-		rank ( <t> )( int i, bool unique );
-
-		copy ( int i, int q, array<<t>> other [upd], int j [opt] );
-
-		insert [upd] ( int i, int q );						-- q null objs at i
-
-		insert [upd] ( int i [opt] ) = <t> proxy [init];	-- one null obj at i (end), return access
-
-		delete [upd] ( int i, int q );						-- q objs at i, discard all
-
-		delete [upd] ( int i [opt] )( <t> );				-- one obj at i (end), save
-
-		delete [upd] ( int i [opt] );						-- one obj at i (end), discard
+		delete [upd] ( int i [opt] );		-- one obj at i (end), discard
 				
-		resize [upd] ( int q );								-- insert or delete at end, new count = q
+		resize [upd] ( int q );				-- insert or delete at end, new count = q
 
-		reduce [upd];										-- release unused memory
+		reduce [upd];						-- release unused memory
 	}
-
-	general -- similar in direct_access<t>
+	
+	general method -- similar in uniform_set<<t>>
 	{
 		count ()( int );  
 
-		use ( int i ) = <t> proxy [eval,init];
+		use_object ( int i ) = <t> proxy [eval,init];
 	}
 
+	base method  -- <t> dependent
+	{
+		fread [upd] ( message [upd], expr fex )()( extra ); 
 
-	abstract in direct_access<<t>>
+		fwrite ( message [upd], expr fex )()( extra );	
+
+		copy [upd] ( int i, int q, array<<t>> other, int j [opt] );	-- init-by-copy q objs at i from other at j (0)
+		
+		relay [upd] ( int i, int q, array<<t>> other [upd], int j [opt] ); -- init-by-relay q objects at i from other at j (0)
+
+		rank ( <t> )( int i, bool unique ); -- find ordered insertion point
+	}
+
+	abstract method
+	{
+		~copy ( <t> )( <t> )
+		{
+			quit fault ( 'bug', 'no adapter' );
+		}
+
+		~relay ( <t> [upd] )( <t> )
+		{
+			quit fault ( 'bug', 'no adapter' );
+		}
+		
+		~fread ( message [upd], expr fex )( <t> )( extra )
+		{
+			quit fault ( 'bug', 'no adapter' );
+		}
+
+		~fwrite ( message [upd], expr fex, <t> )()( extra )
+		{
+			quit fault ( 'bug', 'no adapter' );
+		}
+
+		~before? ( <t> a, <t> b )( bool yes )
+		{
+			quit fault ( 'bug', 'no adapter' );
+		}
+	}
+
+	abstract method in uniform_set< <t> >
 	{
 		[final] ~count ()( int n );
 		
-		[final] ~use ( int i ) = <t> proxy;
+		[final] ~use_object ( int i ) = <t> proxy;
 	}
 
-
-	abstract in serial_access<<t>><array_cursor<<t>>>
+	abstract method in serial_set< <t> >< array_cursor< <t> > >
 	{
 		[final] ~open_cursor ( int )( array_cursor<<t>> );  
 
@@ -101,7 +116,7 @@ type array<t> from direct_access<<t>>, from serial_access<<t>><array_cursor<<t>>
 
 		[final] ~flip_cursor ( array_cursor<<t>> [upd] ); 
 
-		[final] ~use ( array_cursor<<t>> ) = <t> proxy; 
+		[final] ~use_object ( array_cursor<<t>> ) = <t> proxy; 
 	}
 }
 

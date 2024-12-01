@@ -4,12 +4,9 @@
 Universal methods are special methods that can
 can be called for any object.  They're intrinsic
 to the language and have special status because
-they evaluate construction of an object rather
+they evaluate the construction of an object rather
 than it's value. In particular, universal methods
 can be called for null objects without causing disruption.
-
-Note:  The compiler may reject certain calls if
-it can determine that a runtime result will be moot.
 
 
 general method
@@ -28,7 +25,7 @@ general method
 
 	as<t> [eval]= <t> proxy [eval,upd];	-- runtime, may be void
 
-	as_base<t> [eval] = <t> proxy [eval,upd]; -- verified at compile-time, [init] access when called from fraternal method
+	as_base<t> [eval] = <t> proxy [eval,upd,init]; -- verified at compile-time, special access declaration
 
 	as_actual<t> [eval] = <t> proxy [init];  -- runtime, may be void
 }
@@ -38,11 +35,14 @@ general method
 be verified at compile time.  It's used to resolve a
 specific external sub-object when inheritance rules
 would otherwise hide a base method, or when the 
-programmer wants to call an abstract method non-
-virtually, or when an external subobject :begin or
-:reuse method needs to be called from a fraternal 
-method in a subtype.  In the latter case, the result
-proxy has [init] access.
+programmer wants to call a base abstract method 
+non-virtually, or when an external subobject needs
+to be initialized or reused by a subtype method.
+In the latter case, the result proxy increases access
+to [init] if the lead object has [upd] access.
+:as_base<t> can also be called to clarify intent
+when the compiler would automatically deduce the
+base translation.
 
 
 A proxy has an internal double-link representation

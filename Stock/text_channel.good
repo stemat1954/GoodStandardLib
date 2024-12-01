@@ -12,11 +12,11 @@ page text_channel in stock@good
 	Text channels read and write without a time limit. A
 	transfer was successful if an output error text is null.
 
-	Writing is straightforward.  The base channel write 
+	Writing is straightforward.  The as_base channel write 
 	method is called in a loop until the whole message is 
 	transferred. 
 
-	Reading is more complicated. The base channel is read 
+	Reading is more complicated. The as_base channel is read 
 	one code unit at a time until a given count of char-
 	acters is transferred, or until a given delimiter
 	character is read.
@@ -44,7 +44,7 @@ page text_channel in stock@good
 		loop
 		{
 			read_channel_chr( *reader, *data )( error );
-			if ( "not_null?( error )" ) escape;
+			if ( "is_not_null?( error )" ) escape;
 
 			t:read()( unicode c2 );  -- last char
 			if ( "c2 |=| c" ) escape;
@@ -57,7 +57,7 @@ page text_channel in stock@good
 	{
 		data:reserve;  -- one code point
 		read_channel( *reader, *data )( error );
-		if ( "null?( error )" )
+		if ( "is_null?( error )" )
 		{
 			data:reserve()( bool again );
 			if ( again ) read_channel( *reader, *data )( error );
@@ -74,7 +74,7 @@ page text_channel in stock@good
 			if ( "report |=| 'good'" ) escape;
 			
 			evaluate_transfer( report, note )( error );
-			if ( "not_null?( error)" ) escape;
+			if ( "is_not_null?( error)" ) escape;
 		}
 	}
 
@@ -87,7 +87,7 @@ page text_channel in stock@good
 			if ( "report |=| 'good'" ) escape;
 			
 			evaluate_transfer( report, note )( error );
-			if ( "not_null?( error)" ) escape;
+			if ( "is_not_null?( error)" ) escape;
 		}
 	}
 
@@ -125,17 +125,17 @@ type read_only_text_channel from sync_read_only_channel
 	{
 		begin ( handle h )
 		{
-			io:base<sync_read_only_channel>:begin( h );
+			io:as_base<sync_read_only_channel>:begin( h );
 		}
 
 		read [upd]( text data [upd], int q )( text error )  -- q chars
 		{
-			read_channel_str( *io:base<sync_channel_reader>, *data, q )( error );
+			read_channel_str( *io:as_base<sync_channel_reader>, *data, q )( error );
 		}
 
 		read [upd]( text data [upd], unicode c )( text error ) -- delimiter c
 		{
-			read_channel_str( *io:base<sync_channel_reader>, *data, c)( error );
+			read_channel_str( *io:as_base<sync_channel_reader>, *data, c)( error );
 		}
 	}
 }
@@ -147,22 +147,22 @@ type read_write_text_channel from sync_read_write_channel
 	{
 		begin ( handle )
 		{
-			io:base<sync_read_write_channel>:begin( [handle] );
+			io:as_base<sync_read_write_channel>:begin( [handle] );
 		}
 
 		read [upd]( text data [upd], int q )( text error ) -- q chars
 		{
-			read_channel_str( *io:base<sync_channel_reader>, *data, q )( error );
+			read_channel_str( *io:as_base<sync_channel_reader>, *data, q )( error );
 		}
 
 		read [upd]( text data [upd], unicode c )( text error ) -- delimiter c
 		{
-			read_channel_str( *io:base<sync_channel_reader>, *data, c )( error );
+			read_channel_str( *io:as_base<sync_channel_reader>, *data, c )( error );
 		}
 
 		write [upd]( text data [upd] )( text error )
 		{
-			write_channel( *io:base<sync_channel_writer>, *data )( error );
+			write_channel( *io:as_base<sync_channel_writer>, *data )( error );
 		}
 	}
 }

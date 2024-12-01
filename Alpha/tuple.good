@@ -3,7 +3,7 @@ page tuple in alpha@good
 
 
 
-type tuple<#><t> from direct_access<<t>>  -- compatible, conventional
+type tuple<#><t> from uniform_set<<t>>  -- compatible, conventional
 {{
 	A tuple<#><t> is a fixed-size object array.
 
@@ -11,8 +11,7 @@ type tuple<#><t> from direct_access<<t>>  -- compatible, conventional
 	object type. The adhoc type must be a complete type.
 
 	Since object count is known at compile time, implemen-
-	tation can be optimized for a small number of objects 
-	by allocating them in the tuple instance.
+	tation can be optimized.
 
 	Objects are created when the tuple is initialized. They 
 	(the objects) may also be intialized (or not) depending
@@ -38,18 +37,18 @@ type tuple<#><t> from direct_access<<t>>  -- compatible, conventional
 		fwrite ( message [upd], expr fex )()( extra );
 	}
 
-	general -- similar in direct_access<<t>>
+	general -- similar in uniform_set<<t>>
 	{
 		count ()( int n );
 
-		use ( int i ) = <t> proxy [eval,upd]; 
+		use_object ( int i ) = <t> proxy [eval,upd]; 
 	}
 
-	abstract in direct_access<<t>>
+	abstract in uniform_set<<t>>
 	{
 		[final]	~count ()( int n );
 
-		[final] ~use ( int i ) = <t> proxy;
+		[final] ~use_object ( int i ) = <t> proxy;
 	}
 }
 

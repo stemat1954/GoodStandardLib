@@ -28,7 +28,7 @@ type console
 			kernel\console_identify( no_addr, *handle hcon:begin );
 			if ( "hcon |=| no_addr" ) quit ( 'platform', 'no system console' );
 			io:configure( hcon )( text err );
-			if ( "not_null?( err )" ) quit ( 'platform', 'system console broken' );
+			if ( "is_not_null?( err )" ) quit ( 'platform', 'system console broken' );
 			io.ready:begin( true );
 		}
 
@@ -46,7 +46,7 @@ type console
 			else
 			{
 				io:configure( hcon )( error );
-				io.ready:begin( "null?( error )" );
+				io.ready:begin( "is_null?( error )" );
 			}
 		}
 

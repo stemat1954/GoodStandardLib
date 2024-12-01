@@ -99,9 +99,9 @@ type expr -- intrinsic, conventional
 	{
 		begin ( array<ascii> );  -- synthetic
 
-		begin ( direct_access<ascii> );	-- synthetic
+		begin ( uniform_set<ascii> );	-- synthetic
 
-		begin ( serial_access<ascii> );	-- synthetic
+		begin ( serial_set<ascii> );	-- synthetic
 
 		begin ( expr other );	-- copy
 

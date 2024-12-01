@@ -2,37 +2,36 @@
 page extra in alpha@good
 
 
-type extra from direct_access<object> -- intrinsic, restricted
+type extra from uniform_set<object> -- intrinsic, restricted
 {{
-	An object of type extra contains unspecified objects
-	given to a procedure after inputs and outputs.
+	extra is an adjective type that refers to a uniform
+	list of	unspecified objects given to a procedure after
+	inputs and outputs.  
+	
+	An extra list is not an array<object> because type 
+	object is not complete.  
 
 	The compiler automatically creates and initializes an 
-	extra object.
+	extra list.
 		
 	Applications must use runtime methods to determine the
-	actual type of objects contained in a given extra. 
-	Generally, a procedure that accepts extra objects must
-	also receive some kind of definite input that provides 
-	a map of the objects in extra.
+	actual type of extras contained in the list. Generally,
+	a procedure that accepts extras must also receive some
+	kind of auxiliary input that maps the listed objects.
 
-	A given extra object can be forwarded to another proc-
-	edure by giving it as the first object in a list of
-	extra objects passed to the other procedure.
+	An extra list is a first class object that can be given
+	as a regular input to another procedure.  If an extra 
+	list is forwarded as an extra, the compiler will 
+	consolidate the given extra list into a new extra list
+	along with any other objects given.  
 
 	Some applications may need to delete objects before
 	forwarding.  :delete removes a specified number of 
-	objects in given order.  
+	objects in given order (fifo).  
 
-	New objects given after extra when forwarding are
-	added to the list received by the other procedure.
-		
-
-	@given\extra:use( i )[eval]:as<thing>
-	@given\extra:use( i )[upd]:as<thing>
-	@given\extra:use( i ):as_actual<thing>
-
-
+	@given\extra:use_object( i )[eval]:as<thing>
+	@given\extra:use_object( i )[upd]:as<thing>
+	@given\extra:use_object( i ):as_actual<thing>
 }}
 {
 	general
@@ -40,17 +39,17 @@ type extra from direct_access<object> -- intrinsic, restricted
 		delete [upd]( int q [opt] );  -- q objects from front
 	}
 
-	general  -- similar in direct_access<t>
+	general  -- similar in uniform_set<t>
 	{
 		count ()( int );
 
-		use ( int i ) = object proxy; 
+		use_object ( int i ) = object proxy; 
 	}
 
-	abstract in direct_access<object>
+	abstract in uniform_set<object>
 	{
 		[final] ~count ()( int n );
 
-		[final] ~use ( int i ) = object proxy;
+		[final] ~use_object ( int i ) = object proxy;
 	}
 }

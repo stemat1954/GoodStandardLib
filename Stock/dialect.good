@@ -3,14 +3,14 @@ page dialect in stock@good
 
 {{
 	Useful types, subroutines, and operations that comprise
-	a stock Pragma dialect.
+	a stock Good dialect.
 
 
-	Equal predicates are backed by :equal?.
+	Equal predicates are backed by :is_equal?.
 
-	Ordinal predicates are backed by :before?.
+	Ordinal predicates are backed by :is_before?.
 
-	Cardinal predicates are backed by :less?.
+	Cardinal predicates are backed by :is_less?.
 
 	Logical operators are backed by :and, :or, :xor, :not.
 
@@ -46,7 +46,6 @@ common
 	etm max_etm:begin( 'max' ) [const];
 
 	handle no_handle:begin [const];		
-
 }
 	
 common fp2
@@ -79,7 +78,6 @@ common int
 }
 
 
-
 nom type
 {
 	double<t> = tuple<'2'><<t>>;
@@ -92,7 +90,6 @@ nom type
 	word16 = word<'16'>;	-- byte2
 	word32 = word<'32'>;	-- byte4
 	word64 = word<'64'>;	-- byte8
-
 }
 
 
@@ -102,7 +99,7 @@ enum type sign ( 'positive', 'negative' );
 
 subroutine
 {
-	choose<t1><t2> ( bool a?, <t1> a [opt], <t2> b [opt] ) = object proxy ~o 
+	choose ( bool a?, object a [opt], object b [opt] ) = object proxy ~o 
 	{{
 		This subroutine selector chooses from two given
 		inputs a and b based on the value of a given bool
@@ -140,21 +137,21 @@ subroutine
 		  fix( offset, zero ) ~offset;
 	}}
 	{
-		if ( "not_null?( a )" ) ~o -> a else ~o -> b;
+		if ( "is_not_null?( a )" ) ~o -> a else ~o -> b;
 	}
 
 }
 
 
 
-operation	-- equal  
+operation	-- equality  
 {
 	"a |=| b"		= "equal?( a, b )";
 	"a |not=| b"	= "not( equal?( a, b ) )";
 }
 
 
-operation	-- ordinal
+operation	-- ordinality
 {
 	"a |before| b"		= "before?( a, b )";		
 	"a |after| b"		= "before?( b, a )";
@@ -162,7 +159,7 @@ operation	-- ordinal
 }
 
 
-operation	-- cardinal 
+operation	-- cardinality 
 {
 	"a |<| b"		= "less?( a, b )";
 	"a |>| b"		= "less?( b, a )";

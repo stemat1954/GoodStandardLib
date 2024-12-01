@@ -141,11 +141,11 @@ type text from message
 			e:begin( io:use_endian );
 		}
 
-		compatible? ( text other [opt] )( bool yes ) -- compare to platform if other null
+		is_compatible? ( text other [opt] )( bool yes ) -- compare to platform if other null
 		{
 			utf proxy ~f;
 			endian proxy ~e;
-			if ( "null?( other )" )
+			if ( "is_null?( other )" )
 			{
 				~f -> platform_utf;
 				~e -> platform_endian;
@@ -185,7 +185,7 @@ type text from message
 		{
 			describe_utf( m:use_utf )( null, expr m_fex );
 			io:set_rp( zero );
-			loop ( "not( rp_end?( ao ) )" )
+			loop ( "not( rp_end?( io ) )" )
 			{
 				io:as_base<message>:fread<int>( io.code_fex )( int n );
 				m:fwrite<int>( n, m_fex );
@@ -264,22 +264,22 @@ type text from message
 			io:write_chr( c );
 		}
 				
-		write [upd]( direct_access<unicode> s )
+		write [upd]( uniform<unicode> s )
 		{
 			io:write_str( s );
 		}
 
-		write [upd]( direct_access<ascii> s )
+		write [upd]( uniform<ascii> s )
 		{
 			io:write_str( s );
 		}
 
-		write<t> [upd]( serial_access<unicode><<t>> s )  -- <t> cursor type
+		write<t> [upd]( serial<unicode><<t>> s )  -- <t> cursor type
 		{
 			io:write_str( s );
 		}
 		
-		write<t> [upd]( serial_access<ascii><<t>> s )  -- <t> cursor type
+		write<t> [upd]( serial<ascii><<t>> s )  -- <t> cursor type
 		{
 			io:write_str( s );
 		}
@@ -291,13 +291,13 @@ type text from message
 
 		write [upd]( text t ) -- compatible only
 		{
-			if ( "not( compatible?( ao, t ) )" ) quit fault ( 'bug', 'incompatible text' );
+			if ( "not( is_compatible?( io, t ) )" ) quit fault ( 'bug', 'incompatible text' );
 			io:as_base<message>:copy( t, null, zero ); -- all
 		}
 
 		write [upd]( text t [upd] ) -- any encoding
 		{
-			if ( "compatible?( ao, t )" ) 
+			if ( "is_compatible?( io, t )" ) 
 				io:as_base<message>:copy( t, null, zero ); 
 			else
 				io:merge( *t );
@@ -358,7 +358,7 @@ type text from message
 		
 		skip [upd]( text pattern [upd], match_mode [opt] ) -- strict (quits)
 		{
-			fix( @given\match_mode, 'similar' ) ~mode;
+			fix( @given\match_mode, 'similar' as match_mode ) ~mode;
 
 			bool ok; int rp;
 			select ( ~mode )
@@ -374,7 +374,7 @@ type text from message
 		skip [upd]( text pattern [upd] )( bool ok, int q, int rp )  -- general
 		 with match? ( text pattern [upd], unicode, sign, expr fex )( bool )
 		{
-			if ( "not( compatible?( ao, pattern ) )" ) quit fault ( 'bug', 'incompatible pattern' );
+			if ( "not( is_compatible?( io, pattern ) )" ) quit fault ( 'bug', 'incompatible pattern' );
 			io:match( *pattern, 'positive' )( ok, q, rp ) with match?;  
 			if ( ok ) io:set_rp( rp );
 		}
@@ -389,7 +389,7 @@ type text from message
 
 			if ( "n |>| zero" )
 			{
-				loop ( "( n2 |<| n ) |and| not( rp_end?( ao ) )" )
+				loop ( "( n2 |<| n ) |and| not( rp_end?( io ) )" )
 				{	
 					n2:inc;
 					io:inc_rp;
@@ -397,7 +397,7 @@ type text from message
 			}
 			else if ( "n |<| zero" )
 			{
-				loop ( "( n2 |>| n ) |and| not( rp_end?( ao ) )" )
+				loop ( "( n2 |>| n ) |and| not( rp_end?( io ) )" )
 				{	
 					n2:dec;
 					io:dec_rp;
@@ -435,14 +435,14 @@ type text from message
 		seek [upd]( text pattern [upd], sign d [opt] )( int q ) -- q = chars matched (zero = no match)
 		 with match? ( text pattern [upd], unicode c, sign d, expr fex )( bool )
 		{
-			if ( "not( compatible?( ao, pattern ) )" ) quit fault ( 'bug', 'incompatible pattern' );
+			if ( "not( is_compatible?( io, pattern ) )" ) quit fault ( 'bug', 'incompatible pattern' );
 			fix( d, 'positive' ) ~d;
 			loop 
 			{
 				io:match( *pattern, ~d )( bool ok, q:reuse, int rp ) with match?;
 
 				if ( ok ) return;
-				if ( "null?( rp )" ) return after q:reuse:begin( zero );
+				if ( "is_null?( rp )" ) return after q:reuse:begin( zero );
 
 				io:set_rp( rp );  -- next unmatched char
 			}
@@ -493,17 +493,17 @@ type text from message
 	{
 		write_chr<t> [upd]( <t> c )  
 		{
-			c:fwrite( ao, 'code' )()( io.code_fex );
+			c:fwrite( io, 'code' )()( io.code_fex );
 		}
 
-		write_str<t> [upd]( direct_access<<t>> s ) 
+		write_str<t> [upd]( uniform<<t>> s ) 
 		{
-			for ( ~c in s ) ~c:fwrite( ao, 'code' )()( io.code_fex );
+			for ( ~c in s ) ~c:fwrite( io, 'code' )()( io.code_fex );
 		}
 
-		write_str<t><u> [upd]( serial_access<<t>><<u>> s ) 
+		write_str<t><u> [upd]( serial<<t>><<u>> s ) 
 		{
-			for ( ~c in s ) ~c:fwrite( ao, 'code' )()( io.code_fex );
+			for ( ~c in s ) ~c:fwrite( io, 'code' )()( io.code_fex );
 		}
 
 		read_chr<t> [upd]()( <t> c )
@@ -516,7 +516,7 @@ type text from message
 		{
 			s:begin;
 			int q2:begin( q );
-			loop ( "( q2 |>| zero ) |and| not( rp_end?( ao ) )" ) 
+			loop ( "( q2 |>| zero ) |and| not( rp_end?( io ) )" ) 
 			{
 				io:as_base<message>:fread<int>( io.code_fex )( int n );
 				s:insert:begin( n );
@@ -553,7 +553,7 @@ type text from message
 			io:get_rp()( int mark );
 			q:begin;
 
-			loop ( "not( rp_end?( ao ) )" )
+			loop ( "not( rp_end?( io ) )" )
 			{
 				unicode c;
 				if ( "d |=| 'positive'" )
@@ -567,7 +567,7 @@ type text from message
 				q:inc; -- result pending
 			}
 
-			if ( "null?( ok )" ) ok:begin( false );
+			if ( "is_null?( ok )" ) ok:begin( false );
 			else if ( ok ) q:inc; -- account for final match
 
 			io:get_rp()( rp ):set_rp( mark );
@@ -576,7 +576,7 @@ type text from message
 
 		seek_chr<t> [upd]( <t> c, sign d [opt] )( bool ok ) 
 		{
-			if ( "rp_end?( ao )" ) return after ok:begin( false );
+			if ( "rp_end?( io )" ) return after ok:begin( false );
 			fix( d, 'positive' as sign ) ~d;
 			int cn ( c:as_int );
 			if ( "~d |=| 'positive'" )
@@ -585,7 +585,7 @@ type text from message
 				{
 					io:as_base<message>:fread<int>( io.code_fex )( int n )
 					if ( "n |=| cn" ) return after ok:begin( 'true' );
-					if ( "rp_end?( ao )" ) return after ok:begin( 'false' );
+					if ( "rp_end?( io )" ) return after ok:begin( 'false' );
 				}
 			}
 			else
@@ -594,7 +594,7 @@ type text from message
 				{
 					io:as_base<message>:get_rp()( int mark ):fread<int>( io.code_fex )( int n );
 					if ( "n |=| cn" ) return after ok:begin( 'true' );
-					if ( "rp_end?( ao )" ) return after ok:begin( 'false' );
+					if ( "rp_end?( io )" ) return after ok:begin( 'false' );
 					io:set_rp( mark ):dec_rp;
 				}
 			}

@@ -4,21 +4,22 @@ page link in alpha@good
 
 type linked<t>   -- intrinsic
 {{
-	A linked<t> object is a link object that creates and/or 
+	A linked<t> object is an object that creates and/or 
 	accesses another object of type <t> in global storage.
 
 	Note:  Conceptually, a linked<t> object is a generic
-	type that derives from an internal and universal link
-	type.  The term "link" applies to any adhoc linked 
-	object.
+	type based on an abstract link (pointer) type.  The
+	term "link" applies to any adhoc linked object.
 
 	Links are used to create objects at runtime in global
-	storage.  The type of object created must be a complete
-	type, but the link's adhoc type can be any base type
-	of the object created.  Conversely, the type of object 
-	created by a link must be related to the link's adhoc
-	type (same type or subtype).
-		
+	storage. The type of object created must be a complete
+	type, but in general, a link's adhoc type can be any
+	related (possibly incomplete) type.  
+
+	Note: The link that creates an object must a complete
+	adhoc type, but links that copy other links need only
+	be related.
+	
 	Logically, a link is a runtime reference object. That
 	is, the binding of link to object is made at runtime.
 	In this sense, links are similar to proxies.  However, 
@@ -36,14 +37,10 @@ type linked<t>   -- intrinsic
 	Note:  In a sense, :use converts a link into a proxy.  
 	The conversion is optimized and may in fact be virtual.
 	
-	Note:  adhoc type <object> is allowed for <t> because 
-	ultimately <t> is the stated type of a result proxy
-	returned by :use.  
-
-	The proxy returned by :use has [upd] access and it can 
+ 	The proxy returned by :use has [upd] access and it can 
 	be used to call any method of <t> except :begin.  To
-	initialize the global object, call :use_new to get an
-	[init] proxy.
+	initialize the global object, call :use_as_actual to
+	get an [init] proxy.
 
 	The object bound to a link is created when the link 
 	is initialized. 
@@ -53,36 +50,42 @@ type linked<t>   -- intrinsic
 	to see two levels of initialization when a link is
 	created. This expression:
 	
-		linked<thing> lt begin:use_new:begin; 
+		linked<thing> lt begin:use_as_actual:begin; 
 
 	creates and initializes a link named lt, bound to a
 	global object of adhoc type thing, then accesses the 
-	object with :use_new to initialize the global object
-	using default :begin.  
+	object with :use_as_actual to initialize the global
+	object with default :begin.  
+
+	Note: It would be possible to eliminate :use_as_actual
+	in favor of :use:as_actual<t> but the specialized method 
+	is potentially more efficient and avoids redundant type
+	specification in a typical initialization sequence.
 
 	Note:  It's important to distinquish between a null
 	link and a possibly null object accessed by the link.
-	A null link can't be dereferenced, but a properly 
-	intialized link always binds an object that may or may
-	not be null.
+	A null link can't be used, but a properly intialized 
+	link can always be used and it may or may not bind
+	a null global object.
 	
-	A new link can be initialized by copying an existing
-	compatible link. When links are copied, the new
-	link is bound to the existing global object. A new
-	object is not created.  
+	A link can be initialized by copying an existing 
+	compatible link. When links are copied, the new link
+	is bound to some external subobject of the existing
+	global object. 
 	
-	The global object bound to a link (or links) is 
-	automatically deleted when all links that reference 
-	the object are deleted.  It is common to say that the
-	global object bound to one or more links is "reference
-	counted."
+	The global object bound to a link is automatically
+	deleted when all links that reference the object are
+	deleted.
+	
+	Note:  It's common to say that the global object bound 
+	to a link is "reference counted."
 
-	Note:  Copying links and reference counting is
-	thread-safe. Links are essential for sharing objects
-	between threads.
+	Note:  Copying links and reference counting is thread-
+	safe. Links are essential for sharing objects between
+	threads.
 
-	An existing link is compatible with another link
-	if the two adhoc link types are related.
+	An existing link is compatible with another link if 
+	the two adhoc link types are related.
 	
 	For example:
 
@@ -99,18 +102,17 @@ type linked<t>   -- intrinsic
 
 	subroutine foo
 	{
-		linked<widget> lw:begin:use_new:begin; -- new link to widget
+		linked<widget> lw:begin:use_as_actual:begin; -- new link to actual widget
 		linked<thing> lt:begin( lw );  -- copy pw
 
 		lw:use:foo;	-- ok (foo is inherited)
 		lw:use:goo;	-- ok
 
 		lt:use:foo;	-- ok
-		lt:use:goo;	-- error! (goo not in thing)
-		lt:use:as<widget>:goo;  -- ok
+		lt:use:goo;	-- error! (goo not a method of thing)
+		lt:use:as<widget>:goo;  -- ok after type translation
 	}
 		
-
 
 	In general, two types are related and compatible if they
 	occur in a common type hierarchy.
@@ -125,7 +127,7 @@ type linked<t>   -- intrinsic
 
 	If la is a link to an actual object of type A,
 
-		linked<A> la:begin:use_new:begin;
+		linked<A> la:begin:use_as_actual:begin;
 
 	then 
 
@@ -135,20 +137,19 @@ type linked<t>   -- intrinsic
 		linked<B> lb2:begin( lc );
 		linked<C> lc2:begin( lb );
 
-	are all legit and refer to the same actual object
-	pointed to by la.
+	are all legit and refer to the same actual object bound
+	to la.
 
 	This works because 
 
-	  la:use:base<B>
-	  la:use:base<C>
+	  la:use:as_base<B>
+	  la:use:as_base<C>
 	  lb:use:as<A>
 	  lc:use:as<A>
 	  lb:use:as<C>
 	  lc:use:as<B>
 
-	are all legit and return valid proxies that also 
-	reference the original actual object.
+	are all legit and return valid proxies.
 
 	Links can be used to create logically heterogenous 
 	arrays. They're also essential for creating dynamically
@@ -156,7 +157,7 @@ type linked<t>   -- intrinsic
 	networks.
 
 	Links are not portable.  However, since a link can
-	be created from a typename, and those ARE portable, 
+	be created from a typename, and typenames ARE portable, 
 	applications can devise ways to persist	and restore
 	links.
 
@@ -203,15 +204,15 @@ type linked<t>   -- intrinsic
 {
 	general 
 	{
-		begin;						-- create and bind null <t> object, complete <t>
+		begin;						-- create and bind null <t> object, complete <t> (may quit)
 
-		begin ( typename );			-- create and bind null object, named type is complete type or subtype of <t> (may fail)
+		begin ( typename );			-- create and bind null <t> object, typename:is<t>? must be true (may quit)
 
-		begin<xt> ( linked<<xt>> );	-- copy compatible link, <xt> related to <t>  (may fail)
+		begin<xt> ( linked<<xt>> );	-- copy compatible link, <xt> related to <t> (may quit)
 	
-		use_new = <t> proxy [init]; -- void if <t> not actual
+		use = <t> proxy [upd];		-- always works (never void)
 
-		use = <t> proxy [upd];	
+		use_as_actual = <t> proxy [init]; -- if <t> is actual object type (may be void)
 
 		is_equal<xt>? ( linked<<xt>> )( bool );
 
