@@ -35,7 +35,7 @@ type <t>link   -- intrinsic
 	
  	The proxy returned by :use has [upd] access and it can 
 	be used to call any method of <t> except :begin.  To
-	initialize the global object, call :use_as_actual to
+	initialize the global object, call :use_actual to
 	get an [init] proxy.
 
 	The object bound to a link is created when the link 
@@ -46,14 +46,14 @@ type <t>link   -- intrinsic
 	to see two levels of initialization when a link is
 	created. This expression:
 	
-		<thing>link tl begin:use_as_actual:begin; 
+		<thing>link tl begin:use_actual:begin; 
 
 	creates and initializes a link named tl, bound to a
 	global object of adhoc type thing, then accesses the 
-	object with :use_as_actual to initialize the global
+	object with :use_actual to initialize the global
 	object with default :begin.  
 
-	Note: It would be possible to eliminate :use_as_actual
+	Note: It would be possible to eliminate :use_actual
 	in favor of :use:as_actual<t> but the specialized method 
 	is potentially more efficient and avoids redundant type
 	specification in a typical initialization sequence.
@@ -98,7 +98,7 @@ type <t>link   -- intrinsic
 
 	subroutine foo
 	{
-		<widget>link wl:begin:use_as_actual:begin; -- new link to actual widget
+		<widget>link wl:begin:use_actual:begin; -- new link to actual widget
 		<thing>link tl:begin( wl );  -- copy wl
 
 		wl:use:foo;	-- ok (foo is inherited)
@@ -123,7 +123,7 @@ type <t>link   -- intrinsic
 
 	If al is a link to an actual object of type A,
 
-		<A>link al:begin:use_as_actual:begin;
+		<A>link al:begin:use_actual:begin;
 
 	then 
 
@@ -208,7 +208,7 @@ type <t>link   -- intrinsic
 	
 		use = <t> proxy [upd];		-- always works (never void)
 
-		use_as_actual = <t> proxy [init]; -- if <t> is actual object type (may be void)
+		use_actual = <t> proxy [init]; -- if <t> is actual object type (may be void)
 
 		is_equal<xt>? ( <<xt>>link )( bool );
 

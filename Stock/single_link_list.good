@@ -116,6 +116,14 @@ type single_link_list from sequence<node1><list_cursor>
 		nl:use:get_link()( <node1>link next )
 
 	until next is null.
+
+	Typed methods are provided in a segregated group. Most
+	of them work with a given coroutine allowing for generic
+	subtypes that compile with any type provided a proper 
+	coroutine can be given for the method and node type.
+
+	Note: standard coroutines make calling these methods
+	straight forward.
 }}
 {
 	general method
@@ -262,7 +270,7 @@ type single_link_list from sequence<node1><list_cursor>
 	{
 		insert<nt> [upd] with initiate ()( <nt> )  -- after current
 		{
-			initiate()( <<nt>>link nl:begin:use_as_actual );
+			initiate()( <<nt>>link nl:begin:use_actual );
 			io:insert( nl as <node1>link );
 		}
 		
@@ -329,6 +337,13 @@ type lifo_list<nt> from single_link_list  -- typed stack
 	NOTE!  Implementation assumes current node starts at
 	front and doesn't change.  Application must restore
 	current node if base methods are called. 
+
+	pull with transfer requires a proper coroutine to select
+	and reconcile call.
+
+	my_stack:pull()( thing next ) with std_relay<thing>;
+
+	my_stack:pull()( thing next ) with std_copy<thing>;
 }}
 {
 	general method
@@ -374,7 +389,10 @@ type fifo_list<nt> from single_link_list  -- typed queue
 {{
 	<nt> derived from node1
 
-	insert last node (push) and remove first node (pull).
+	push (insert) last node and pull (remove) first node.
+
+	pull with transfer requires a proper coroutine to select
+	and reconcile call.
 }}
 {
 	general method

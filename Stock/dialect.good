@@ -140,6 +140,17 @@ subroutine
 		if ( "is_not_null?( a )" ) ~o -> a else ~o -> b;
 	}
 
+
+	std_copy<t> ( <t> a )( <t> b )
+	{
+		b:begin( a );
+	}
+
+	std_relay<t> ( <t> [upd] a )( <t> b )
+	{
+		b:begin( *a );
+	}
+
 }
 
 
