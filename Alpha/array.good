@@ -4,7 +4,6 @@ page array in alpha@good
 
 nom type array_cursor = tuple<'2'><int>;
 
-
 type array<t> from ( set<<t>>, sequence<<t>><array_cursor> ) -- compatible and conventional per <t>
 {{
 	An array<t> is a resizable object set. Objects are
@@ -13,7 +12,7 @@ type array<t> from ( set<<t>>, sequence<<t>><array_cursor> ) -- compatible and c
 	<t> is the symbolic object type. The adhoc type must
 	be a complete type.  
 		
-	Methods that require a given index fail if the index is
+	Methods that require a given index quit if the index is
 	invalid. A valid index is between zero and count
 	(inclusive).  index = count is a valid insertion index.
 
@@ -27,23 +26,12 @@ type array<t> from ( set<<t>>, sequence<<t>><array_cursor> ) -- compatible and c
 	Inserting and deleting at the end of an array is most
 	efficient.
 
-	<t> dependent methods supporting initialization,
-	external portability, and ordered insertion are pro-
-	vided and segrgated in a seperate general group: 
-	
-		:copy depends on <t>:begin( <t> )
+	An array can be configured from any type <t> but some
+	methods can only be called with a type dependent co-
+	routine.  See stock dialect for standard coroutines.
 
-		:move depends on <t>:begin( <t> [upd] )
-
-		:rank depends on <t>:is_before?( <t> )
-
-		:fread depends on <t>:begin( message... )
-
-		:fwrite depends on <t>:fwrite( message... )
-
-	
-	NOTE:  <t> dependent compilation errors aren't 
-	detected until alpha is translated to sub-alpha.
+	Note: This technique verifies type compatibility and
+	adds flexibility.
 
 	An array cursor is bidirectional and represented by
 	a pair of ints.  One int carries the current position,
@@ -55,17 +43,19 @@ type array<t> from ( set<<t>>, sequence<<t>><array_cursor> ) -- compatible and c
 	{
 		begin ( int reserve [opt] ); 
 
-		insert [upd] ( int i, int q );		-- q null objs at i
+		begin ( array<<t>> other upd );		-- move
 
-		insert [upd] ( int i [opt] ) = <t> proxy [init];  -- one null obj at i (end), return access
+		insert [upd]( int i, int q );		-- q null objs at i
 
-		delete [upd] ( int i, int q );		-- q objs at i, discard all
+		insert [upd]( int i [opt] ) = <t> proxy [init];  -- one null obj at i (end), return access
 
-		delete [upd] ( int i [opt] );		-- one obj at i (end), discard
+		delete [upd]( int i, int q );		-- q objs at i, discard all
+
+		delete [upd]( int i [opt] );		-- one obj at i (end), discard
 				
-		resize [upd] ( int q );				-- insert or delete at end, new count = q
+		resize [upd]( int q );				-- insert or delete at end, new count = q
 
-		reduce [upd];						-- release unused memory
+		shrink [upd];						-- release unused memory
 	}
 	
 	general method -- similar in set<<t>>
@@ -77,21 +67,22 @@ type array<t> from ( set<<t>>, sequence<<t>><array_cursor> ) -- compatible and c
 
 	general method  -- <t> dependent 
 	{
-		fread [upd]( message [upd], expr fex );				-- array image
-		fread [upd]( message [upd], expr fex )()( extra );  -- ditto
+		load [upd]( array<<t>> other ) with copy ( <t> )( <t> );
+		load [upd]( message [upd], expr fex ) with fread ( message [upd], expr fex )( <t> );	
+		load [upd]( message [upd], expr fex )()( extra ) with fread ( message [upd], expr fex )( <t> )( extra ); 
 
-		fwrite [eval]( message [upd], expr fex );			 -- array immage
-		fwrite [eval]( message [upd], expr fex )()( extra ); -- ditto	
+		fwrite [eval]( message [upd], expr fex ) with fwrite ( message [upd], expr fex, <t> );
+		fwrite [eval]( message [upd], expr fex )()( extra ) with fwrite ( message [upd], expr fex, <t> )()( extra );
 
-		copy [eval]( int i [opt] )( <t> obj );	-- copy from one obj at i (end) TO obj
-		copy [upd] ( int i [opt], <t> obj );	-- copy into one null obj at i (end) FROM obj
-		copy [upd] ( int i, int q, array<<t>> other, int j [opt] );  -- copy into q null objs at i FROM other at j (0)
+		copy [eval]( int i [opt] )( <t> obj ) with copy ( <t> )( <t> );						-- from one obj at i (end) TO obj
+		copy [upd]( int i [opt], <t> obj ) with copy ( <t> )( <t> );						-- into one null obj at i (end) FROM obj
+		copy [upd]( int i, int q, array<<t>> other, int j [opt] ) with copy ( <t> )( <t> ); -- into q null objs at i FROM other at j (0)
 
-		move [upd]( int i [opt] )( <t> obj )		-- move one obj at i (end) TO obj
-		move [upd]( int i [opt], <t> obj [upd] );  -- move into one null obj at i (end) FROM obj
-		move [upd]( int i, int q, array<<t>> other [upd], int j [opt] ); -- move into q objects at i FROM other at j (0)
+		move [upd]( int i [opt] )( <t> obj ) with move ( <t> [upd] )( <t> );				-- ditto copy 
+		move [upd]( int i [opt], <t> obj [upd] ) with move ( <t> [upd] )( <t> );
+		move [upd]( int i, int q, array<<t>> other [upd], int j [opt] ) with move ( <t> [upd] )( <t> );
 
-		rank [eval]( <t> )( int i, bool unique ); -- find ordered insertion point
+		rank [eval]( <t> )( int i, bool unique ) with is_before? ( <t> a, <t> b )( bool ); -- find ordered insertion point
 	}
 
 

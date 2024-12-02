@@ -12,21 +12,14 @@ type tuple<#><t> from set<<t>> -- compatible and conventional per <t>
 	Since object count is known at compile time, implemen-
 	tation can be optimized.
 
-	<t> dependent methods supporting tuple initialization
-	and portability are provided and segregated in a 
-	seperate general group: 
-	
-		:load by copy and replicate depends on <t>:begin( <t> )
+	A tuple can be constructed from any type <t> but load
+	methods can only be called with a type dependent co-
+	routine.  See stock dialect for standard coroutines.
 
-		:load by move depends on <t>:begin( <t> [upd] )
+	Note: This technique verifies type compatibility and
+	adds flexibility.
 
-		:load by fread depends on <t>:begin( message... )
-
-		:fwrite depends on <t>:fwrite( message... )
-
-	NOTE:  <t> dependent compilation errors aren't 
-	detected until alpha is translated to sub-alpha.
-	
+	tuple<'3'><int>:begin:load( zero ) with std_copy<int>;
 }}
 {
 	general 
@@ -41,14 +34,11 @@ type tuple<#><t> from set<<t>> -- compatible and conventional per <t>
 
 	general -- <t> dependent
 	{
-		load ( <t> seed );	-- replicate
-
-		load ( tuple<<#>><<t>> other ); -- copy 
-
-		load ( tuple<<#>><<t>> other [upd] ); -- move 
-
-		load ( message [upd], expr fex );   -- fread
-		load ( message [upd], expr fex )()( extra ); -- fread 
+		load ( <t> seed ) with copy ( <t> )( <t> );	-- replicate
+		load ( tuple<<#>><<t>> other )  with copy ( <t> )( <t> );
+		load ( tuple<<#>><<t>> other [upd] )  with move ( <t> [upd] )( <t> );
+		load ( message [upd], expr fex ) with fread ( message [upd], expr fex )( <t> ); 
+		load ( message [upd], expr fex )()( extra )  with fread ( message [upd], expr fex )( <t> )( extra ); 
 
 		fwrite ( message [upd], expr fex ); 
 		fwrite ( message [upd], expr fex )()( extra ); 

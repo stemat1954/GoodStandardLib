@@ -338,17 +338,20 @@ type lifo_list<nt> from single_link_list  -- typed stack
 	front and doesn't change.  Application must restore
 	current node if base methods are called. 
 
-	pull with transfer requires a proper coroutine to select
-	and reconcile call.
+	:begin with copy and :pull with transfer require a type-
+	dependent coroutine.
 
+	Example:
+
+	lifo_list<thing> my_stack ( other_stack ) with std_copy<thing>;
 	my_stack:pull()( thing next ) with std_move<thing>;
-
 	my_stack:pull()( thing next ) with std_copy<thing>;
+
 }}
 {
 	general method
 	{
-		begin
+		begin --empty
 		{
 			io:as_base<single_link_list>:begin;
 		}
@@ -356,6 +359,16 @@ type lifo_list<nt> from single_link_list  -- typed stack
 		begin ( lifo_list<<nt>> other [upd] )  -- move 
 		{
 			io:as_base<single_link_list>:begin( *other );
+		}
+
+		begin ( lifo_list<<nt>> other ) with copy ( <nt> )( <nt> )
+		{
+			io:as_base<single_link_list>:begin;
+			for ( ~node in other )
+			{
+				copy( ~node )( <<nt>>link nl:begin:use_actual );
+				io:insert( nl ):go_next;
+			}
 		}
 
 		push [upd] with initiate ()( <nt> node )
@@ -391,13 +404,13 @@ type fifo_list<nt> from single_link_list  -- typed queue
 
 	push (insert) last node and pull (remove) first node.
 
-	pull with transfer requires a proper coroutine to select
-	and reconcile call.
+	:begin with copy and pull with transfer require a type-
+	dependent coroutine.
 }}
 {
 	general method
 	{
-		begin
+		begin -- empty
 		{
 			io:as_base<single_link_list>:begin;
 		}
@@ -405,6 +418,16 @@ type fifo_list<nt> from single_link_list  -- typed queue
 		begin ( fifo_list<<nt>> other [upd] )  -- move 
 		{
 			io:as_base<single_link_list>:begin( *other );
+		}
+				
+		begin ( fifo_list<<nt>> other ) with copy ( <nt> )( <nt> )
+		{
+			io:as_base<single_link_list>:begin;
+			for ( ~node in other )
+			{
+				copy( ~node )( <<nt>>link nl:begin:use_actual );
+				io:insert( nl ):go_next;
+			}
 		}
 
 		push [upd] with initiate ()( <nt> node )
