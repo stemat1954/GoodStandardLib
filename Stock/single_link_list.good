@@ -269,18 +269,18 @@ type single_link_list from sequence<node1><list_cursor>
 		copy_next<nt> ()( <nt> node ) with copy ( <nt> )( <nt> )
 		{
 			io:get_next()( <node1>link nl );
-			if ( "is_not_null?( nl )" )	copy( nl.use:as<<nt>> )( node );
+			if ( "is_not_null?( nl )" )	copy( nl:use:as<<nt>> )( node );
 		}
 
-		relay_next<nt> [upd] ()( <t> node ) with relay ( <nt> upd )( <nt> ) 
+		relay_next<nt> [upd] ()( <t> node ) with relay ( <nt> [upd] )( <nt> ) 
 		{
 			io:get_next()( <node1>link nl );
-			if ( "is_not_null?( nl )" ) relay( nl.use:as<<nt>> )( node );
+			if ( "is_not_null?( nl )" ) relay( nl:use:as<<nt>> )( node );
 		}
 
 		use_current<nt> = <nt> proxy [upd] ~n   -- void possible
 		{
-			if ( "is_not_null?( io.current )" ) ~n -> io.current.use;
+			if ( "is_not_null?( io.current )" ) ~n -> io.current:use:as<<nt>>;
 		}
 	}
 
