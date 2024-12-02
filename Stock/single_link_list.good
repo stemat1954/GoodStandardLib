@@ -331,18 +331,19 @@ type lifo_list<nt> from single_link_list  -- typed stack
 {{
 	<nt> derived from node1
 
-	push (insert) and pull (remove) list where front node is
-	always current.
-
+	push (insert) front node
+	pull (remove) front node
+	
 	NOTE!  Implementation assumes current node starts at
 	front and doesn't change.  Application must restore
 	current node if base methods are called. 
 
-	:begin with copy and :pull with transfer require a type-
-	dependent coroutine.
+	:begin with copy and :pull with transfer require a
+	type-dependent coroutine.
 
 	Example:
 
+	type thing from node1;
 	lifo_list<thing> my_stack ( other_stack ) with std_copy<thing>;
 	my_stack:pull()( thing next ) with std_move<thing>;
 	my_stack:pull()( thing next ) with std_copy<thing>;
@@ -402,10 +403,11 @@ type fifo_list<nt> from single_link_list  -- typed queue
 {{
 	<nt> derived from node1
 
-	push (insert) last node and pull (remove) first node.
+	push (insert) last node
+	pull (remove) first node
 
-	:begin with copy and pull with transfer require a type-
-	dependent coroutine.
+	:begin with copy and :pull with transfer require a 
+	type-dependent coroutine.
 }}
 {
 	general method
