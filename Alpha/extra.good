@@ -2,7 +2,7 @@
 page extra in alpha@good
 
 
-type extra from uniform_set<object> -- intrinsic, restricted
+type extra from set<object> -- intrinsic, restricted
 {{
 	extra is an adjective type that refers to a uniform
 	list of	unspecified objects given to a procedure after
@@ -39,14 +39,14 @@ type extra from uniform_set<object> -- intrinsic, restricted
 		delete [upd]( int q [opt] );  -- q objects from front
 	}
 
-	general  -- similar in uniform_set<t>
+	general  -- similar in set<t>
 	{
 		count ()( int );
 
 		use_object ( int i ) = object proxy; 
 	}
 
-	abstract in uniform_set<object>
+	abstract in set<object>
 	{
 		[final] ~count ()( int n );
 

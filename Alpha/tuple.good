@@ -2,8 +2,7 @@
 page tuple in alpha@good
 
 
-
-type tuple<#><t> from uniform_set<<t>>  -- compatible, conventional
+type tuple<#><t> from set<<t>> -- compatible and conventional per <t>
 {{
 	A tuple<#><t> is a fixed-size object array.
 
@@ -13,38 +12,49 @@ type tuple<#><t> from uniform_set<<t>>  -- compatible, conventional
 	Since object count is known at compile time, implemen-
 	tation can be optimized.
 
-	Objects are created when the tuple is initialized. They 
-	(the objects) may also be intialized (or not) depending
-	on which :begin method is called.
+	<t> dependent methods supporting tuple initialization
+	and portability are provided and segregated in a 
+	seperate general group: 
+	
+		:load by copy and replicate depends on <t>:begin( <t> )
 
-	A tuple is portable if <t> is portable. See Alpha type
-	reference for supported formats.
+		:load by relay depends on <t>:begin( <t> [upd] )
 
-	Generic binary 'b' is supported for any <t> that also
-	supports generic binary 'b'.
+		:load by fread depends on <t>:begin( message... )
+
+		:fwrite depends on <t>:fwrite( message... )
+
+	NOTE:  <t> dependent compilation errors aren't 
+	detected until alpha is translated to sub-alpha.
+	
 }}
 {
 	general 
 	{
 		begin;	-- all objects null
-
-		begin ( <t> seed );	-- copy seed to all objects
-
-		begin ( tuple<<#>><<t>> other ); -- copy 
-		
-		begin ( message [upd], expr fex )()( extra ); -- fread
-
-		fwrite ( message [upd], expr fex )()( extra );
 	}
 
-	general -- similar in uniform_set<<t>>
+	general -- similar in set<<t>>
 	{
-		count ()( int n );
-
 		use_object ( int i ) = <t> proxy [eval,upd]; 
 	}
 
-	abstract in uniform_set<<t>>
+	general -- <t> dependent
+	{
+		load ( <t> seed );	-- replicate
+
+		load ( tuple<<#>><<t>> other ); -- copy 
+
+		load ( tuple<<#>><<t>> other [upd] ); -- relay 
+
+		load ( message [upd], expr fex );   -- fread
+		load ( message [upd], expr fex )()( extra ); -- fread 
+
+		fwrite ( message [upd], expr fex ); 
+		fwrite ( message [upd], expr fex )()( extra ); 
+	}
+
+	abstract in set<<t>>
 	{
 		[final]	~count ()( int n );
 

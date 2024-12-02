@@ -1,0 +1,46 @@
+
+page set in alpha@good
+
+
+type set<t> [incomplete] -- intrinsic
+{{
+	set<t> is a generic base type for uniform object
+	collections.
+		
+	<t> is the symbolic object type. 
+
+	Collections that derive from set<t> manage a countable
+	set of objects where individual objects are directly
+	accessed by a numeric position index.
+
+	Valid indexes range from zero to count - 1.
+
+	:use_object returns access to an object at a given
+	position. If the index is out of range, the result proxy 
+	will be void.
+
+	Sets are naturally ordered by index, but there is no
+	presumption that objects with a lesser index compare
+	less than or before objects with a greater index.
+
+	A set can be scanned in a Good for loop.
+}}
+{
+	general 
+	{
+		begin;
+
+		count ()( int n );
+
+		use_object ( int i ) = <t> proxy;
+	}
+
+	abstract
+	{
+		~count ()( int );	
+
+		~use_object ( int i ) = <t> proxy; 
+	}
+}
+
+

@@ -2,12 +2,12 @@
 page array in alpha@good
 
 
-type array_cursor<t>;
+nom type array_cursor = tuple<'2'><int>;
 
 
-type array<t> from ( uniform_set<<t>>, serial_set<<t>>< array_cursor<<t>>> ) -- conventional
+type array<t> from ( set<<t>>, sequence<<t>><array_cursor> ) -- compatible and conventional per <t>
 {{
-	An array<t> is a resizable object set.  Objects are
+	An array<t> is a resizable object set. Objects are
 	uniform and logically contiguous in memory.
 
 	<t> is the symbolic object type. The adhoc type must
@@ -27,18 +27,33 @@ type array<t> from ( uniform_set<<t>>, serial_set<<t>>< array_cursor<<t>>> ) -- 
 	Inserting and deleting at the end of an array is most
 	efficient.
 
-	<t> dependent base methods supporting initialization,
+	<t> dependent methods supporting initialization,
 	external portability, and ordered insertion are pro-
-	vided.  They're adapted via an associated abstract 
-	interface.  
+	vided and segrgated in a seperate general group: 
 	
-	Note:  See page array in stock@good for permutable 
-	array types.
+		:copy depends on <t>:begin( <t> )
+
+		:relay depends on <t>:begin( <t> [upd] )
+
+		:rank depends on <t>:is_before?( <t> )
+
+		:fread depends on <t>:begin( message... )
+
+		:fwrite depends on <t>:fwrite( message... )
+
+	
+	NOTE:  <t> dependent compilation errors aren't 
+	detected until alpha is translated to sub-alpha.
+
+	An array cursor is bidirectional and represented by
+	a pair of ints.  One int carries the current position,
+	while the other carries step.  If step is zero, the 
+	cursor is inoperable.
 }}
 {
-	general method
+	general method 
 	{
-		begin ( int reserve [opt] ); -- empty
+		begin ( int reserve [opt] ); 
 
 		insert [upd] ( int i, int q );		-- q null objs at i
 
@@ -53,70 +68,50 @@ type array<t> from ( uniform_set<<t>>, serial_set<<t>>< array_cursor<<t>>> ) -- 
 		reduce [upd];						-- release unused memory
 	}
 	
-	general method -- similar in uniform_set<<t>>
+	general method -- similar in set<<t>>
 	{
 		count ()( int );  
 
 		use_object ( int i ) = <t> proxy [eval,init];
 	}
 
-	base method  -- <t> dependent
+	general method  -- <t> dependent 
 	{
-		fread [upd] ( message [upd], expr fex )()( extra ); 
+		fread [upd]( message [upd], expr fex );				-- array image
+		fread [upd]( message [upd], expr fex )()( extra );  -- ditto
 
-		fwrite ( message [upd], expr fex )()( extra );	
+		fwrite [eval]( message [upd], expr fex );			 -- array immage
+		fwrite [eval]( message [upd], expr fex )()( extra ); -- ditto	
 
-		copy [upd] ( int i, int q, array<<t>> other, int j [opt] );	-- init-by-copy q objs at i from other at j (0)
-		
-		relay [upd] ( int i, int q, array<<t>> other [upd], int j [opt] ); -- init-by-relay q objects at i from other at j (0)
+		copy [eval]( int i [opt] )( <t> obj );	-- copy from one obj at i (end) TO obj
+		copy [upd] ( int i [opt], <t> obj );	-- copy into one null obj at i (end) FROM obj
+		copy [upd] ( int i, int q, array<<t>> other, int j [opt] );  -- copy into q null objs at i FROM other at j (0)
 
-		rank ( <t> )( int i, bool unique ); -- find ordered insertion point
+		relay [upd]( int i [opt] )( <t> obj )		-- relay one obj at i (end) TO obj
+		relay [upd]( int i [opt], <t> obj [upd] );  -- relay into one null obj at i (end) FROM obj
+		relay [upd]( int i, int q, array<<t>> other [upd], int j [opt] ); -- relay into q objects at i FROM other at j (0)
+
+		rank [eval]( <t> )( int i, bool unique ); -- find ordered insertion point
 	}
 
-	abstract method
-	{
-		~copy ( <t> )( <t> )
-		{
-			quit fault ( 'bug', 'no adapter' );
-		}
 
-		~relay ( <t> [upd] )( <t> )
-		{
-			quit fault ( 'bug', 'no adapter' );
-		}
-		
-		~fread ( message [upd], expr fex )( <t> )( extra )
-		{
-			quit fault ( 'bug', 'no adapter' );
-		}
-
-		~fwrite ( message [upd], expr fex, <t> )()( extra )
-		{
-			quit fault ( 'bug', 'no adapter' );
-		}
-
-		~before? ( <t> a, <t> b )( bool yes )
-		{
-			quit fault ( 'bug', 'no adapter' );
-		}
-	}
-
-	abstract method in uniform_set< <t> >
+	abstract method in set<<t>>
 	{
 		[final] ~count ()( int n );
 		
 		[final] ~use_object ( int i ) = <t> proxy;
 	}
 
-	abstract method in serial_set< <t> >< array_cursor< <t> > >
+	abstract method in sequence<<t>><array_cursor>
 	{
-		[final] ~open_cursor ( int )( array_cursor<<t>> );  
+		[final] ~open_cursor ( int )( array_cursor );  
 
-		[final] ~move_cursor ( array_cursor<<t>> [upd] );
+		[final] ~move_cursor ( array_cursor [upd] );
 
-		[final] ~flip_cursor ( array_cursor<<t>> [upd] ); 
+		[final] ~flip_cursor ( array_cursor [upd] ); 
 
-		[final] ~use_object ( array_cursor<<t>> ) = <t> proxy; 
+		[final] ~use_object ( array_cursor ) = <t> proxy; 
 	}
 }
+
 

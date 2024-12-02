@@ -2,54 +2,59 @@
 page single_link_list in stock@good
 
 {{
-	on this page:
+	types on this page:
 
-	type list_cursor
-	type single_link_list
-	type fifo_list<t>
-	type lifo_list<t>
+	list_cursor
+	single_link_list
+	lifo_list<nt>
+	fifo_list<nt>
 
 }}
 
 
 type list_cursor
+{{
+	A list cursor is inoperable if io.nl is null.
+
+	Note:  the cursor itself is not null.
+}}
 {
 	general
 	{
-		begin ( linked<node1> ln [opt] )
+		begin ( <node1>link nl [opt] )
 		{
-			if ( "is_not_null?( ln )" ) io.ln:begin( ln );
+			if ( "is_not_null?( nl )" ) io.nl:begin( nl );
 		}
 
 		move [upd]
 		{
-			if ( "is_not_null?( io.ln )" ) 
+			if ( "is_not_null?( io.nl )" ) 
 			{
-				io.ln:use:get_link()( linked<node1> next );
-				io.ln:reuse;
-				if ( "is_not_null?( next )" ) io.ln:begin( next );
+				io.nl:use:get_link()( <node1>link next );
+				io.nl:reuse;
+				if ( "is_not_null?( next )" ) io.nl:begin( next );
 			}
 		}
 
 		flip [upd]
 		{
-			io.ln:reuse;  -- not supported
+			io.nl:reuse;  -- not supported
 		}
 
 		use_node = node1 proxy ~n;
 		{
-			if ( "is_not_null?( io.ln )" ) ~n -> io.ln:use 
+			if ( "is_not_null?( io.nl )" ) ~n -> io.nl:use 
 		}
 	}
 
 	instance
 	{
-		linked<node1> ln [opt];
+		<node1>link nl [opt];
 	}
 }
 
 
-type single_link_list from serial<node1><list_cursor>
+type single_link_list from sequence<node1><list_cursor>
 {{
 	One-way linked list with heterogenous nodes.
 
@@ -61,8 +66,6 @@ type single_link_list from serial<node1><list_cursor>
 	designate nodes that may or may not exist.  If the 
 	list has at least one node, first and last exist and
 	are well-defined.  
-	
-	An internal link designates the current position. 
 	
 	Generally, the next node follows the current position.
 	If the last node is current, the next node doesn't 
@@ -105,20 +108,24 @@ type single_link_list from serial<node1><list_cursor>
 	the node after the next node, if it exists.  current 
 	position doesn't change.
 	
-	A [const] list can be traversed using :get methods.
-	:get methods copy a named link if it exists.  If
-	:get_current doesn't copy a link (output is null), the
-	list is empty and the front position is current.
+	A constant list can be traversed using [eval] :get
+	methods.  :get methods copy a named link if it exists.  
+	Once a named link is copied, the list is traversed by
+	calling 
+
+		nl:use:get_link()( <node1>link next )
+
+	until next is null.
 }}
 {
 	general method
 	{
 		begin  -- original empty
 		{
-			io:as_base<serial<node1><linked<node1>>:begin;
+			io:as_base<sequence<node1><<node1>link>:begin;
 		}
 
-		begin ( single_link_list other [upd] )  -- take other 
+		begin ( single_link_list other [upd] )  -- relay 
 		{
 			if ( "is_not_null?( other.first )" )
 			{
@@ -159,61 +166,61 @@ type single_link_list from serial<node1><list_cursor>
 			}
 			else
 			{
-				io.current:use:get_link()( linked<node1> ln ); 
-				if ( "is_not_null?( ln )" ) io.current:reuse:begin( ln );
+				io.current:use:get_link()( <node1>link nl ); 
+				if ( "is_not_null?( nl )" ) io.current:reuse:begin( nl );
 			}
 		}
 
-		go_here [upd]( linked<node1> ln )  
+		go_here [upd]( <node1>link nl )  
 		{
-			io.current:reset:begin( ln );
+			io.current:reset:begin( nl );
 		}
 		
 		
-		get_first ()( linked<node1> ln )
+		get_first [eval]()( <node1>link nl )
 		{
-			if ( "is_not_null?( io.first )" ) ln:begin( io.first );
+			if ( "is_not_null?( io.first )" ) nl:begin( io.first );
 		}
 
-		get_last ()( linked<node1> ln )
+		get_last [eval]()( <node1>link nl )
 		{
-			if ( "is_not_null?( io.last )" ) ln:begin( io.last );
+			if ( "is_not_null?( io.last )" ) nl:begin( io.last );
 		}
 
-		get_current ()( linked<node1> ln )
+		get_current [eval]()( <node1>link nl )
 		{
-			if ( "is_not_null?( io.current )" ) ln:begin( io.current );
+			if ( "is_not_null?( io.current )" ) nl:begin( io.current );
 		}
 
-		get_next ()( linked<node1> ln ) 
+		get_next [eval]()( <node1>link nl ) 
 		{
-			if ( "is_not_null?( io.current )" ) io.current:use:get_link()( ln );
+			if ( "is_not_null?( io.current )" ) io.current:use:get_link()( nl );
 		}
 
 
-		insert [upd]( linked<node1> ln )  -- after current  
+		insert [upd]( <node1>link nl )  -- after current  
 		{
-			ln:use:unlink;  -- just in case
+			nl:use:unlink;  -- just in case
 			if ( "is_not_null?( io.current )" )  
 			{
 				-- after current
-				io.current:use:get_link()( linked<node> before ):set_link( ln ); 
+				io.current:use:get_link()( <node1>link before ):set_link( nl ); 
 				if ( "is_null?( before )" )
-					io.last:reuse:begin( ln )
+					io.last:reuse:begin( nl )
 				else
-					ln:use:set_link( before );
+					nl:use:set_link( before );
 			}
 			else if ( "is_not_null?( io.first )" )
 			{
 				-- front (before first)
-				ln:use:set_link( io.first );
-				io.first:reuse:begin( ln );
+				nl:use:set_link( io.first );
+				io.first:reuse:begin( nl );
 			}
 			else 
 			{
 				-- first and only node
-				io.first:begin( ln );
-				io.last:begin( ln );
+				io.first:begin( nl );
+				io.last:begin( nl );
 			}
 		}
 	
@@ -222,10 +229,10 @@ type single_link_list from serial<node1><list_cursor>
 			if ( "is_not_null?( io.current )" ) 
 			{
 				-- node after current
-				io.current:use:get_link()( linked<node1> next );
+				io.current:use:get_link()( <node1>link next );
 				if ( "is_not_null?( next )" ) 
 				{
-					next:use:get_link()( linked<node1> next_next ):unlink;
+					next:use:get_link()( <node1>link next_next ):unlink;
 					if ( "is_null?( next_next )" )
 						io.last:reuse:begin( io.current ) -- new last
 					else 
@@ -251,35 +258,34 @@ type single_link_list from serial<node1><list_cursor>
 	}
 
 
-	general method  -- typed nodes: complete <t> derived from node1
+	general method  -- typed node <nt> must derive from node1
 	{
-		insert<t> [upd] with make ()( <t> )  -- after current
+		insert<nt> [upd] with initiate ()( <nt> )  -- after current
 		{
-			linked<node1> ln:begin<t>;
-			make()( ln:use:as_actual<<t>> );
-			io:insert( ln );
+			initiate()( <<nt>>link nl:begin:use_as_actual );
+			io:insert( nl as <node1>link );
 		}
 		
-		copy_next<t> [upd] ()( <t> node )
+		copy_next<nt> ()( <nt> node ) with copy ( <nt> )( <nt> )
 		{
-			io:get_next()( linked<node1> ln );
-			if ( "is_not_null?( ln )" )	node:begin( ln:use:as<<t>> );
+			io:get_next()( <node1>link nl );
+			if ( "is_not_null?( nl )" )	copy( nl.use:as<<nt>> )( node );
 		}
 
-		relay_next<t> [upd] ()( <t> node ) 
+		relay_next<nt> [upd] ()( <t> node ) with relay ( <nt> upd )( <nt> ) 
 		{
-			io:get_next()( linked<node1> ln );
-			if ( "is_not_null?( ln )" ) node:begin( *ln:use:as<<t>> );
+			io:get_next()( <node1>link nl );
+			if ( "is_not_null?( nl )" ) relay( nl.use:as<<nt>> )( node );
 		}
 
-		current<t> = <t> proxy [init] ~n   -- void possible
+		use_current<nt> = <nt> proxy [upd] ~n   -- void possible
 		{
-			if ( "is_not_null?( io.current )" ) ~n -> io.current.use:as_actual<<t>>;
+			if ( "is_not_null?( io.current )" ) ~n -> io.current.use;
 		}
 	}
 
 
-	abstract in serial<node1><list_cursor>
+	abstract in sequence<node1><list_cursor>
 	{
 		[final] ~open_cursor ( int step )( list_cursor c )
 		{	
@@ -296,27 +302,28 @@ type single_link_list from serial<node1><list_cursor>
 			c:flip;
 		}
 
-		[final] ~use_object ( list_cursor c ) = node1 proxy ~o   
+		[final] ~use_object ( list_cursor c ) = node1 proxy ~node   
 		{
-			~o -> c:use_node;
+			~node -> c:use_node;
 		}
 	}
 	
 	instance
 	{
-		linked<node1> first   [opt];
-		linked<node1> last    [opt];
-		linked<node1> current [opt];  
+		<node1>link first   [opt];
+		<node1>link last    [opt];
+		<node1>link current [opt];  
 	}
-	
+
 }
 
 
-type lifo<t> from single_link_list  -- typed stack
-{{
-	<t> derived from node1
 
-	insert (push) and remove (pull) where front node is
+type lifo_list<nt> from single_link_list  -- typed stack
+{{
+	<nt> derived from node1
+
+	push (insert) and pull (remove) list where front node is
 	always current.
 
 	NOTE!  Implementation assumes current node starts at
@@ -331,12 +338,29 @@ type lifo<t> from single_link_list  -- typed stack
 			io:as_base<single_link_list>:begin;
 		}
 
-		push [upd] with make ()( <t> node )
+		begin ( lifo_list<<nt>> other [upd] )  -- relay 
 		{
-			io:insert<<t>> with make ()( node );  
+			io:as_base<single_link_list>:begin( *other );
 		}
 
-		pull [upd] -- no copy
+		push [upd] with initiate ()( <nt> node )
+		{
+			io:insert<<nt>> with initiate;  
+		}
+
+		pull [upd]()( <nt> node ) with copy ( <nt> )( <nt> )
+		{
+			io:copy_next()( node ) with copy;
+			io:remove_next();
+		}
+
+		pull [upd]()( <nt> node ) with relay ( <nt> [upd] )( <nt> )
+		{
+			io:relay_next()( node ) with relay;
+			io:remove_next();
+		}
+
+		pull [upd] -- no transfer
 		{
 			io:remove_next;
 		}
@@ -344,33 +368,11 @@ type lifo<t> from single_link_list  -- typed stack
 }
 
 
-type lifo_dup<t> : from lifo<<t>> 
-{
-	general method
-	{
-		begin
-		{
-			io:as_base<lifo<<t>>>:begin;
-		}
-
-		pull [upd]()( <t> node )  -- copy
-		{
-			io:copy<<t>>()( node ) with copy_node;
-			io:remove_next;
-		}
-	}
-
-	subroutine copy_node ( <t> a )( <t> b )
-	{
-		b:begin( a );
-	}
-}
 
 
-
-type fifo_list<t> from single_link_list  -- typed queue
+type fifo_list<nt> from single_link_list  -- typed queue
 {{
-	<t> derived from node1
+	<nt> derived from node1
 
 	insert last node (push) and remove first node (pull).
 }}
@@ -382,24 +384,29 @@ type fifo_list<t> from single_link_list  -- typed queue
 			io:as_base<single_link_list>:begin;
 		}
 
-		push [upd] with make ()( <t> node )
+		begin ( fifo_list<<nt>> other [upd] )  -- relay 
 		{
-			io:go_last:insert with make ()( node );  
+			io:as_base<single_link_list>:begin( *other );
 		}
 
-		pull [upd] ()( <t> node ) with dup ( <t> )( <t> )  -- dup copy
+		push [upd] with initiate ()( <nt> node )
 		{
-			io:go_front:copy<<t>>()( node ) with dup;
+			io:go_last:insert with initiate;
+		}
+
+		pull [upd]()( <nt> node ) with copy ( <nt> )( <nt> )
+		{
+			io:go_front:copy_next()( node ) with copy;
 			io:remove_next;
 		}
 
-		pull [upd] ()( <t> node ) with take ( <t> [upd] )( <t> ) -- take copy
+		pull [upd]()( <nt> node ) with relay ( <nt> [upd] )( <nt> )
 		{
-			io:go_front:copy<<t>>()( node ) with take;
+			io:go_front:relay_next()( node ) with relay;
 			io:remove_next;
 		}
 
-		pull [upd]  -- no copy
+		pull [upd]  -- no transfer
 		{
 			io:go_front:remove_next;
 		}

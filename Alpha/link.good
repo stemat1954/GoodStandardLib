@@ -2,14 +2,10 @@
 page link in alpha@good
 
 
-type linked<t>   -- intrinsic
+type <t>link   -- intrinsic
 {{
-	A linked<t> object is an object that creates and/or 
+	A <t>link object is an object that creates and/or 
 	accesses another object of type <t> in global storage.
-
-	Note:  Conceptually, a linked<t> object is a generic
-	type based on an abstract link (pointer) type.  The
-	term "link" applies to any adhoc linked object.
 
 	Links are used to create objects at runtime in global
 	storage. The type of object created must be a complete
@@ -50,9 +46,9 @@ type linked<t>   -- intrinsic
 	to see two levels of initialization when a link is
 	created. This expression:
 	
-		linked<thing> lt begin:use_as_actual:begin; 
+		<thing>link tl begin:use_as_actual:begin; 
 
-	creates and initializes a link named lt, bound to a
+	creates and initializes a link named tl, bound to a
 	global object of adhoc type thing, then accesses the 
 	object with :use_as_actual to initialize the global
 	object with default :begin.  
@@ -102,15 +98,15 @@ type linked<t>   -- intrinsic
 
 	subroutine foo
 	{
-		linked<widget> lw:begin:use_as_actual:begin; -- new link to actual widget
-		linked<thing> lt:begin( lw );  -- copy pw
+		<widget>link wl:begin:use_as_actual:begin; -- new link to actual widget
+		<thing>link tl:begin( wl );  -- copy wl
 
-		lw:use:foo;	-- ok (foo is inherited)
-		lw:use:goo;	-- ok
+		wl:use:foo;	-- ok (foo is inherited)
+		wl:use:goo;	-- ok
 
-		lt:use:foo;	-- ok
-		lt:use:goo;	-- error! (goo not a method of thing)
-		lt:use:as<widget>:goo;  -- ok after type translation
+		tl:use:foo;	-- ok
+		tl:use:goo;	-- error! (goo not a method of thing)
+		tl:use:as<widget>:goo;  -- ok after type translation
 	}
 		
 
@@ -125,29 +121,29 @@ type linked<t>   -- intrinsic
 	A, B, and C are all related.  Note that B and C are
 	related through A, but are otherwise not related.
 
-	If la is a link to an actual object of type A,
+	If al is a link to an actual object of type A,
 
-		linked<A> la:begin:use_as_actual:begin;
+		<A>link al:begin:use_as_actual:begin;
 
 	then 
 
-		linked<B> lb:begin( la );
-		linked<C> lc:begin( la );
+		<B>link bl:begin( al );
+		<C>link cl:begin( al );
 
-		linked<B> lb2:begin( lc );
-		linked<C> lc2:begin( lb );
+		<B>link bl2:begin( cl );
+		<C>link cl2:begin( bl );
 
 	are all legit and refer to the same actual object bound
 	to la.
 
 	This works because 
 
-	  la:use:as_base<B>
-	  la:use:as_base<C>
-	  lb:use:as<A>
-	  lc:use:as<A>
-	  lb:use:as<C>
-	  lc:use:as<B>
+	  al:use:as_base<B>
+	  al:use:as_base<C>
+	  bl:use:as<A>
+	  cl:use:as<A>
+	  bl:use:as<C>
+	  cl:use:as<B>
 
 	are all legit and return valid proxies.
 
@@ -208,15 +204,15 @@ type linked<t>   -- intrinsic
 
 		begin ( typename );			-- create and bind null <t> object, typename:is<t>? must be true (may quit)
 
-		begin<xt> ( linked<<xt>> );	-- copy compatible link, <xt> related to <t> (may quit)
+		begin<xt> ( <<xt>>link );	-- copy compatible link, <xt> related to <t> (may quit)
 	
 		use = <t> proxy [upd];		-- always works (never void)
 
 		use_as_actual = <t> proxy [init]; -- if <t> is actual object type (may be void)
 
-		is_equal<xt>? ( linked<<xt>> )( bool );
+		is_equal<xt>? ( <<xt>>link )( bool );
 
-		is_before<xt>? ( linked<<xt>> )( bool );
+		is_before<xt>? ( <<xt>>link )( bool );
 	}
 }
 

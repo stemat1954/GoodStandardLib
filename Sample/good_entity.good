@@ -15,9 +15,11 @@ enum type visibility ( 'internal', 'fraternal', 'external' );
 enum type opcode ( 'adhoc-scan', 'adhoc-copy' );
 
 
-nom type entity_array = alpha\array< linked<good_entity> >;
+nom type entity_link = <good_entity>link;
 
-nom type copy_record = stock\mapping< linked<good_entity> >to< linked<good_entity> >;
+nom type entity_array = alpha\array<entity_link>;
+
+nom type copy_record = stock\mapping<entity_link>to<entity_link>;
 
 
 

@@ -40,9 +40,9 @@ type entry [incomplete]
 		begin;
 	}
 
-	abstract -- [tbd] in subtype, not fundamental
+	abstract 
 	{
-		~run ( signal active, signal stop, linked<object> lo [opt] )( trace );
+		~run ( signal active, signal stop, <object>link [opt] )( trace );
 	}
 }
 

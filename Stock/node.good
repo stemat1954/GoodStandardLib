@@ -15,7 +15,7 @@ page node in stock@good
 
 
 
-type node 
+type node [incomplete]
 {{
 	A node is a multi-link adapatable base type.
 	
@@ -31,7 +31,8 @@ type node
 	instead.
 }}
 {
-	nom type linkage = array< linked<node> >;
+	nom type link = <node>link;
+	nom type linkage = array<link>;
 
 	general method
 	{
@@ -40,20 +41,20 @@ type node
 			io.linkage:begin( dim );
 		}
 
-		get_link ( int i )( linked<node> nl )
+		get_link ( int i )( link nl )
 		{
-			nl:begin( io.linkage:use( i ) );
+			nl:begin( io.linkage:use_object( i ) );
 		}
 
-		set_link [upd]( int i, linked<node> nl )
+		set_link [upd]( int i, link nl )
 		{
 			io:make_room( i );
-			io.linkage:use( i ):reuse:begin( nl );
+			io.linkage:use_object( i ):reuse:begin( nl );
 		}
 
 		unlink [upd]( int i )
 		{
-			io.linkage:use( i ):reuse;
+			io.linkage:use_object( i ):reuse;
 		}
 	}
 
@@ -63,7 +64,7 @@ type node
 		{
 			io.linkage:count()( int q );
 			i:sub( q )( =int ):add( one )( int need );
-			if ( "need |>| zero" ) io.linkage:insert( q, need )
+			if ( "need |>| zero" ) io.linkage:insert( q, need ); -- at i = q
 		}
 	}
 
@@ -74,12 +75,12 @@ type node
 }
 
 
-type node<#>
+type node<#> [incomplete]
 {{
 	A node<#> is a generic fixed dimension node.
 	
 	node<#> linkage is uniform.  That is, all nodes in a
-	<#n> nexus are of the same dimension.
+	<#n>-way nexus are of the same dimension.
 
 	A node<#> is technically complete, but doesn't have any
 	practical application as an actual type. It should be 
@@ -89,7 +90,8 @@ type node<#>
 	alternative.
 }}
 {
-	nom type linkage = tuple<<#>>< linked<node<<#>>>;
+	nom type link = <node<<#>>>link;
+	nom type linkage = tuple<<#>><link>;
 
 	general method
 	{
@@ -98,20 +100,20 @@ type node<#>
 			io.linkage:begin;  -- all links null
 		}
 
-		get_link ( int i )( linked<node<<#>>> nl ) 
+		get_link ( int i )( link nl ) 
 		{
-			io.linkage:use( i ) ~nl;
+			io.linkage:use_object( i ) ~nl;
 			if ( "is_not_null?( ~nl )" ) nl:begin( ~nl );
 		}
 
-		set_link [upd](int i, linked<node<<#>>> nl )
+		set_link [upd](int i, <node<<#>>>link> nl )
 		{
-			io.linkage:use( i ):reuse:begin( nl );
+			io.linkage:use_object( i ):reuse:begin( nl );
 		}
 
 		unlink [upd]( int i )
 		{
-			io.linkage:use( i ):reuse;
+			io.linkage:use_object( i ):reuse;
 		}
 	}
 
@@ -153,13 +155,13 @@ type <t>node<#> from ( <t>, node<<#>> )
 		begin
 		{
 			io:as_base< node<<#>> >:begin;
-			io:as_base< <t> >:begin;
+			io:as_base<<t>>:begin;
 		}
 
-		begin with make ()( <t> )
+		begin with co_begin ()( <t> )
 		{
 			io:as_base< node<<#>> >:begin;
-			make()( io:as_base< <t> > );
+			co_begin()( io:as_base<<t>> );
 		}
 	}
 }
@@ -171,7 +173,7 @@ type node1
 	A node1 is a specialized one-way node.
 }}
 {
-	nom type link = linked<node1>;
+	nom type link = <node1>link;
 
 	general method
 	{
@@ -179,12 +181,12 @@ type node1
 		{
 		}
 
-		get_link ()( linked<node1> nl )
+		get_link ()( link nl )
 		{
 			if ( "is_not_null?( io.link )" ) nl:begin( io.link );
 		}
 
-		set_link [upd]( linked<node1> nl )
+		set_link [upd]( link nl )
 		{
 			io.link:reuse:begin( nl );
 		}
@@ -217,10 +219,10 @@ type <t>node1 from ( <t>, node1 )
 			io:as_base<<t>>:begin;
 		}
 
-		begin with make ()( <t> )
+		begin with co_begin ()( <t> )
 		{
 			io:as_base<node1>:begin;
-			make()( io:as_base<<t>> );
+			co_begin()( io:as_base<<t>> );
 		}
 	}
 }

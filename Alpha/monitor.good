@@ -29,7 +29,7 @@ type monitor
 	{
 		begin;
 
-		add [upd]( linked<indicator>, int id );
+		add [upd]( <indicator>link, int id );
 
 		delete [upd]( int id );
 
