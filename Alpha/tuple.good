@@ -18,7 +18,7 @@ type tuple<#><t> from set<<t>> -- compatible and conventional per <t>
 	
 		:load by copy and replicate depends on <t>:begin( <t> )
 
-		:load by relay depends on <t>:begin( <t> [upd] )
+		:load by move depends on <t>:begin( <t> [upd] )
 
 		:load by fread depends on <t>:begin( message... )
 
@@ -45,7 +45,7 @@ type tuple<#><t> from set<<t>> -- compatible and conventional per <t>
 
 		load ( tuple<<#>><<t>> other ); -- copy 
 
-		load ( tuple<<#>><<t>> other [upd] ); -- relay 
+		load ( tuple<<#>><<t>> other [upd] ); -- move 
 
 		load ( message [upd], expr fex );   -- fread
 		load ( message [upd], expr fex )()( extra ); -- fread 

@@ -33,7 +33,7 @@ type array<t> from ( set<<t>>, sequence<<t>><array_cursor> ) -- compatible and c
 	
 		:copy depends on <t>:begin( <t> )
 
-		:relay depends on <t>:begin( <t> [upd] )
+		:move depends on <t>:begin( <t> [upd] )
 
 		:rank depends on <t>:is_before?( <t> )
 
@@ -87,9 +87,9 @@ type array<t> from ( set<<t>>, sequence<<t>><array_cursor> ) -- compatible and c
 		copy [upd] ( int i [opt], <t> obj );	-- copy into one null obj at i (end) FROM obj
 		copy [upd] ( int i, int q, array<<t>> other, int j [opt] );  -- copy into q null objs at i FROM other at j (0)
 
-		relay [upd]( int i [opt] )( <t> obj )		-- relay one obj at i (end) TO obj
-		relay [upd]( int i [opt], <t> obj [upd] );  -- relay into one null obj at i (end) FROM obj
-		relay [upd]( int i, int q, array<<t>> other [upd], int j [opt] ); -- relay into q objects at i FROM other at j (0)
+		move [upd]( int i [opt] )( <t> obj )		-- move one obj at i (end) TO obj
+		move [upd]( int i [opt], <t> obj [upd] );  -- move into one null obj at i (end) FROM obj
+		move [upd]( int i, int q, array<<t>> other [upd], int j [opt] ); -- move into q objects at i FROM other at j (0)
 
 		rank [eval]( <t> )( int i, bool unique ); -- find ordered insertion point
 	}

@@ -133,7 +133,7 @@ type single_link_list from sequence<node1><list_cursor>
 			io:as_base<sequence<node1><<node1>link>:begin;
 		}
 
-		begin ( single_link_list other [upd] )  -- relay 
+		begin ( single_link_list other [upd] )  -- move 
 		{
 			if ( "is_not_null?( other.first )" )
 			{
@@ -280,10 +280,10 @@ type single_link_list from sequence<node1><list_cursor>
 			if ( "is_not_null?( nl )" )	copy( nl:use:as<<nt>> )( node );
 		}
 
-		relay_next<nt> [upd] ()( <t> node ) with relay ( <nt> [upd] )( <nt> ) 
+		move_next<nt> [upd] ()( <t> node ) with move ( <nt> [upd] )( <nt> ) 
 		{
 			io:get_next()( <node1>link nl );
-			if ( "is_not_null?( nl )" ) relay( nl:use:as<<nt>> )( node );
+			if ( "is_not_null?( nl )" ) move( nl:use:as<<nt>> )( node );
 		}
 
 		use_current<nt> = <nt> proxy [upd] ~n   -- void possible
@@ -341,7 +341,7 @@ type lifo_list<nt> from single_link_list  -- typed stack
 	pull with transfer requires a proper coroutine to select
 	and reconcile call.
 
-	my_stack:pull()( thing next ) with std_relay<thing>;
+	my_stack:pull()( thing next ) with std_move<thing>;
 
 	my_stack:pull()( thing next ) with std_copy<thing>;
 }}
@@ -353,7 +353,7 @@ type lifo_list<nt> from single_link_list  -- typed stack
 			io:as_base<single_link_list>:begin;
 		}
 
-		begin ( lifo_list<<nt>> other [upd] )  -- relay 
+		begin ( lifo_list<<nt>> other [upd] )  -- move 
 		{
 			io:as_base<single_link_list>:begin( *other );
 		}
@@ -369,9 +369,9 @@ type lifo_list<nt> from single_link_list  -- typed stack
 			io:remove_next();
 		}
 
-		pull [upd]()( <nt> node ) with relay ( <nt> [upd] )( <nt> )
+		pull [upd]()( <nt> node ) with move ( <nt> [upd] )( <nt> )
 		{
-			io:relay_next()( node ) with relay;
+			io:move_next()( node ) with move;
 			io:remove_next();
 		}
 
@@ -402,7 +402,7 @@ type fifo_list<nt> from single_link_list  -- typed queue
 			io:as_base<single_link_list>:begin;
 		}
 
-		begin ( fifo_list<<nt>> other [upd] )  -- relay 
+		begin ( fifo_list<<nt>> other [upd] )  -- move 
 		{
 			io:as_base<single_link_list>:begin( *other );
 		}
@@ -418,9 +418,9 @@ type fifo_list<nt> from single_link_list  -- typed queue
 			io:remove_next;
 		}
 
-		pull [upd]()( <nt> node ) with relay ( <nt> [upd] )( <nt> )
+		pull [upd]()( <nt> node ) with move ( <nt> [upd] )( <nt> )
 		{
-			io:go_front:relay_next()( node ) with relay;
+			io:go_front:move_next()( node ) with move;
 			io:remove_next;
 		}
 

@@ -146,7 +146,7 @@ subroutine
 		b:begin( a );
 	}
 
-	std_relay<t> ( <t> [upd] a )( <t> b )
+	std_move<t> ( <t> [upd] a )( <t> b )
 	{
 		b:begin( *a );
 	}
