@@ -2,12 +2,12 @@
 page array in alpha@good
 
 
-nom type array_cursor = tuple<'2'><int>;
+nom type array_cursor = <'2'>ply<int>;
 
-type array<t> from ( set<<t>>, sequence<<t>><array_cursor> ) -- compatible and conventional per <t>
+type <t>array from ( <<t>>set, <<t>>sequence<array_cursor> ) -- compatible and conventional per <t>
 {{
-	An array<t> is a resizable object set. Objects are
-	uniform and logically contiguous in memory.
+	An array<t> is a resizable, sequential, object set.
+	Objects are	uniform and logically contiguous in memory.
 
 	<t> is the symbolic object type. The adhoc type must
 	be a complete type.  
@@ -43,57 +43,54 @@ type array<t> from ( set<<t>>, sequence<<t>><array_cursor> ) -- compatible and c
 	{
 		begin ( int reserve [opt] ); 
 
-		begin ( array<<t>> other upd );		-- move
+		begin ( <<t>>array other [upd] );	-- move
 
 		insert [upd]( int i, int q );		-- q null objs at i
 
 		insert [upd]( int i [opt] ) = <t> proxy [init];  -- one null obj at i (end), return access
 
-		delete [upd]( int i, int q );		-- q objs at i, discard all
+		delete [upd]( int i, int q );		-- q objs at i
 
-		delete [upd]( int i [opt] );		-- one obj at i (end), discard
+		delete [upd]( int i [opt] );		-- one obj at i (end)
 				
 		resize [upd]( int q );				-- insert or delete at end, new count = q
 
 		shrink [upd];						-- release unused memory
 	}
 	
-	general method -- similar in set<<t>>
+	general method -- similar in <<t>>set
 	{
 		count ()( int );  
 
 		use_object ( int i ) = <t> proxy [eval,init];
 	}
 
-	general method  -- <t> dependent 
+	general method  -- <t> dependent with coroutine
 	{
-		load [upd]( array<<t>> other ) with copy ( <t> )( <t> );
-		load [upd]( message [upd], expr fex ) with fread ( message [upd], expr fex )( <t> );	
-		load [upd]( message [upd], expr fex )()( extra ) with fread ( message [upd], expr fex )( <t> )( extra ); 
+		begin ( <<t>>array other ) with copy ( <t> )( <t> );
+		begin ( message [upd], expr fex ) with fread ( message [upd], expr fex )( <t> );	
+		begin ( message [upd], expr fex )()( extra ) with fread ( message [upd], expr fex )( <t> )( extra ); 
 
 		fwrite [eval]( message [upd], expr fex ) with fwrite ( message [upd], expr fex, <t> );
 		fwrite [eval]( message [upd], expr fex )()( extra ) with fwrite ( message [upd], expr fex, <t> )()( extra );
 
-		copy [eval]( int i [opt] )( <t> obj ) with copy ( <t> )( <t> );						-- from one obj at i (end) TO obj
-		copy [upd]( int i [opt], <t> obj ) with copy ( <t> )( <t> );						-- into one null obj at i (end) FROM obj
-		copy [upd]( int i, int q, array<<t>> other, int j [opt] ) with copy ( <t> )( <t> ); -- into q null objs at i FROM other at j (0)
+		copy [eval]( int i [opt] )( <t> obj ) with copy ( <t> )( <t> );			-- OUT: one obj at i (end) to obj
+		move [upd]( int i [opt] )( <t> obj ) with move ( <t> [upd] )( <t> );	-- ditto
 
-		move [upd]( int i [opt] )( <t> obj ) with move ( <t> [upd] )( <t> );				-- ditto copy 
-		move [upd]( int i [opt], <t> obj [upd] ) with move ( <t> [upd] )( <t> );
-		move [upd]( int i, int q, array<<t>> other [upd], int j [opt] ) with move ( <t> [upd] )( <t> );
+		copy [upd]( int i, int q, <<t>>array other, int j [opt] ) with copy ( <t> )( <t> );				-- INTO: q null objs at i from other at j (0)
+		move [upd]( int i, int q, <<t>>array other [upd], int j [opt] ) with move ( <t> [upd] )( <t> ); -- ditto
 
 		rank [eval]( <t> )( int i, bool unique ) with is_before? ( <t> a, <t> b )( bool ); -- find ordered insertion point
 	}
 
-
-	abstract method in set<<t>>
+	abstract method in <<t>>set
 	{
 		[final] ~count ()( int n );
 		
 		[final] ~use_object ( int i ) = <t> proxy;
 	}
 
-	abstract method in sequence<<t>><array_cursor>
+	abstract method in <<t>>sequence<array_cursor>
 	{
 		[final] ~open_cursor ( int )( array_cursor );  
 

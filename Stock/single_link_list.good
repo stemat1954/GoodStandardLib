@@ -54,7 +54,7 @@ type list_cursor
 }
 
 
-type single_link_list from sequence<node1><list_cursor>
+type single_link_list from <node1>sequence<list_cursor>
 {{
 	One-way linked list with heterogenous nodes.
 
@@ -293,7 +293,7 @@ type single_link_list from sequence<node1><list_cursor>
 	}
 
 
-	abstract in sequence<node1><list_cursor>
+	abstract in <node1>sequence<list_cursor>
 	{
 		[final] ~open_cursor ( int step )( list_cursor c )
 		{	
@@ -327,7 +327,7 @@ type single_link_list from sequence<node1><list_cursor>
 
 
 
-type lifo_list<nt> from single_link_list  -- typed stack
+type <nt>lifo_list from single_link_list  -- typed stack
 {{
 	<nt> derived from node1
 
@@ -344,7 +344,7 @@ type lifo_list<nt> from single_link_list  -- typed stack
 	Example:
 
 	type thing from node1;
-	lifo_list<thing> my_stack ( other_stack ) with std_copy<thing>;
+	<thing>lifo_list my_stack ( other_stack ) with std_copy<thing>;
 	my_stack:pull()( thing next ) with std_move<thing>;
 	my_stack:pull()( thing next ) with std_copy<thing>;
 
@@ -357,12 +357,12 @@ type lifo_list<nt> from single_link_list  -- typed stack
 			io:as_base<single_link_list>:begin;
 		}
 
-		begin ( lifo_list<<nt>> other [upd] )  -- move 
+		begin ( <<nt>>lifo_list other [upd] )  -- move 
 		{
 			io:as_base<single_link_list>:begin( *other );
 		}
 
-		begin ( lifo_list<<nt>> other ) with copy ( <nt> )( <nt> )
+		begin ( <<nt>>lifo_list other ) with copy ( <nt> )( <nt> )
 		{
 			io:as_base<single_link_list>:begin;
 			for ( ~node in other )
@@ -399,7 +399,7 @@ type lifo_list<nt> from single_link_list  -- typed stack
 
 
 
-type fifo_list<nt> from single_link_list  -- typed queue
+type <nt>fifo_list from single_link_list  -- typed queue
 {{
 	<nt> derived from node1
 
@@ -417,12 +417,12 @@ type fifo_list<nt> from single_link_list  -- typed queue
 			io:as_base<single_link_list>:begin;
 		}
 
-		begin ( fifo_list<<nt>> other [upd] )  -- move 
+		begin ( <<nt>>fifo_list other [upd] )  -- move 
 		{
 			io:as_base<single_link_list>:begin( *other );
 		}
 				
-		begin ( fifo_list<<nt>> other ) with copy ( <nt> )( <nt> )
+		begin ( <<nt>>fifo_list other ) with copy ( <nt> )( <nt> )
 		{
 			io:as_base<single_link_list>:begin;
 			for ( ~node in other )

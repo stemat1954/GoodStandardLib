@@ -2,14 +2,15 @@
 page extra in alpha@good
 
 
-type extra from set<object> -- intrinsic, restricted
+type extra from <object>set -- intrinsic, restricted
 {{
-	extra is an adjective type that refers to a uniform
-	list of	unspecified objects given to a procedure after
+	extra is an adjectival type that refers to a uniform
+	set of unspecified objects given to a procedure after
 	inputs and outputs.  
 	
-	An extra list is not an array<object> because type 
-	object is not complete.  
+	Note: an extra list is logically similar to an <object>
+	array except type object isn't complete (so it can't be
+	an array element).  
 
 	The compiler automatically creates and initializes an 
 	extra list.
@@ -39,14 +40,14 @@ type extra from set<object> -- intrinsic, restricted
 		delete [upd]( int q [opt] );  -- q objects from front
 	}
 
-	general  -- similar in set<t>
+	general  -- similar in <object>set
 	{
 		count ()( int );
 
 		use_object ( int i ) = object proxy; 
 	}
 
-	abstract in set<object>
+	abstract in <object>set
 	{
 		[final] ~count ()( int n );
 

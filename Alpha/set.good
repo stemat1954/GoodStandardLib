@@ -2,14 +2,14 @@
 page set in alpha@good
 
 
-type set<t> [incomplete] -- intrinsic
+type <t>set [incomplete] -- intrinsic
 {{
-	set<t> is a generic base type for uniform object
+	<t>set is a base type for uniform generic object
 	collections.
 		
 	<t> is the symbolic object type. 
 
-	Collections that derive from set<t> manage a countable
+	Collections that derive from <t>set manage a countable
 	set of objects where individual objects are directly
 	accessed by a numeric position index.
 

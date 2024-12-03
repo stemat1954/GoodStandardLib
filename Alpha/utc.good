@@ -2,7 +2,10 @@
 page utc in alpha@good
 
 
-common tuple<'2'><int> utc_origin [const];	
+nom type utc_pair = <'2'>ply<int>;
+
+
+common utc_pair utc_origin [const];	 -- (years,days)
 
 
 type utc  -- conventional
@@ -97,11 +100,11 @@ type utc  -- conventional
 
 	general
 	{
-		begin ( expr vex [opt] );			-- literal, default = "now"
+		begin ( expr vex [opt] );	-- literal, default = "now"
 
-		begin ( tuple<'2'><int> );			-- specify (d,t)
+		begin ( utc_pair );			-- (days,ticks)
 
-		begin ( utc other );				-- copy
+		begin ( utc other );		-- copy
 
 		begin ( message [upd], expr fex );	-- fread
 
@@ -117,7 +120,7 @@ type utc  -- conventional
 	
 		update [upd];		-- "now"
 
-		analyze ()( tuple<'2'><int> );	-- (d,t)
+		analyze ()( utc_pair );	-- (days,ticks)
 
 		add [upd]( etm t );
 		add [eval]( etm t )( utc );

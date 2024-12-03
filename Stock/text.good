@@ -286,7 +286,7 @@ type text from message
 
 		write [upd]( expr e ) 
 		{
-			io:write_str( e:extract()( =array<ascii> ) );
+			io:write_str( e:extract()( =<ascii>array ) );
 		}
 
 		write [upd]( text t ) -- compatible only
@@ -328,12 +328,12 @@ type text from message
 			io:read_chr( c );
 		}
 
-		read [upd]( int q )( array<unicode> s )
+		read [upd]( int q )( <unicode>array s )
 		{
 			io:read_str( q )( s );
 		}
 
-		read [upd]( int q )( array<ascii> s )  
+		read [upd]( int q )( <ascii>array s )  
 		{
 			io:read_str( q )( s );
 		}
@@ -496,12 +496,12 @@ type text from message
 			c:fwrite( io, 'code' )()( io.code_fex );
 		}
 
-		write_str<t> [upd]( uniform<<t>> s ) 
+		write_str<t> [upd]( <<t>>set s ) 
 		{
 			for ( ~c in s ) ~c:fwrite( io, 'code' )()( io.code_fex );
 		}
 
-		write_str<t><u> [upd]( serial<<t>><<u>> s ) 
+		write_str<t><u> [upd]( <<t>>sequence<<c>> s ) 
 		{
 			for ( ~c in s ) ~c:fwrite( io, 'code' )()( io.code_fex );
 		}
@@ -512,7 +512,7 @@ type text from message
 			c:begin( n );
 		}
 
-		read_str<t> [upd]( int q )( array<t> s )
+		read_str<t> [upd]( int q )( <t>array s )
 		{
 			s:begin;
 			int q2:begin( q );

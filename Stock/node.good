@@ -32,7 +32,7 @@ type node [incomplete]
 }}
 {
 	nom type link = <node>link;
-	nom type linkage = array<link>;
+	nom type linkage = <link>array;
 
 	general method
 	{
@@ -91,7 +91,7 @@ type node<#> [incomplete]
 }}
 {
 	nom type link = <node<<#>>>link;
-	nom type linkage = tuple<<#>><link>;
+	nom type linkage = <<#>>ply<link>;
 
 	general method
 	{

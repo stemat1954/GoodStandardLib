@@ -1,0 +1,57 @@
+
+page ply in alpha@good
+
+
+type <#>ply<t> from <<t>>set -- compatible and conventional per <t>
+{{
+	A <#>ply<t> is a fixed-size object set.
+
+	<#> is the symbolic ply dimension. <t> is the symbolic
+	object type. The adhoc type must be a complete type.
+
+	Since object count is known at compile time, implemen-
+	tation can be optimized.
+
+	A ply can be constructed from any type <t> but some
+	methods can only be called with a type dependent co-
+	routine.  See stock dialect for standard coroutines.
+
+	Note: This technique verifies type compatibility and
+	adds flexibility.
+
+	Example:
+
+	<'3'>ply<int> point:begin( zero ) with std_copy<int>;
+}}
+{
+	general 
+	{
+		begin;	-- all objects null
+		
+		begin ( <<#>>ply<<t>> other [upd] );  -- move
+	}
+
+	general -- similar in <<t>>set
+	{
+		use_object ( int i ) = <t> proxy [eval,upd]; 
+	}
+
+	general -- <t> dependent with coroutine
+	{
+		begin ( <t> seed ) with copy ( <t> )( <t> );	-- replicate
+		begin ( <<#>>ply<<t>> other )  with copy ( <t> )( <t> );
+		begin ( message [upd], expr fex ) with fread ( message [upd], expr fex )( <t> ); 
+		begin ( message [upd], expr fex )()( extra ) with fread ( message [upd], expr fex )( <t> )( extra ); 
+
+		fwrite ( message [upd], expr fex ) with fread ( message [upd], expr fex )( <t> ); 
+		fwrite ( message [upd], expr fex )()( extra ) with fread ( message [upd], expr fex )( <t> )( extra ); 
+	}
+
+	abstract in <<t>>set
+	{
+		[final]	~count ()( int n );
+
+		[final] ~use_object ( int i ) = <t> proxy;
+	}
+}
+

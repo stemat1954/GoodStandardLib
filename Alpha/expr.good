@@ -97,11 +97,7 @@ type expr -- intrinsic, conventional
 {
 	general 	
 	{
-		begin ( array<ascii> );  -- synthetic
-
-		begin ( set<ascii> );	-- synthetic
-
-		begin ( sequence<ascii> );	-- synthetic
+		begin ( <ascii>array );  -- synthetic
 
 		begin ( expr other );	-- copy
 

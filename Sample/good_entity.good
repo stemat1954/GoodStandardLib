@@ -17,7 +17,7 @@ enum type opcode ( 'adhoc-scan', 'adhoc-copy' );
 
 nom type entity_link = <good_entity>link;
 
-nom type entity_array = alpha\array<entity_link>;
+nom type entity_array = alpha\<entity_link>array;
 
 nom type copy_record = stock\mapping<entity_link>to<entity_link>;
 

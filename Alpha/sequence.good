@@ -1,15 +1,15 @@
 
 page sequence in alpha@good
 
-type sequence<t><c> [incomplete] -- intrinsic
+type <t>sequence<c> [incomplete] -- intrinsic
 {{
-	sequence<t> is a generic base type for serially ordered 
-	object collections.
+	<t>sequence<c> is a base type for generic object 
+	collections that can be accessed sequentially.
 		
 	<t> is the symbolic object type and <c> is the symbolic 
 	cursor type. 
 	
-	Collections that derive from sequence<t><c> manage an
+	Collections that derive from <t>sequence<c> manage an
 	ordered set of objects where individual objects are
 	accessed in serial order using a bespoke cursor.
 

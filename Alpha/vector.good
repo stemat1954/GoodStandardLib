@@ -1,10 +1,8 @@
 
-page tuple in alpha@good
+page vector in alpha@good
 
 
-page vector in alpha@prag
-
-type vector<#><t>
+type <t>vector<#>
 {{
 	Linear algebra vector with <#> coordinates of numeric 
 	type <t>.
