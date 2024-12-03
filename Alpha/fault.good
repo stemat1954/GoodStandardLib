@@ -1,5 +1,5 @@
 
-page fault in alpha@good
+page fault in AlphaByGood
 
 
 enum type fault_category ( 'bug', 'format', 'value', 'timeout', 'resource', 'platform', 'system' );

@@ -1,5 +1,5 @@
 
-page text in stock@good
+page text in StockByGood
 
 
 enum type match_mode ( 'exact', 'similar', 'regex' );

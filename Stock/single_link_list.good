@@ -1,5 +1,5 @@
 
-page single_link_list in stock@good
+page single_link_list in StockByGood
 
 {{
 	types on this page:

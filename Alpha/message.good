@@ -1,5 +1,5 @@
 
-page message in alpha@good
+page message in AlphaByGood
 
 
 enum type endian ( 'little-endian', 'big-endian' );		

@@ -1,5 +1,5 @@
 
-page typename in alpha@good
+page typename in AlphaByGood
 
 
 subroutine typename<t>()( typename );

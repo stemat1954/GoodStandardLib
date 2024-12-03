@@ -1,5 +1,5 @@
 
-page channel in kernel@good [primitive]
+page channel in KernelByGood [compatible]
 
 
 subroutine
@@ -171,7 +171,7 @@ subroutine
 
 	Here is the corresponding image:
 
-	image 'b' [primitive] 
+	image 'b' [compatible] 
 	{
 		word8	( 'b' );
 		addr	( 'b' );

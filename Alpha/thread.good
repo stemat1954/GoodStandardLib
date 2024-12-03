@@ -1,5 +1,5 @@
 
-page thread in alpha@good
+page thread in AlphaByGood
 
 
 enum type thread_state ( 'new', 'starting', 'active', 'stopping', 'done', 'dead' );

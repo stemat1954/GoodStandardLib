@@ -1,5 +1,5 @@
 
-page utc in alpha@good
+page utc in AlphaByGood
 
 
 nom type utc_pair = <'2'>ply<int>;
