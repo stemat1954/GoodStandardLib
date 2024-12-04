@@ -1,18 +1,18 @@
 
-page ply in AlphaByGood
+page tuple in AlphaByGood
 
 
-type <#>ply<t> from <<t>>set -- compatible and conventional per <t>
+type <t>tuple<#> from <<t>>set -- compatible and conventional per <t>
 {{
-	A <#>ply<t> is a fixed-size object set.
+	A <t>tuple<#> is a fixed-size object set, aka n-tuple.
 
-	<#> is the symbolic ply dimension. <t> is the symbolic
+	<#> is the symbolic dimension. <t> is the symbolic 
 	object type. The adhoc type must be a complete type.
 
 	Since object count is known at compile time, implemen-
 	tation can be optimized.
 
-	A ply can be constructed from any type <t> but some
+	A tuple can be constructed from any type <t> but some
 	methods can only be called with a type dependent co-
 	routine.  See stock dialect for standard coroutines.
 
@@ -21,14 +21,14 @@ type <#>ply<t> from <<t>>set -- compatible and conventional per <t>
 
 	Example:
 
-	<'3'>ply<int> point:begin( zero ) with std_copy<int>;
+	<int>tuple<'3'> point:begin( zero ) with std_copy<int>;
 }}
 {
 	general 
 	{
 		begin;	-- all objects null
 		
-		begin ( <<#>>ply<<t>> other [upd] );  -- move
+		begin ( <<t>>tuple<<#>> other [upd] );  -- move
 	}
 
 	general -- similar in <<t>>set
@@ -39,7 +39,7 @@ type <#>ply<t> from <<t>>set -- compatible and conventional per <t>
 	general -- <t> dependent with coroutine
 	{
 		begin ( <t> seed ) with copy ( <t> )( <t> );	-- replicate
-		begin ( <<#>>ply<<t>> other )  with copy ( <t> )( <t> );
+		begin ( <<t>>tuple<<#>> other )  with copy ( <t> )( <t> );
 		begin ( message [upd], expr fex ) with fread ( message [upd], expr fex )( <t> ); 
 		begin ( message [upd], expr fex )()( extra ) with fread ( message [upd], expr fex )( <t> )( extra ); 
 

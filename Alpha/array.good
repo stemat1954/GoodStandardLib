@@ -2,7 +2,8 @@
 page array in AlphaByGood
 
 
-nom type array_cursor = <'2'>ply<int>;
+nom type array_cursor = <int>tuple<'2'>;
+
 
 type <t>array from ( <<t>>set, <<t>>sequence<array_cursor> ) -- compatible and conventional per <t>
 {{

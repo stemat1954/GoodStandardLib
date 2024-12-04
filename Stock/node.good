@@ -91,7 +91,7 @@ type node<#> [incomplete]
 }}
 {
 	nom type link = <node<<#>>>link;
-	nom type linkage = <<#>>ply<link>;
+	nom type linkage = <link>tuple<<#>>;
 
 	general method
 	{
