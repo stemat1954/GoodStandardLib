@@ -54,7 +54,7 @@ type list_cursor
 }
 
 
-type single_link_list from <node1>sequence<list_cursor>
+type single_link_list from serial<node1><list_cursor>
 {{
 	One-way linked list with heterogenous nodes.
 
@@ -130,7 +130,7 @@ type single_link_list from <node1>sequence<list_cursor>
 	{
 		begin  -- original empty
 		{
-			io:as_base<sequence<node1><<node1>link>:begin;
+			io:as_base<serial<node1><list_cursor>>:begin;
 		}
 
 		begin ( single_link_list other [upd] )  -- move 
@@ -293,7 +293,7 @@ type single_link_list from <node1>sequence<list_cursor>
 	}
 
 
-	abstract in <node1>sequence<list_cursor>
+	abstract in serial<node1><list_cursor>
 	{
 		[final] ~open_cursor ( int step )( list_cursor c )
 		{	

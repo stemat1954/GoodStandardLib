@@ -264,22 +264,12 @@ type text from message
 			io:write_chr( c );
 		}
 				
-		write [upd]( uniform<unicode> s )
+		write [upd]( array<unicode> s )
 		{
 			io:write_str( s );
 		}
 
-		write [upd]( uniform<ascii> s )
-		{
-			io:write_str( s );
-		}
-
-		write<t> [upd]( serial<unicode><<t>> s )  -- <t> cursor type
-		{
-			io:write_str( s );
-		}
-		
-		write<t> [upd]( serial<ascii><<t>> s )  -- <t> cursor type
+		write [upd]( array<ascii> s )
 		{
 			io:write_str( s );
 		}
@@ -328,12 +318,12 @@ type text from message
 			io:read_chr( c );
 		}
 
-		read [upd]( int q )( <unicode>array s )
+		read [upd]( int q )( array<unicode> s )
 		{
 			io:read_str( q )( s );
 		}
 
-		read [upd]( int q )( <ascii>array s )  
+		read [upd]( int q )( array<ascii> s )  
 		{
 			io:read_str( q )( s );
 		}
@@ -496,14 +486,9 @@ type text from message
 			c:fwrite( io, 'code' )()( io.code_fex );
 		}
 
-		write_str<t> [upd]( <<t>>set s ) 
+		write_str<t> [upd]( array<<t>> arr ) 
 		{
-			for ( ~c in s ) ~c:fwrite( io, 'code' )()( io.code_fex );
-		}
-
-		write_str<t><u> [upd]( <<t>>sequence<<c>> s ) 
-		{
-			for ( ~c in s ) ~c:fwrite( io, 'code' )()( io.code_fex );
+			for ( ~c in arr ) ~c:fwrite( io, 'code' )()( io.code_fex );
 		}
 
 		read_chr<t> [upd]()( <t> c )
@@ -512,14 +497,14 @@ type text from message
 			c:begin( n );
 		}
 
-		read_str<t> [upd]( int q )( <t>array s )
+		read_str<t> [upd]( int q )( array<t> arr )
 		{
-			s:begin;
+			arr:begin;
 			int q2:begin( q );
 			loop ( "( q2 |>| zero ) |and| not( rp_end?( io ) )" ) 
 			{
 				io:as_base<message>:fread<int>( io.code_fex )( int n );
-				s:insert:begin( n );
+				arr:insert:begin( n );
 				q2:dec;
 			}
 		}

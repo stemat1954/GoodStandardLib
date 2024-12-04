@@ -5,10 +5,10 @@ page array in AlphaByGood
 nom type array_cursor = <int>tuple<'2'>;
 
 
-type <t>array from ( <<t>>set, <<t>>sequence<array_cursor> ) -- compatible and conventional per <t>
+type <t>array from ( <<t>>set, serial<<t>><array_cursor> ) -- compatible and conventional per <t>
 {{
-	An array<t> is a resizable, sequential, object set.
-	Objects are	uniform and logically contiguous in memory.
+	An array<t> is a resizable object set.  Objects are
+	uniform and logically contiguous in memory.
 
 	<t> is the symbolic object type. The adhoc type must
 	be a complete type.  
@@ -91,7 +91,7 @@ type <t>array from ( <<t>>set, <<t>>sequence<array_cursor> ) -- compatible and c
 		[final] ~use_object ( int i ) = <t> proxy;
 	}
 
-	abstract method in <<t>>sequence<array_cursor>
+	abstract method in serial<<t>><array_cursor>
 	{
 		[final] ~open_cursor ( int )( array_cursor );  
 
