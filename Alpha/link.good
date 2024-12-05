@@ -138,8 +138,8 @@ type <t>link   -- intrinsic
 
 	This works because 
 
-	  al:use:as_base<B>
-	  al:use:as_base<C>
+	  al:use:base<B>
+	  al:use:base<C>
 	  bl:use:as<A>
 	  cl:use:as<A>
 	  bl:use:as<C>

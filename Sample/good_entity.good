@@ -29,19 +29,19 @@ type good_entity from descriptive
 	{
 		begin -- anon
 		{
-			io:as_base<descriptive>:begin;
+			io:base<descriptive>:begin;
 		}
 
 		begin ( good_name name, source_guid guid ) 
 		{
-			io:as_base<descriptive>:begin;
+			io:base<descriptive>:begin;
 			io.name:begin( name );
 			io.guid:begin( guid );
 		}
 
 		begin ( good_entity other )
 		{
-			io:as_base<descriptive>:begin;
+			io:base<descriptive>:begin;
 			if ( "is_not_null?( other.name )" ) io.name:begin( other.name );
 			if ( "is_not_null?( other.guid )" ) io.guid:begin( other.guid );
 		}

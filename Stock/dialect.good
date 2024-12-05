@@ -48,14 +48,14 @@ common
 	
 common fp2
 {
-	fp2_max:begin( 'max' ) [const];
+	max_fp2:begin( 'max' ) [const];
 	-- MORE TBD
 }
 
 
 common fp10
 {
-	fp10_max:begin( 'max' ) [const];
+	max_fp10:begin( 'max' ) [const];
 	-- MORE TBD
 }
 

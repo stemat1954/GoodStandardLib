@@ -543,8 +543,8 @@ type sync_read_only_channel from ( channel, sync_channel_reader )
 	{
 		begin ( handle hch, etm wait [opt] )
 		{
-			io:as_base<channel>:begin( hch );
-			io:as_base<sync_channel_reader>:begin( wait );
+			io:base<channel>:begin( hch );
+			io:base<sync_channel_reader>:begin( wait );
 		}
 	}
 
@@ -552,7 +552,7 @@ type sync_read_only_channel from ( channel, sync_channel_reader )
 	{
 		[final] ~read [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			io:as_base<channel>:execute_sync( wait, 'r', seek, pdata, offset, size )( deficit, report, note );
+			io:base<channel>:execute_sync( wait, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 }
@@ -565,8 +565,8 @@ type sync_write_only_channel from ( channel, sync_channel_writer )
 	{
 		begin ( handle hch, etm wait [opt] )
 		{
-			io:as_base<channel>:begin( hch );
-			io:as_base<sync_channel_writer>:begin( wait );
+			io:base<channel>:begin( hch );
+			io:base<sync_channel_writer>:begin( wait );
 		}
 	}
 
@@ -574,7 +574,7 @@ type sync_write_only_channel from ( channel, sync_channel_writer )
 	{
 		[final] ~write [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			io:as_base<channel>:execute_sync( wait, 'w', seek, pdata, offset, size )( deficit, report, note );
+			io:base<channel>:execute_sync( wait, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 }
@@ -586,9 +586,9 @@ type sync_read_write_channel from ( channel, sync_channel_reader, sync_channel_w
 	{
 		begin ( handle hch, etm wait [opt] )
 		{
-			io:as_base<channel>:begin( hch );
-			io:as_base<sync_channel_reader>:begin( wait );
-			io:as_base<sync_channel_writer>:begin( wait );
+			io:base<channel>:begin( hch );
+			io:base<sync_channel_reader>:begin( wait );
+			io:base<sync_channel_writer>:begin( wait );
 		}
 	}
 
@@ -596,7 +596,7 @@ type sync_read_write_channel from ( channel, sync_channel_reader, sync_channel_w
 	{
 		[final] ~read [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			io:as_base<channel>:execute_sync( wait, 'r', seek, pdata, offset, size )( deficit, report, note );
+			io:base<channel>:execute_sync( wait, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 
@@ -604,7 +604,7 @@ type sync_read_write_channel from ( channel, sync_channel_reader, sync_channel_w
 	{
 		[final] ~write [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			io:as_base<channel>:execute_sync( wait, 'w', seek, pdata, offset, size )( deficit, report, note );
+			io:base<channel>:execute_sync( wait, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 }
@@ -617,8 +617,8 @@ type async_read_only_channel from ( channel, async_channel_reader )
 	{
 		begin ( handle hch )
 		{
-			io:as_base<channel>:begin( hch );
-			io:as_base<async_channel_reader>:begin;
+			io:base<channel>:begin( hch );
+			io:base<async_channel_reader>:begin;
 		}
 	}
 
@@ -626,7 +626,7 @@ type async_read_only_channel from ( channel, async_channel_reader )
 	{
 		[final] ~read [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			io:as_base<channel>:execute_async( id, hq, 'r', seek, pdata, offset, size )( deficit, report, note );
+			io:base<channel>:execute_async( id, hq, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
 		
 	}
@@ -639,8 +639,8 @@ type async_write_only_channel from ( channel, async_channel_writer )
 	{
 		begin ( handle hch )
 		{
-			io:as_base<channel>:begin( hch );
-			io:as_base<async_channel_writer>:begin;
+			io:base<channel>:begin( hch );
+			io:base<async_channel_writer>:begin;
 		}
 	}
 
@@ -648,7 +648,7 @@ type async_write_only_channel from ( channel, async_channel_writer )
 	{
 		[final] ~write [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			io:as_base<channel>:execute_async( id, hq, 'w', seek, pdata, offset, size )( deficit, report, note );
+			io:base<channel>:execute_async( id, hq, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 }
@@ -661,9 +661,9 @@ type async_read_write_channel from ( channel, async_channel_reader, async_channe
 	{
 		begin ( handle hch )
 		{
-			io:as_base<channel>:begin( hch );
-			io:as_base<async_channel_reader>:begin;
-			io:as_base<async_channel_writer>:begin;
+			io:base<channel>:begin( hch );
+			io:base<async_channel_reader>:begin;
+			io:base<async_channel_writer>:begin;
 		}
 	}
 
@@ -671,7 +671,7 @@ type async_read_write_channel from ( channel, async_channel_reader, async_channe
 	{
 		[final] ~read [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			io:as_base<channel>:execute_async( id, hq, 'r', seek, pdata, offset, size )( deficit, report, note );
+			io:base<channel>:execute_async( id, hq, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
 		
 	}
@@ -680,7 +680,7 @@ type async_read_write_channel from ( channel, async_channel_reader, async_channe
 	{
 		[final] ~write [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
 		{
-			io:as_base<channel>:execute_async( id, hq, 'w', seek, pdata, offset, size )( deficit, report, note );
+			io:base<channel>:execute_async( id, hq, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
 	}
 }

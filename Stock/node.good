@@ -154,14 +154,14 @@ type <t>node<#> from ( <t>, node<<#>> )
 	{
 		begin
 		{
-			io:as_base< node<<#>> >:begin;
-			io:as_base<<t>>:begin;
+			io:base< node<<#>> >:begin;
+			io:base<<t>>:begin;
 		}
 
 		begin with co_begin ()( <t> )
 		{
-			io:as_base< node<<#>> >:begin;
-			co_begin()( io:as_base<<t>> );
+			io:base< node<<#>> >:begin;
+			co_begin()( io:base<<t>> );
 		}
 	}
 }
@@ -215,14 +215,14 @@ type <t>node1 from ( <t>, node1 )
 	{
 		begin
 		{
-			io:as_base<node1>:begin;
-			io:as_base<<t>>:begin;
+			io:base<node1>:begin;
+			io:base<<t>>:begin;
 		}
 
 		begin with co_begin ()( <t> )
 		{
-			io:as_base<node1>:begin;
-			co_begin()( io:as_base<<t>> );
+			io:base<node1>:begin;
+			co_begin()( io:base<<t>> );
 		}
 	}
 }

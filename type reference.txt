@@ -23,15 +23,17 @@ general method
 
 	is<t>? [eval]()( bool );  runtime
 
+	is_actual<t>? [eval]()( bool );
+
 	as<t> [eval]= <t> proxy [eval,upd];	-- runtime, may be void
 
-	as_base<t> [eval] = <t> proxy [eval,upd,init]; -- verified at compile-time, special access declaration
-
 	as_actual<t> [eval] = <t> proxy [init];  -- runtime, may be void
+
+	base<t> [eval] = <t> proxy [eval,upd,init]; -- verified at compile-time, special access declaration
 }
 
 
-:as_base<t> is a "static" type translation that can
+:base<t> is a "static" type translation that can
 be verified at compile time.  It's used to resolve a
 specific external sub-object when inheritance rules
 would otherwise hide a base method, or when the 
