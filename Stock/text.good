@@ -343,12 +343,12 @@ type text from message
 		skip [upd]( expr pattern, match_mode [opt] )  -- strict (quits)
 		{
 			io:copy_pattern( pattern )( text pattern2 );
-			io:skip( *pattern2, @given\match_mode );
+			io:skip( *pattern2, given\match_mode );
 		}
 		
 		skip [upd]( text pattern [upd], match_mode [opt] ) -- strict (quits)
 		{
-			fix( @given\match_mode, 'similar' as match_mode ) ~mode;
+			fix( given\match_mode, 'similar' as match_mode ) ~mode;
 
 			bool ok; int rp;
 			select ( ~mode )
@@ -408,12 +408,12 @@ type text from message
 		seek [upd]( expr pattern, sign d [opt], match_mode [opt] )( int q ) -- q = chars matched (zero = no match)
 		{
 			io:copy_pattern( pattern )( text pattern2 );
-			io:seek( *pattern2, d, @given\match_mode )( q );
+			io:seek( *pattern2, d, given\match_mode )( q );
 		}
 
 		seek [upd]( text pattern [upd], sign d [opt], match_mode [opt] )( int q ) -- q = chars matched (zero = no match)
 		{
-			fix( @given\match_mode, 'exact' ) ~mode;
+			fix( given\match_mode, 'exact' ) ~mode;
 			select ( ~mode  )
 			{
 				case ( 'exact' )   io:seek( *pattern, d )( q ) with exact_match?;
@@ -668,7 +668,7 @@ type text from message
 
 	subroutine describe_utf ( utf )( int unit, expr fex )
 	{
-		select ( @given\utf )
+		select ( given\utf )
 		{	
 			case ( 'UTF-8' ) 
 			{

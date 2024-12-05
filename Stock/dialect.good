@@ -159,7 +159,7 @@ subroutine  --  coroutines
 
 	std_fread<t> ( message m [upd], expr fex )( <t> obj )( extra )
 	{
-		obj:begin( *m, fex )()( @given\extra );
+		obj:begin( *m, fex )()( given\extra );
 	}
 
 	std_fwrite<t> ( message m [upd], expr fex, <t> obj )
@@ -169,7 +169,7 @@ subroutine  --  coroutines
 
 	std_fwrite<t> ( message m [upd], expr fex, <t> obj )()( extra )
 	{
-		obj:fwrite( *m, fex )()( @given\extra );
+		obj:fwrite( *m, fex )()( given\extra );
 	}
 
 	std_before<t> ( <t> a, <t> b )( bool yes )

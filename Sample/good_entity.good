@@ -1,5 +1,5 @@
 
-page good_entity in good_compiler@steveware
+page good_entity in TheGoodCompilerBySteve
 
 
 {{
@@ -68,12 +68,12 @@ type good_entity from descriptive
 
 		copy ( copy_record [upd] )
 		{
-			io:~copy( *@given\copy_record );
+			io:~copy( *given\copy_record );
 		}
 
 		review [upd] ( page_reviewer reviewer [upd], opcode )( bool ok )
 		{
-			io:~review( *reviewer, @given\opcode )( ok );
+			io:~review( *reviewer, given\opcode )( ok );
 		}
 	}
 
@@ -101,8 +101,9 @@ type good_entity from descriptive
 	{
 		[new] ~get_descriptor ()( text )
 		{
-			@given\text.begin( 'entity' );
+			given\text.begin( 'entity' );
 		}
+
 
 		[new] ~get_description ()( text descr )
 		{
@@ -118,10 +119,11 @@ type good_entity from descriptive
 			if ( "is_not_null?( io.guid )" )
 				descr:write( '/' ):write( io.guid:get_page_name()( =text ) ):write( io.guid:get_spot()( =text ) );
 			
-			descr:write( ' ' ):fwrite( io:uid );
+			descr:write( ' ' ):fwrite( io:use_handle );
 
 			if ( "is_adhoc?( io.name )" ) descr:write( ' = ' ):write( io.name:use_comment );
 		}
+
 
 		[pwd] ~describe ( double<int> inset, text label, array<text> description [upd ] );
 

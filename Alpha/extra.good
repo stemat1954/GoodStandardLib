@@ -30,9 +30,9 @@ type extra from <object>set -- intrinsic, restricted
 	forwarding.  :delete removes a specified number of 
 	objects in given order (fifo).  
 
-	@given\extra:use_object( i )[eval]:as<thing>
-	@given\extra:use_object( i )[upd]:as<thing>
-	@given\extra:use_object( i ):as_actual<thing>
+	given\extra:use_object( i )[eval]:as<thing>
+	given\extra:use_object( i )[upd]:as<thing>
+	given\extra:use_object( i ):as_actual<thing>
 }}
 {
 	general

@@ -53,7 +53,7 @@ type console
 
 		make_text ()( text )  -- i/o compatible
 		{
-			if ( io.ready ) @given\text:begin( io.utf, io.endian );
+			if ( io.ready ) given\text:begin( io.utf, io.endian );
 		}
 	
 				

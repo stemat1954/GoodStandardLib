@@ -6,8 +6,8 @@ page single_link_list in StockByGood
 
 	list_cursor
 	single_link_list
-	lifo_list<nt>
-	fifo_list<nt>
+	<nt>lifo_list
+	<nt>fifo_list
 
 }}
 
@@ -268,9 +268,9 @@ type single_link_list from serial<node1><list_cursor>
 
 	general method  -- typed node <nt> must derive from node1
 	{
-		insert<nt> [upd] with initiate ()( <nt> )  -- after current
+		insert<nt> [upd] with begin ()( <nt> )  -- after current
 		{
-			initiate()( <<nt>>link nl:begin:use_actual );
+			begin()( <<nt>>link nl:begin:use_actual );
 			io:insert( nl as <node1>link );
 		}
 		
@@ -432,9 +432,9 @@ type <nt>fifo_list from single_link_list  -- typed queue
 			}
 		}
 
-		push [upd] with initiate ()( <nt> node )
+		push [upd] with begin ()( <nt> node )
 		{
-			io:go_last:insert with initiate;
+			io:go_last:insert with begin;
 		}
 
 		pull [upd]()( <nt> node ) with copy ( <nt> )( <nt> )
