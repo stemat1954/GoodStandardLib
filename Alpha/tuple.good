@@ -33,7 +33,7 @@ type <t>tuple<#> from <<t>>set -- compatible and conventional per <t>
 
 	general -- similar in <<t>>set
 	{
-		use_object ( int i ) = <t> proxy [eval,upd]; 
+		use_object ( int i ) = <t> proxy [eval,init]; 
 	}
 
 	general -- <t> dependent with coroutine
