@@ -95,14 +95,14 @@ page text_channel in StockByGood
 	{
 		select( cr )
 		{
-			case ( 'retry' );  -- partial transfer, no error
+			value ( 'retry' );  -- partial transfer, no error
 
-			case ( 'closed' )
+			value ( 'closed' )
 			{
 				error:begin:write( 'channel closed' );
 			}
 
-			case ( 'error' )
+			value ( 'error' )
 			{
 				error:begin:write( 'channel error [' );
 				if ( "not_null?( note )" ) error:write( note );

@@ -31,7 +31,7 @@ subroutine
 	{{
 		This coroutine matches consecutive white-space in the 
 		pattern to consecutive input white-space, and matches 
-		pattern letters	to input letters regardless	of case.
+		pattern letters	to input letters regardless	of value.
 	}}
 	{
 	}
@@ -264,12 +264,12 @@ type text from message
 			io:write_chr( c );
 		}
 				
-		write [upd]( array<unicode> s )
+		write [upd]( <unicode>array s )
 		{
 			io:write_str( s );
 		}
 
-		write [upd]( array<ascii> s )
+		write [upd]( <ascii>array s )
 		{
 			io:write_str( s );
 		}
@@ -318,12 +318,12 @@ type text from message
 			io:read_chr( c );
 		}
 
-		read [upd]( int q )( array<unicode> s )
+		read [upd]( int q )( <unicode>array s )
 		{
 			io:read_str( q )( s );
 		}
 
-		read [upd]( int q )( array<ascii> s )  
+		read [upd]( int q )( <ascii>array s )  
 		{
 			io:read_str( q )( s );
 		}
@@ -353,9 +353,9 @@ type text from message
 			bool ok; int rp;
 			select ( ~mode )
 			{
-				case ( 'exact' )   io:skip( *pattern )( ok, null, rp ) with exact_match?;
-				case ( 'similar' ) io:skip( *pattern )( ok, null, rp ) with similar_match?;
-				case ( 'regex' )   io:skip( *pattern )( ok, null, rp ) with regex_match?;
+				value ( 'exact' )   io:skip( *pattern )( ok, null, rp ) with exact_match?;
+				value ( 'similar' ) io:skip( *pattern )( ok, null, rp ) with similar_match?;
+				value ( 'regex' )   io:skip( *pattern )( ok, null, rp ) with regex_match?;
 			}
 			if ( ok:not ) quit fault ( 'format', 'skip pattern mismatch' );
 			io:set_rp( rp );
@@ -416,9 +416,9 @@ type text from message
 			fix( given\match_mode, 'exact' ) ~mode;
 			select ( ~mode  )
 			{
-				case ( 'exact' )   io:seek( *pattern, d )( q ) with exact_match?;
-				case ( 'similar' ) io:seek( *pattern, d )( q ) with similar_match?;
-				case ( 'regex' )   io:seek( *pattern, d )( q ) with regex_match?;
+				value ( 'exact' )   io:seek( *pattern, d )( q ) with exact_match?;
+				value ( 'similar' ) io:seek( *pattern, d )( q ) with similar_match?;
+				value ( 'regex' )   io:seek( *pattern, d )( q ) with regex_match?;
 			}
 		}
 			
@@ -670,19 +670,19 @@ type text from message
 	{
 		select ( given\utf )
 		{	
-			case ( 'UTF-8' ) 
+			value ( 'UTF-8' ) 
 			{
 				unit:begin( one );
 				fex:begin( 'b:utf8' );
 			}
 
-			case ( 'UTF-16' )
+			value ( 'UTF-16' )
 			{
 				unit:begin( two );
 				fex:begin( 'b:utf16' );  
 			}
 
-			case ( 'UTF-32' )
+			value ( 'UTF-32' )
 			{
 				unit:begin( four );
 				fex:begin( 'b:utf32' );	

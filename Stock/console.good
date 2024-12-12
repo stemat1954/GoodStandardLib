@@ -110,9 +110,9 @@ type console
 
 				select ( unit )
 				{
-					case ( '1' ) io.utf:begin ( 'UTF-8' );
-					case ( '2' ) io.utf:begin ( 'UTF-16' );
-					case ( '4' ) io.utf:begin ( 'UTF-32' );
+					value ( '1' ) io.utf:begin ( 'UTF-8' );
+					value ( '2' ) io.utf:begin ( 'UTF-16' );
+					value ( '4' ) io.utf:begin ( 'UTF-32' );
 					else quit ( 'bug', 'unexpected code unit value' );
 				}
 

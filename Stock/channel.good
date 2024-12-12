@@ -74,13 +74,13 @@ page channel in StockByGood
 			deficit:begin( io.deficit );
 			select ( word_to_ascii( io.report )( =ascii ) )
 			{
-				case ( 'NUL' )	cr:begin( 'good' );
-				case ( 'p' )	cr:begin( 'pending' );
-				case ( 'b' )	cr:begin( 'busy' );
-				case ( 'c' )	cr:begin( 'closed' );
-				case ( 'r' )	cr:begin( 'retry' );
-				case ( 'e' )	cr:begin( 'end' );
-				case ( 'x' )	cr:begin( 'error' );
+				value ( 'NUL' )	cr:begin( 'good' );
+				value ( 'p' )	cr:begin( 'pending' );
+				value ( 'b' )	cr:begin( 'busy' );
+				value ( 'c' )	cr:begin( 'closed' );
+				value ( 'r' )	cr:begin( 'retry' );
+				value ( 'e' )	cr:begin( 'end' );
+				value ( 'x' )	cr:begin( 'error' );
 				else			cr:begin( 'other' );
 			}
 			if ( "io.pnote |not=| no_addr" )
@@ -199,7 +199,7 @@ type channel [incomplete]
 	A channel handle is given at :begin time and respon-
 	sibility for the handle is assumed by the channel.  The 
 	application should not close the handle after calling 
-	:begin in any case.
+	:begin in any value.
 
 	:close closes the channel normally. An application can
 	give it's own closing note. "normal close" is the 
@@ -207,7 +207,7 @@ type channel [incomplete]
 	closing note is	copied to an output.
 
 	A channel is automatically closed in response to any
-	error. In this case, the closing note is copied from
+	error. In this value, the closing note is copied from
 	the i/o request record, if any.  If not provided, the
 	closing note is "unspecified channel error."
 	

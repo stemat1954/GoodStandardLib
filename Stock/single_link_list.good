@@ -95,7 +95,7 @@ type single_link_list from serial<node1><list_cursor>
 	:insert adds a node link after the current position.
 	The current position doesn't change.  The given node 
 	should be a new (unlinked) node, but the method clears
-	the link just in case.
+	the link just in value.
 
 	NOTE! It's possible to re-insert (move) a node in the
 	list if it's removed before reinserting.  Failure to
@@ -208,7 +208,7 @@ type single_link_list from serial<node1><list_cursor>
 
 		insert [upd]( <node1>link nl )  -- after current  
 		{
-			nl:use:unlink;  -- just in case
+			nl:use:unlink;  -- just in value
 			if ( "is_not_null?( io.current )" )  
 			{
 				-- after current
