@@ -486,7 +486,7 @@ type text from message
 			c:fwrite( io, 'code' )()( io.code_fex );
 		}
 
-		write_str<t> [upd]( array<<t>> arr ) 
+		write_str<t> [upd]( <t>array arr ) 
 		{
 			for ( ~c in arr ) ~c:fwrite( io, 'code' )()( io.code_fex );
 		}
@@ -497,7 +497,7 @@ type text from message
 			c:begin( n );
 		}
 
-		read_str<t> [upd]( int q )( array<t> arr )
+		read_str<t> [upd]( int q )( <t>array arr )
 		{
 			arr:begin;
 			int q2:begin( q );
