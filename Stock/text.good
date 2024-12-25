@@ -105,7 +105,7 @@ type text from message
 			describe_utf( f )( io.code_unit, io.code_fex );
 		}
 
-		begin ( text other [upd] )		-- var copy
+		begin ( text other [upd] )		-- move
 		{
 			other:get_encoding()( utf f, endian e );
 			io:base<message>:begin( e, f );
@@ -116,7 +116,7 @@ type text from message
 			io:attach( pmem, size );
 		}
 
-		begin ( text other )			-- const copy
+		begin ( text other )			-- copy
 		{
 			other:get_encoding()( utf f, endian e );
 			io:base<message>:begin( e, f );

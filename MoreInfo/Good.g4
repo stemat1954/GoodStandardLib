@@ -65,7 +65,7 @@ grammar Good;
 		{}	group
 		<>	factor
 		()	list, precedence 
-		||	operator
+		||	bar-operator
 		->	proxy assignment (proxy to object)
 		.	subobject ref
 		\	namespace qualification
@@ -98,7 +98,6 @@ ABSTRACT			:	'abstract'		;
 AFTER				:	'after'			;
 ALIGN				:	'align'			;
 AS					:	'as'			;
-AUX					:	'aux'			;		// auxiliary
 BASE				:	'base'			;
 COMMON				:	'common'		;	
 COMPATIBLE			:	'compatible'	;		
@@ -118,11 +117,12 @@ IN_					:	'in'			;
 INCOMPLETE			:	'incomplete'	;
 INIT				:	'init'			;		// initiate
 INSTANCE			:	'instance'		;
+INTERNAL			:	'internal'		;	
 ISOLATE				:	'isolate'		;
 LOOP				:	'loop'			;
 METHOD				:	'method'		;
 MISC				:	'misc'			;		// miscellaneous
-NAF					:	'naf'			;		// not-a-function
+NAF					:   'naf'			;		// not-a-function
 NEW					:	'new'			;
 NOM					:	'nom'			;		// nominal
 NULL_				:	'null'			;
@@ -198,7 +198,9 @@ fragment
 OP1					: [!-z{}~]						// char subset: printable, except SP and |
 					;
 
-OPERATOR			: '|' OP1+? '|'
+
+OPERATOR			:  '|' OP1+? '|'
+					| ( PLUS | MINUS | ASTERISK | DIVIDE )
 					;
 
 
@@ -269,20 +271,20 @@ SPACE				: [ \t\r\n]+			-> skip
 
 	There are two kinds of procedures: method and subroutine.
 	A method is defined within the scope of a type definition
-	and references assumed object "ao".  A subroutine stands
+	and references implied object "io".  A subroutine stands
 	alone and can only reference an object's general methods.
 	
 	Any procedure can have inputs, outputs, and additional
 	unspecified objects (extra). Subroutines can have auxiliary 
-	inputs.	Variable inputs are labeled [var].  
+	inputs.	Variable inputs are labeled [upd].  
 
 	Auxiliary inputs are used to pass context to a subroutine
-	used as a co-routine. 
+	used as a coroutine. 
 	
-	A co-routine can be called by any method or subroutine
+	A coroutine can be called by any method or subroutine
 	to adapt it's algorithm.  Auxiliary inputs are given
-	to the co-routine using a with-clause in the procedure 
-	call.  A co-routine cannot itself call a co-routine 
+	to the coroutine using a with-clause in the procedure 
+	call.  A coroutine cannot itself call a coroutine 
 	(adaptation is only one	level deep).
 
 	A method is always called for some lead object given
@@ -306,7 +308,7 @@ SPACE				: [ \t\r\n]+			-> skip
 	Executable items can be grouped into executable blocks.
 	
 	Items and blocks can be incorporated into executable
-	forms:  if/else, loop, for, select/case/else, 
+	forms:  if/else, loop, for, select/value/else, 
 	isolate/trap.
 
 	A formula is an expression enclosed in double quotes.
@@ -316,26 +318,15 @@ SPACE				: [ \t\r\n]+			-> skip
 	function call has an implicit result given a list of 
 	const inputs.
 	
-	A formula has it's own local object scope and it
-	cannot have a side effect on any object outside that
-	scope.  Any procedure with const inputs and a single 
-	output/result can be called functionally inside a
-	formula. Since there cannot be any side effects, 
-	methods that target objects outside the formula must
-	be const.
-	
-	Operations in a formula are translated into traditional
-	function calls using explicit operation definitions.
-	Ultimately a formula is translated into a purely func-
-	tional expression that has a single result. A 
-	formula can generally be used in any context where an
-	object is required.  Indeed, it is an object context
-	that determines the resulting type and thus provides
-	necessary context for interpreting the formula.
+	Any procedure with const inputs and a single output/
+	result can be called functionally inside a formula. A
+	procedure that has side effects and/or a result that 
+	depends on non-inputs is not suitable for formulae and 
+	they can be excluded from consideration using [naf].
 		
 	Generally, definitions that introduce names can be
 	truncated to allow references. These definitions are
-	called "nominal."
+	called "trivial."
 
 	Here are possible object expressions and their
 	semantics:
@@ -343,25 +334,23 @@ SPACE				: [ \t\r\n]+			-> skip
 	SID				type ref:  new anon null obj, type = SID
 	SID				obj ref:  existing obj, type = per def
 	SID				proxy ref: existing obj, type = per proxy 
-	SID				symbolic dimension: new anon initialized obj, type = expr
-	SID				pseudo-object subroutine call: type = per proxy
+	SID				dimension: new anon initialized obj, type = expr
+	SID				inconspicuous subroutine call: type = per proxy
 	NULL_			new anon null input/output obj, type = per spec 
 	LITERAL			new anon initialized obj, type = expr 
 	new_obj			new named null obj, type and name specified
 	new_analog		new anon initialized obj, type = analog 
 	formula			new anon initialized obj, type = contextual 
-	conversion_chain	  new anon initialized obj, type = specified
-	method_call_sequence  existing result obj (method obj, result proxy, designated output)
-	subroutine_call		  existing result obj (result proxy, designated output)
-
-	Given an object of known type in some known context,
-	the compiler will attempt to match the types using
-	a single conversion if they don't agree exactly. In
-	some cases, the target context may be manifold or
-	indefinite, in which case the app must code a conv-
-	ersion sequence to specify a particular conversion.
-
+	conversion		new anon initialized obj, type = specified
+	method_call_sequence	existing result obj (method obj, result
+					proxy, designated output)
+	subroutine_call	existing result obj (result proxy, designated output)
 */
+
+
+operator_				:  OPERATOR
+						| ( PLUS | MINUS | ASTERISK | DIVIDE )
+						;
 
 
 // EXECUTABLE 
@@ -374,9 +363,8 @@ assignment_obj			: LITERAL
 						| formula
 						| method_call_sequence
 						| subroutine_call
-						| conversion_chain
+						| conversion
 						;	
-
 
 assignment				: ASSIGN assignment_obj
 						;
@@ -406,9 +394,7 @@ new_obj					: new_obj_type_ref new_obj_name
 						;
 
 
-new_analog_ref			: SID					// proxy ref
-						| method_call_sequence	// result proxy
-						| subroutine_call		// ditto
+new_analog_ref			: SID	// proxy ref
 						;
 
 new_analog				: LEFT_SQUARE new_analog_ref RIGHT_SQUARE 
@@ -426,50 +412,39 @@ conversion_obj			: LITERAL
 conversion_type_ref		: SID
 						;
 
-conversion_chain		: conversion_obj ( AS conversion_type_ref )+  // left to right
+conversion				: conversion_obj ( AS conversion_type_ref )+  // left to right
 						;
 
 
 
-formula_obj				: LITERAL
-						| NULL_
+formula_operand			: LITERAL
 						| SID
-						| method_call_sequence
-						| subroutine_call	
-						| conversion_chain
-						| formula_func_call
-						| formula_closed_nexus
+						| formula_closure
+						| formula_call
+						| formula_operand ( AS SID )+  // special case conversion
 						;
 
-formula_func_ref		: SID
+formula_term			: operator_? formula_operand
 						;
 
-formula_func_input		: formula_obj
-						| formula_open_nexus
+formula_product			: formula_term ( operator_ formula_term )*   
 						;
 
-formula_func_call		: formula_func_ref LEFT_PAREN ( formula_func_input ( COMMA formula_func_input )* )? RIGHT_PAREN
+formula_closure			: LEFT_PAREN formula_product RIGHT_PAREN
 						;
 
-formula_operator		: OPERATOR 
-						| ( PLUS | MINUS | ASTERISK | DIVIDE )
+formula_input			: NULL_
+						| new_analog
+						| formula_product
 						;
 
-formula_term			: formula_operator? formula_obj
+formula_ref				: SID  // proc ref
 						;
 
-formula_open_nexus		: formula_term ( formula_operator formula_term )+ 
+formula_call			: formula_ref LEFT_PAREN ( formula_input ( COMMA formula_input )* )? RIGHT_PAREN
 						;
 
-formula_closed_nexus	: LEFT_PAREN formula_open_nexus RIGHT_PAREN
-						;
-
-formula_def				: formula_open_nexus
-						| formula_closed_nexus 
-						| formula_func_call
-						;
-
-formula					: DOUBLE_QUOTE formula_def DOUBLE_QUOTE
+formula					: DOUBLE_QUOTE formula_product DOUBLE_QUOTE 
 						;
 
 
@@ -480,7 +455,7 @@ input_obj				: NULL_
 						| formula
 						| method_call_sequence
 						| subroutine_call	
-						| conversion_chain
+						| conversion
 						;
 
 input_obj_item			: ASTERISK? input_obj
@@ -514,10 +489,10 @@ extra_obj				: NULL_
 						| LITERAL
 						| SID
 						| new_obj
-						| formula	
+						| formula
 						| method_call_sequence
 						| subroutine_call	
-						| conversion_chain
+						| conversion
 						;
 
 extra_obj_enum			: extra_obj ( COMMA extra_obj )*
@@ -556,9 +531,10 @@ call_provision			: reg_given_obj_list? call_coroutine? call_proxy_attribution? c
 
 
 method_obj				: LITERAL
-						| SID  // type or obj ref
+						| SID  
 						| new_obj	
 						| new_analog
+						| formula
 						| subroutine_call	
 						;
 
@@ -842,13 +818,11 @@ proxy_result			: EQUAL proxy_spec proxy_result_name?
 						;
 
 
-subroutine_attribute	: NAF
-						;
-
-subroutine_attribution	: LEFT_SQUARE subroutine_attribute RIGHT_SQUARE
-						;
 
 subroutine_name			: SID
+						;
+
+subroutine_attribution	: LEFT_SQUARE NAF RIGHT_SQUARE
 						;
 
 subroutine_interface	: subroutine_attribution? aux_obj_spec_list? reg_obj_spec_list? coroutine_spec? proxy_result?
@@ -1019,34 +993,32 @@ enum_type_group			: ENUM TYPE LEFT_CURLY enum_type_def* RIGHT_CURLY
 
 
 
-operation_func_ref		: SID
+operation_ref			: SID
 						;
 
-operation_func_input	: operation_operand
-						| operation_func_call
+operation_input			: NULL_
+						| LITERAL
+						| operation_operand	
+						| operation_function
 						;
 
-operation_func_call		: operation_func_ref LEFT_PAREN operation_func_input ( COMMA operation_func_input )* RIGHT_PAREN	
-						;
-
-operation_operator		:  OPERATOR
-						| ( PLUS | MINUS | ASTERISK | DIVIDE )
+operation_function		: operation_ref LEFT_PAREN operation_input ( COMMA operation_input )* RIGHT_PAREN	
 						;
 
 operation_operand		: SID		
 						;
 
-operation_unary_expr	: operation_operator operation_operand
+operation_unary_expr	: operator_ operation_operand
 						;
 
-operation_qnary_expr	: operation_operand ( operation_operator operation_operand )+ 
+operation_qnary_expr	: operation_operand ( operator_ operation_operand )+ 
 						;
 
 operation_expr			: operation_unary_expr
 						| operation_qnary_expr
 						;
 
-operation_right_side	: EQUAL DOUBLE_QUOTE operation_func_call DOUBLE_QUOTE
+operation_right_side	: EQUAL DOUBLE_QUOTE operation_function DOUBLE_QUOTE
 						;
 
 operation_left_side		: DOUBLE_QUOTE operation_expr DOUBLE_QUOTE
@@ -1144,20 +1116,20 @@ type					: TYPE type_def
 
 
 
-page_item_modifier		: LEFT_SQUARE AUX RIGHT_SQUARE
+page_internal			: LEFT_SQUARE INTERNAL RIGHT_SQUARE
 						;
 
-page_item				: page_item_modifier? common_obj
-						| page_item_modifier? common_obj_group
-						| page_item_modifier? operation
-						| page_item_modifier? operation_group
-						| page_item_modifier? enum_type
-						| page_item_modifier? enum_type_group
-						| page_item_modifier? nom_type
-						| page_item_modifier? nom_type_group
-						| page_item_modifier? subroutine
-						| page_item_modifier? subroutine_group
-						| page_item_modifier? type
+page_item				: page_internal? common_obj
+						| page_internal? common_obj_group
+						| page_internal? operation
+						| page_internal? operation_group
+						| page_internal? enum_type
+						| page_internal? enum_type_group
+						| page_internal? nom_type
+						| page_internal? nom_type_group
+						| page_internal? subroutine
+						| page_internal? subroutine_group
+						| page_internal? type
 						;
 						
 page_uses_book_alias	: SID

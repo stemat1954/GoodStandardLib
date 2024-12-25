@@ -63,7 +63,7 @@ type node [incomplete]
 		make_room [upd]( int i )
 		{
 			io.linkage:count()( int q );
-			i:sub( q )( =int ):add( one )( int need );
+			int need:begin( "i - q + 1" );			--i:sub( q )( =int ):add( one )( int need );
 			if ( "need |>| zero" ) io.linkage:insert( q, need ); -- at i = q
 		}
 	}

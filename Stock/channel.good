@@ -148,7 +148,7 @@ page channel in StockByGood
 		message:begin:attach( pr, sizeof_request ):fread<request>( 'b' )( r );
 	}
 
-	attach ( message m [var], addr pdata, int offset, int size, int deficit, ascii action ) 
+	attach ( message m [upd], addr pdata, int offset, int size, int deficit, ascii action ) 
 	{
 		int msize:begin( "offset + size" );
 		m:attach( pdata, msize );
