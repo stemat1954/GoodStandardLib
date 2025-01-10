@@ -331,7 +331,7 @@ type channel [incomplete]
 			{
 				fix( note, unspecified_error ) ~note;
 				io:internal_close( ~note )( text first );
-				if ( "is_not_null?( first )" ) note:reuse:begin( first );
+				if ( "is_not_null?( first )" ) note <= first;
 			}
 		}
 	}

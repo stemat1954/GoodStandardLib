@@ -44,7 +44,7 @@ type <t>array from ( <<t>>set, serial<<t>><array_cursor> ) -- compatible and con
 	{
 		begin ( int reserve [opt] ); 
 
-		begin ( <<t>>array other [upd] );	-- move
+		begin ( <<t>>array other [upd] );	-- vacate other
 
 		insert [upd]( int i, int q );		-- q null objs at i
 

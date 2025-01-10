@@ -432,7 +432,7 @@ type text from message
 				io:match( *pattern, ~d )( bool ok, q:reuse, int rp ) with match?;
 
 				if ( ok ) return;
-				if ( "is_null?( rp )" ) return after q:reuse:begin( zero );
+				if ( "is_null?( rp )" ) return after q <= zero;
 
 				io:set_rp( rp );  -- next unmatched char
 			}

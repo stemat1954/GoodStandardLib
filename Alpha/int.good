@@ -2,7 +2,6 @@
 page int in AlphaByGood
 
 
-
 type int -- elementary, compatible, conventional
 {{
 	An int encapsulates the higest precision integer

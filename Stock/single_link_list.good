@@ -158,24 +158,24 @@ type single_link_list from serial<node1><list_cursor>
 
 		go_first [upd]
 		{
-			if ( "is_not_null?( io.first )" ) io.current:reuse:begin( io.first );
+			if ( "is_not_null?( io.first )" ) io.current <= io.first;
 		}
 
 		go_last [upd]
 		{
-			if ( "is_not_null?( io.last )" ) io.current:reuse:begin( io.last );
+			if ( "is_not_null?( io.last )" ) io.current <= io.last;
 		}
 
 		go_next [upd]
 		{
 			if ( "is_null?( io.current )" )
 			{
-				if ( "is_not_null?( io.first )" ) io.current:reuse:begin( io.first );
+				if ( "is_not_null?( io.first )" ) io.current <= io.first;
 			}
 			else
 			{
 				io.current:use:get_link()( <node1>link nl ); 
-				if ( "is_not_null?( nl )" ) io.current:reuse:begin( nl );
+				if ( "is_not_null?( nl )" ) io.current <= nl;
 			}
 		}
 
@@ -214,7 +214,7 @@ type single_link_list from serial<node1><list_cursor>
 				-- after current
 				io.current:use:get_link()( <node1>link before ):set_link( nl ); 
 				if ( "is_null?( before )" )
-					io.last:reuse:begin( nl )
+					io.last <= nl 
 				else
 					nl:use:set_link( before );
 			}
@@ -222,7 +222,7 @@ type single_link_list from serial<node1><list_cursor>
 			{
 				-- front (before first)
 				nl:use:set_link( io.first );
-				io.first:reuse:begin( nl );
+				io.first <= nl;
 			}
 			else 
 			{
@@ -242,7 +242,7 @@ type single_link_list from serial<node1><list_cursor>
 				{
 					next:use:get_link()( <node1>link next_next ):unlink;
 					if ( "is_null?( next_next )" )
-						io.last:reuse:begin( io.current ) -- new last
+						io.last <= io.current -- new last
 					else 
 						io.current:use:set_link( next_next );
 				}
@@ -259,7 +259,7 @@ type single_link_list from serial<node1><list_cursor>
 				}
 				else
 				{
-					io.first:reuse:begin( next_next );  -- new first
+					io.first <= next_next;  -- new first
 				}
 			}
 		}

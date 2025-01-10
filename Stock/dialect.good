@@ -68,9 +68,9 @@ common int
 
 	neg_one:begin( '-1' ) [const];
 
-	max_int:begin( 'max' ) [const];
+	int max_int:begin( 'max' ) [const];
 
-	min_int:begin( 'min' ) [const];
+	int min_int:begin( 'min' ) [const];
 
 	-- more tbd
 }
@@ -92,7 +92,7 @@ nom type
 
 
 
-enum type sign ( 'positive', 'negative' );
+enum type sign ( 'zero', 'positive', 'negative' );
 
 
 subroutine -- selectors
