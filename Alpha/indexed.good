@@ -2,14 +2,14 @@
 page set in AlphaByGood
 
 
-type <t>set [incomplete] -- intrinsic
+type indexed<t> [incomplete] -- intrinsic
 {{
-	<t>set is a base type for uniform generic object
+	indexed<t> is a base type for uniform generic object
 	collections.
 		
 	<t> is the symbolic object type. 
 
-	Collections that derive from <t>set manage a countable
+	Collections that derive from indexed<t> manage a countable
 	set of objects where individual objects are directly
 	accessed by a numeric position index.
 

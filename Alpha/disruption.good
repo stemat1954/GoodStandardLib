@@ -2,7 +2,7 @@
 page disruption in AlphaByGood
 
 
-type disruption from <trace>set  -- intrinsic, restricted
+type disruption from indexed<trace>  -- intrinsic, restricted
 {{
 	A disruption is a uniform collection of trace objects.
 
@@ -31,14 +31,14 @@ type disruption from <trace>set  -- intrinsic, restricted
 	A disruption is not portable. 
 }}
 {
-	general  -- similar in <trace>set
+	general  -- similar in indexed<trace>
 	{
 		count ()( int );
 
 		use_object ( int i ) = trace proxy [eval]; 
 	}
 
-	abstract in <trace>set
+	abstract in indexed<trace>
 	{
 		[final] ~count ()( int n );
 

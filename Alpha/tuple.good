@@ -2,7 +2,7 @@
 page tuple in AlphaByGood
 
 
-type <t>tuple<#> from <<t>>set -- compatible and conventional per <t>
+type <t>tuple<#> from indexed<<t>> -- compatible and conventional per <t>
 {{
 	A <t>tuple<#> is a fixed-size object set, aka n-tuple.
 
@@ -31,7 +31,7 @@ type <t>tuple<#> from <<t>>set -- compatible and conventional per <t>
 		begin ( <<t>>tuple<<#>> other [upd] );  -- move
 	}
 
-	general -- similar in <<t>>set
+	general -- similar in indexed<<t>>
 	{
 		use_object ( int i ) = <t> proxy [eval,init]; 
 	}
@@ -47,7 +47,7 @@ type <t>tuple<#> from <<t>>set -- compatible and conventional per <t>
 		fwrite ( message [upd], expr fex )()( extra ) with fread ( message [upd], expr fex )( <t> )( extra ); 
 	}
 
-	abstract in <<t>>set
+	abstract in indexed<<t>>
 	{
 		[final]	~count ()( int n );
 

@@ -1,7 +1,7 @@
 
 page unicode in AlphaByGood
 
-type unicode from enumerated
+type unicode from int
 {{
 	label = 'U+xxxxxx' where x is hex digit
 
@@ -27,7 +27,7 @@ type unicode from enumerated
 {
 	general
 	{
-		begin ( expr label );	-- vex
+		begin ( expr notation );-- vex
 
 		begin ( int code );		-- code point, enum value
 
@@ -37,10 +37,6 @@ type unicode from enumerated
 
 		fwrite ( message m [upd], expr fex )()( extra ); 
 
-		is_equal? ( unicode )( bool );
-
-		is_before? ( unicode )( bool );
-
-		use_label = expr proxy [eval];
+		notation = expr proxy [eval];
 	}
 }
