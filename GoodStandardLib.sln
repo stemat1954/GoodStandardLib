@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alpha", "Alpha", "{B85B8CE5
 		Alpha\bool.good = Alpha\bool.good
 		Alpha\disruption.good = Alpha\disruption.good
 		Alpha\entry.good = Alpha\entry.good
+		Alpha\enumerated.good = Alpha\enumerated.good
 		Alpha\enumerator.good = Alpha\enumerator.good
 		Alpha\etm.good = Alpha\etm.good
 		Alpha\expr.good = Alpha\expr.good
