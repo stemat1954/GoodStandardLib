@@ -38,5 +38,9 @@ type unicode from enumerated
 		fwrite ( message m [upd], expr fex )()( extra ); 
 
 		notation = expr proxy [eval];
+
+		is_before? ( unicode )( bool );
+
+		is_equal? ( unicode )( bool );
 	}
 }

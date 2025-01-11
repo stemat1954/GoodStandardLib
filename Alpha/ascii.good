@@ -117,6 +117,10 @@ type ascii from enumerated
 
 		notation = expr proxy [eval];
 
+		is_before? ( ascii )( bool );
+
+		is_equal? ( ascii )( bool );
+
 		is_standard? ()( bool );		-- not extended
 
 		is_extended? ()( bool );		-- not standard
