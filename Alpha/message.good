@@ -204,16 +204,6 @@ type message
 	as necessary.
 	
 	
-	A message has an internal level value used for evident
-	images.  An evident image is a text format that has 
-	labeled and indented sub-objects similar to JSON.  Level
-	is used to maintain the format nesting level, which in
-	turn can be used to calculate the indention	of sub-
-	objects. Initial level is zero.
-
-	:inc_level and :dec_level adjust the level by one, plus
-	and minus respectively.  :get_level returns the current
-	level in an output.
 				
 	Intra-message :move shifts a q-byte block by n bytes, 
 	where n is signed: 
@@ -248,26 +238,60 @@ type message
 	not) as neccessary. Copying	memory may leave holes in
 	the message, so the	application must adjust size 
 	(truncate) and/or fill holes as necessary.
+
+
+	:enable_auto_align turns on alignment for binary
+	formats.  Objects will be written and read on platform
+	compatible memory boundaries.  
+
+	
+	A message has an internal level value used for evident
+	images.  An evident image is a text format that has 
+	labeled and indented sub-objects similar to JSON.  Level
+	is used to maintain the format nesting level, which in
+	turn can be used to calculate the indention	of sub-
+	objects. Initial level is zero.
+
+	:inc_level and :dec_level adjust the level by one, plus
+	and minus respectively.  :get_level returns the current
+	level in an output.
+
+	:write_new_line writes a string of ascii control
+	characters plus an optional expresion:
+	
+		'CR' + 'LF' + ( level * 'TAB' )
+		+ expr + 'SP' + '=' + 'SP'	 -- optional
+
 }}
 {
 
 	general 
 	{
-		begin ( endian [opt], utf [opt] );	-- empty, defaults in common
+		begin ( endian [opt], utf [opt] ); -- original
 
-		begin ( message other [upd] );	   -- take
+		begin ( message other [upd] );	   -- vacate
 
 		begin ( message other );		   -- dup 
 
 
-		use_endian = endian proxy [eval];
+		get_endian ()( endian );
 
-		use_utf = utf proxy [eval];
+		get_utf ()( utf );
 
 
 		attach [upd]( addr pmem, int size [opt] );
 
 		detach [upd]()( addr pmem, int size ); 
+
+
+		enable_auto_align [upd];		-- binary alignment
+
+
+		inc_level [upd];				-- text level = add 1
+
+		dec_level [upd];				-- text level = sub 1
+
+		get_level ()( int );			-- out = text level
 
 
 		set_size [upd]( int );			-- size = given
@@ -307,13 +331,6 @@ type message
 		wp_end? ()( bool );				-- wp |=| size ?
 
 
-		inc_level [upd];				-- level = add 1
-
-		dec_level [upd];				-- level = sub 1
-
-		get_level ()( int );			-- out = level
-						
-
 		fread<t> [upd]( expr fex )( <t> obj );			-- read object, one fex
 
 		fread<t> [upd]( expr fex )( <t> obj )( extra );	-- read object, extra fex
@@ -322,6 +339,9 @@ type message
 		fwrite<t> [upd]( <t> obj, expr fex );			-- write object, one fex
 
 		fwrite<t> [upd]( <t> obj, expr fex )()( extra ); -- write object, extra fex
+
+		
+		write_new_line [upd] ( expr [opt] );	-- see narrative
 
 
 		move [upd]( int q, int n );		-- intra-message shift, see notes
