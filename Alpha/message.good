@@ -120,7 +120,7 @@ type message
 	A message maintains a block of heap memory to contain
 	data.  Message data is naturally intended for external 
 	consumption, so at some point the memory must be 
-	detached and given to some primitive subroutine (e.g.
+	detached and given to some compatible subroutine (e.g.
 	kernel subroutine) for final disposition.  
 	
 	Detaching message memory creates an unattached message
@@ -131,7 +131,7 @@ type message
 
 	External heap memory can be attached (or reattached)
 	to an unattached message.  The memory usually originates 
-	from another message or from a primitive procedure.
+	from another message or from a compatible subroutine.
 	The memory block may or may not contain	formatted data.
 	Once external memory is attached to a message, the message
 	owns the memory and applications must not allow the given
@@ -244,24 +244,39 @@ type message
 	formats.  Objects will be written and read on platform
 	compatible memory boundaries.  
 
+
+	Several methods support readable images.  A readable 
+	image is a default image format that has indented and 
+	labeled sub-objects similar to JSON. 
 	
-	A message has an internal level value used for evident
-	images.  An evident image is a text format that has 
-	labeled and indented sub-objects similar to JSON.  Level
-	is used to maintain the format nesting level, which in
-	turn can be used to calculate the indention	of sub-
-	objects. Initial level is zero.
+	:inc_indent and :dec_indent adjust the indention level by 
+	one, plus and minus respectively.  :get_indent returns the
+	current indention level in an output.
 
-	:inc_level and :dec_level adjust the level by one, plus
-	and minus respectively.  :get_level returns the current
-	level in an output.
+	Note: Indention level is used to maintain the format
+	nesting  level, which in turn can be used to calculate 
+	the	indention of subobjects. Initial indent is zero.
 
-	:write_new_line writes a string of ascii control
-	characters plus an optional expresion:
+	:write_new_line writes a string of ascii control characters
+	and an ascii label using the current indention level:
 	
-		'CR' + 'LF' + ( level * 'TAB' )
-		+ expr + 'SP' + '=' + 'SP'	 -- optional
+	'CR' + 'LF' + ( indent * 'TAB' ) + label + 'SP' + '='
 
+	The chars in label are copied from a given expr and it's
+	delimited by 'SP' + '='. 
+
+	Note:  The label can't contain an internal '=' char. The
+	current utf is used to encode and decode chars.
+
+	:read_new_line reads the same characters using the current
+	indention level.
+
+	:write_nul writes an ascii 'NUL' character.
+
+	:read_nul reads over an ascii 'NUL' character if it's 
+	written, and assigns 'true' to an output bool.  If the
+	next char is not 'NUL', rp is not moved and the output
+	is 'false'.
 }}
 {
 
@@ -274,6 +289,9 @@ type message
 		begin ( message other );		   -- dup 
 
 
+		enable_auto_align [upd];		-- binary alignment
+
+
 		get_endian ()( endian );
 
 		get_utf ()( utf );
@@ -282,16 +300,6 @@ type message
 		attach [upd]( addr pmem, int size [opt] );
 
 		detach [upd]()( addr pmem, int size ); 
-
-
-		enable_auto_align [upd];		-- binary alignment
-
-
-		inc_level [upd];				-- text level = add 1
-
-		dec_level [upd];				-- text level = sub 1
-
-		get_level ()( int );			-- out = text level
 
 
 		set_size [upd]( int );			-- size = given
@@ -331,6 +339,21 @@ type message
 		wp_end? ()( bool );				-- wp |=| size ?
 
 
+		inc_indent [upd];				-- indent = add 1
+
+		dec_indent [upd];				-- indent = sub 1
+
+		get_indent ()( int );			-- out = indent
+
+		write_new_line [upd]( expr label );	
+
+		read_new_line [upd]()( expr label );
+		
+		write_nul [upd];
+
+		read_nul [upd]()( bool );
+
+
 		fread<t> [upd]( expr fex )( <t> obj );			-- read object, one fex
 
 		fread<t> [upd]( expr fex )( <t> obj )( extra );	-- read object, extra fex
@@ -339,9 +362,6 @@ type message
 		fwrite<t> [upd]( <t> obj, expr fex );			-- write object, one fex
 
 		fwrite<t> [upd]( <t> obj, expr fex )()( extra ); -- write object, extra fex
-
-		
-		write_new_line [upd] ( expr [opt] );	-- see narrative
 
 
 		move [upd]( int q, int n );		-- intra-message shift, see notes

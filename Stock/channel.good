@@ -24,7 +24,7 @@ page channel in StockByGood
 	group2 note is encoded using platform defaults 
 }}
 {
-	general 
+	general method 
 	{
 		begin	
 		{
@@ -54,7 +54,7 @@ page channel in StockByGood
 			.pnote:begin;
 		}
 
-		begin ( message [upd], expr fex );			-- per image
+		begin ( message [upd], expr fex );	-- per image
 
 		fwrite ( message [upd], expr fex );	-- per image
 
@@ -92,7 +92,6 @@ page channel in StockByGood
 	}
 
 
-
 	subroutine
 	{
 		word_to_ascii ( word8 w )( ascii a )
@@ -121,18 +120,7 @@ page channel in StockByGood
 	}
 
 
-	image 'b' [compat,align] 
-	{
-		action	( 'b' );
-		pdata	( 'b' );
-		offset	( 'b' );
-		size	( 'b' );
-		id		( 'b' );
-		seek	( 'b' );
-		deficit	( 'b' );
-		report	( 'b' );
-		pnote	( 'b' );
-	}
+	image 'b' [compatible,align];
 }
 
 
@@ -336,11 +324,11 @@ type channel [incomplete]
 		}
 	}
 
-	common text 
+	common  
 	{
-		normal_close:begin( 'normal close' ) [const];
+		text normal_close:begin( 'normal close' ) [const];
 
-		unspecified_error:begin( 'unspecified channel error' ) [const];
+		text unspecified_error:begin( 'unspecified channel error' ) [const];
 	}
 	
 	instance	
