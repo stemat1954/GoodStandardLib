@@ -66,7 +66,8 @@ grammar Good;
 		<>	factor
 		()	list, precedence 
 		||	bar-operator
-		->	proxy assignment (proxy to object)
+		->	bind proxy to object
+		<=  assignment
 		.	subobject ref
 		\	namespace qualification
 		;	group item delimiter
@@ -106,7 +107,6 @@ ELSE				:	'else'			;
 ENUM				:	'enum'			;		// enumerated
 ESCAPE				:	'escape'		;
 EVAL				:	'eval'			;		// evaluate
-EVIDENT				:	'evident'		;
 FINAL				:	'final'			;
 FOR					:	'for'			;
 FROM				:	'from'			;
@@ -128,11 +128,11 @@ NOM					:	'nom'			;		// nominal
 NULL_				:	'null'			;
 OPERATION			:	'operation'		;
 OPT					:	'opt'			;		// optional
-PACK				:	'pack'			;
 PAGE				:	'page'			;
 PROXY				:	'proxy'			;	
 PWD					:	'pwd'			;		// previously well-defined
 QUIT				:	'quit'			;
+READABLE			:	'readable'		;
 RETURN				:	'return'		;
 SELECT				:	'select'		;	
 STATIC				:	'static'		;
@@ -165,7 +165,8 @@ ASTERISK			:	'*'				;
 PLUS				:	'+'				;
 MINUS				:	'-'				;
 DIVIDE				:	'/'				;
-ASSIGN				:	'->'			;
+BIND				:	'->'			;
+ASSIGN				:	'<='			;
 
 
 // literal 
@@ -357,30 +358,31 @@ operator_				:  OPERATOR
 
 
 
-assignment_obj			: LITERAL
+binding_obj				: LITERAL
 						| VOID_
 						| SID
 						| formula
 						| method_call_sequence
 						| subroutine_call
+						| assignment
 						| conversion
 						;	
 
-assignment				: ASSIGN assignment_obj
+binding					: BIND binding_obj
 						;
 
 
-proxy_assignment_ref	: SID	
+proxy_binding_ref		: SID	
 						;
 
-proxy_assignment		: proxy_assignment_ref assignment
+proxy_binding			: proxy_binding_ref binding
 						;
 
 
 new_proxy_name			: SID
 						;
 
-new_proxy				: proxy_spec new_proxy_name assignment?
+new_proxy				: proxy_spec new_proxy_name binding?
 						;
 
 
@@ -401,6 +403,11 @@ new_analog				: LEFT_SQUARE new_analog_ref RIGHT_SQUARE
 						;
 
 
+conversion_type_ref		: SID
+						;
+
+conversion_chain		: ( AS conversion_type_ref )+
+						;
 
 conversion_obj			: LITERAL
 						| SID
@@ -409,10 +416,25 @@ conversion_obj			: LITERAL
 						| subroutine_call
 						;
 
-conversion_type_ref		: SID
+conversion				: conversion_obj conversion_chain
 						;
 
-conversion				: conversion_obj ( AS conversion_type_ref )+  // left to right
+
+
+assignment_obj_left		: SID
+						| method_call_sequence 
+						| subroutine_call	
+						;
+
+assignment_obj_right	: NULL_
+						| LITERAL
+						| SID
+						| formula
+						| method_call_sequence
+						| subroutine_call
+						;
+
+assignment				: assignment_obj_left ASSIGN ASTERISK? assignment_obj_right conversion_chain?
 						;
 
 
@@ -455,6 +477,7 @@ input_obj				: NULL_
 						| formula
 						| method_call_sequence
 						| subroutine_call	
+						| assignment
 						| conversion
 						;
 
@@ -492,6 +515,7 @@ extra_obj				: NULL_
 						| formula
 						| method_call_sequence
 						| subroutine_call	
+						| assignment
 						| conversion
 						;
 
@@ -568,7 +592,7 @@ quit					: QUIT quit_obj?
 
 
 
-after					: AFTER ( subroutine_call | method_call_sequence | proxy_assignment )
+after					: AFTER ( subroutine_call | method_call_sequence | proxy_binding | assignment )
 						;
 
 
@@ -586,6 +610,7 @@ condition_obj			: LITERAL
 						| formula
 						| method_call_sequence
 						| subroutine_call
+						| assignment
 						;
 
 condition				: LEFT_PAREN condition_obj RIGHT_PAREN	
@@ -662,6 +687,7 @@ select_key_obj			: SID
 						| formula
 						| method_call_sequence
 						| subroutine_call	
+						| assignment
 						;
 
 select_labeled_branch	: select_branch_label exec_element? SEMI_COLON
@@ -685,7 +711,8 @@ plain_block				: LEFT_CURLY exec_item* RIGHT_CURLY
 
 exec_element			: new_obj	
 						| new_proxy
-						| proxy_assignment
+						| proxy_binding
+						| assignment
 						| method_call_sequence	
 						| subroutine_call
 						| if
@@ -907,29 +934,22 @@ instance					: INSTANCE instance_block
 							;
 
 
-image_item_label		: LITERAL
-						;
 
 image_item_fex			: LITERAL
 						;
 
-image_item_input		: LEFT_PAREN image_item_fex? RIGHT_PAREN	
+image_item_fex_list		: LEFT_PAREN image_item_fex ( COMMA image_item_fex )* RIGHT_PAREN		
 						;
 
-image_item_extra		: LEFT_PAREN image_item_fex ( COMMA image_item_fex )* RIGHT_PAREN		
+image_item_label		: LITERAL
 						;
 
 image_item_obj_ref		: SID 
 						;
 
-image_item_include_key	: LITERAL
-						;
 
-image_item_include		: IMAGE image_item_include_key
-						;
-
-image_item				: image_item_obj_ref image_item_label? image_item_input image_item_extra? SEMI_COLON
-						| image_item_include SEMI_COLON
+image_item				: image_item_obj_ref image_item_label? image_item_fex_list? SEMI_COLON
+						| IMAGE image_name image_item_label? SEMI_COLON
 						;
 
 image_block				: LEFT_CURLY image_item* RIGHT_CURLY
@@ -941,14 +961,14 @@ image_name				: SID
 image_key				: LITERAL
 						;
 
-image_attribute			: EVIDENT
-						| COMPATIBLE ( COMMA ( ALIGN | PACK ) )?
+image_attribute			: READABLE
+						| COMPATIBLE ( COMMA ALIGN )?
 						;
 						
 image_attribution		: LEFT_SQUARE image_attribute RIGHT_SQUARE 
 						;
 
-image_def				: image_name? image_key image_attribution? image_block
+image_def				: image_name? image_key image_attribution? ( image_block | SEMI_COLON )
 						;
 
 image					: IMAGE image_def
@@ -1050,19 +1070,14 @@ common_obj_attribution	: LEFT_SQUARE common_obj_attribute RIGHT_SQUARE
 common_obj_proc			: SID proc_block   // SID = begin
 						;
 
-common_obj_subdef		: common_obj_name method_call? common_obj_attribution? SEMI_COLON  // method_call = :begin with literal inputs only
-						;
-
-common_obj_def			: common_obj_type_ref common_obj_subdef
+common_obj_def			: common_obj_type_ref common_obj_name method_call? common_obj_attribution? SEMI_COLON  // method_call = :begin with literal inputs only
 						;
 
 common_obj				: COMMON common_obj_def 
 						;
 
 common_obj_group		: COMMON LEFT_CURLY common_obj_def* common_obj_proc? RIGHT_CURLY
-						| COMMON common_obj_type_ref LEFT_CURLY common_obj_subdef* common_obj_proc? RIGHT_CURLY
 						;
-
 
 
 type_item				: common_obj
