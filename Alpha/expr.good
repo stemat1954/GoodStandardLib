@@ -115,7 +115,7 @@ type expr -- intrinsic, conventional
 
 		extract ( int i )( ascii );	 -- one char 
 
-		extract ( int i [opt], int q [opt] )( array<ascii> );  -- multiple chars
+		extract ( int i [opt], int q [opt] )( <ascii>array );  -- multiple chars
 
 		find ( expr other, int i [upd] )( bool );
 

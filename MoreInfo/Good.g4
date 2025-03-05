@@ -109,10 +109,10 @@ ESCAPE				:	'escape'		;
 EVAL				:	'eval'			;		// evaluate
 FINAL				:	'final'			;
 FOR					:	'for'			;
+FORMAT				:	'format'		;
 FROM				:	'from'			;
 GENERAL				:	'general'		;
 IF					:	'if'			;
-IMAGE				:	'image'			;
 IN_					:	'in'			;
 INCOMPLETE			:	'incomplete'	;
 INIT				:	'init'			;		// initiate
@@ -935,43 +935,42 @@ instance					: INSTANCE instance_block
 
 
 
-image_item_fex			: LITERAL
+format_item_fex			: LITERAL
 						;
 
-image_item_fex_list		: LEFT_PAREN image_item_fex ( COMMA image_item_fex )* RIGHT_PAREN		
+format_item_fex_list	: LEFT_PAREN format_item_fex ( COMMA format_item_fex )* RIGHT_PAREN		
 						;
 
-image_item_label		: LITERAL
+format_item_label		: LITERAL
 						;
 
-image_item_obj_ref		: SID 
+format_item_ref			: SID 
 						;
 
-
-image_item				: image_item_obj_ref image_item_label? image_item_fex_list? SEMI_COLON
-						| IMAGE image_name image_item_label? SEMI_COLON
+format_item				: format_item_ref format_item_label? format_item_fex_list? SEMI_COLON
+						| FORMAT format_item_ref format_item_label? SEMI_COLON
 						;
 
-image_block				: LEFT_CURLY image_item* RIGHT_CURLY
+format_block			: LEFT_CURLY format_item* RIGHT_CURLY
 						;
 
-image_name				: SID
+format_name				: SID
 						;
 
-image_key				: LITERAL
+format_key				: LITERAL
 						;
 
-image_attribute			: READABLE
+format_attribute		: READABLE
 						| COMPATIBLE ( COMMA ALIGN )?
 						;
 						
-image_attribution		: LEFT_SQUARE image_attribute RIGHT_SQUARE 
+format_attribution		: LEFT_SQUARE format_attribute RIGHT_SQUARE 
 						;
 
-image_def				: image_name? image_key image_attribution? ( image_block | SEMI_COLON )
+format_def				: format_name? format_key? format_attribution? ( format_block | SEMI_COLON )
 						;
 
-image					: IMAGE image_def
+format					: FORMAT format_def
 						;
 
 						
@@ -1095,7 +1094,7 @@ type_item				: common_obj
 						| recap_method
 						| recap_method_group
 						| instance
-						| image
+						| format
 						;
 
 type_item_group			: LEFT_CURLY type_item* RIGHT_CURLY

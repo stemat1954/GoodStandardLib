@@ -68,7 +68,7 @@ subroutine
 
 	this_process_id = expr proxy [eval]; 
 
-	start_thread<ept> ( <object>link [opt] )( linked<thread> ); 
+	start_thread<ept> ( <object>link [opt] )( <thread>link ); 
 	{{
 		This subroutine creates an entry point object of 
 		type <ept> which derives from alpha\entry, then 
@@ -76,7 +76,7 @@ subroutine
 		forwarding the given object link. The entry point 
 		object is created in the new thread's local storage.
 
-		A linked thread object that controls the new thread
+		A <thread>link object that controls the new thread
 		is returned in an output.
 	}}
 }

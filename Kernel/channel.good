@@ -168,10 +168,8 @@ subroutine
 	info when the report is 'x', but it can be allocated
 	for any report.
 
+	Here is the corresponding format:
 
-	Here is the corresponding image:
-
-	image 'b' [compatible] 
 	{
 		word8	( 'b' );
 		addr	( 'b' );
@@ -183,6 +181,7 @@ subroutine
 		word8	( 'b' );
 		addr	( 'b' );
 	}
+
 }}
 {
 	channel_sync_io ( handle hch, addr preq, int wait );

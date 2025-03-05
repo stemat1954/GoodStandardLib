@@ -12,7 +12,10 @@ page float in AlphaByGood
 }}
 
 
-type fp_ -- elementary, compatible (fp2), conventional
+type fp10;  -- def pending
+
+
+type fp2 -- elementary, compatible, conventional
 {{
 	fp is a generic floating point number type.
 		
@@ -72,9 +75,9 @@ type fp_ -- elementary, compatible (fp2), conventional
 	{
 		begin ( expr vex [opt] );	-- literal, default = 0
 
-		begin ( fp_ x );  -- copy same
+		begin ( fp2 x );  -- copy same
 
-		begin ( fp_ x );  -- copy conversion
+		begin ( fp10 x );  -- copy conversion
 
 		begin<wt> ( <wt> w, expr fex );	-- fread from word
 
@@ -85,77 +88,77 @@ type fp_ -- elementary, compatible (fp2), conventional
 		fwrite ( message [upd], expr fex );	
 
 
-		is_equal? ( fp_ x )( bool );
+		is_equal? ( fp2 x )( bool );
 		
-		is_before? ( fp_ x )( bool );	
+		is_before? ( fp2 x )( bool );	
 
-		is_less? ( fp_ x )( bool );
+		is_less? ( fp2 x )( bool );
 
-		is_precise? ( fp_ u )( bool );
+		is_precise? ( fp2 u )( bool );
 
 		to_int ()( int n );	
 
-		set [upd]( fp_ x );  -- replace
+		set [upd]( fp2 x );  -- replace
 
-		add [upd]( fp_ x );								
-		add [eval]( fp_ x )( fp_ );	
+		add [upd]( fp2 x );								
+		add [eval]( fp2 x )( fp2 );	
 
-		sub [upd]( fp_ x );
-		sub [eval]( fp_ x )( fp_ );
+		sub [upd]( fp2 x );
+		sub [eval]( fp2 x )( fp2 );
 
-		mul [upd]( fp_ x );
-		mul [eval]( fp_ x )( fp_ );		
+		mul [upd]( fp2 x );
+		mul [eval]( fp2 x )( fp2 );		
 
-		div [upd]( fp_ x );
-		div [eval]( fp_ x )( fp_ );
-		div [eval]( fp_ x )( fp_ q, fp_ r );	--  q = "rpn( v/x )", r = "v - q * x" 
+		div [upd]( fp2 x );
+		div [eval]( fp2 x )( fp2 );
+		div [eval]( fp2 x )( fp2 q, fp2 r );	--  q = "rpn( v/x )", r = "v - q * x" 
 
-		rem [upd]( fp_ x );								-- "v - ( rpn( v/x ) * x )" 
-		rem [eval]( fp_ x )( fp_ );		
+		rem [upd]( fp2 x );								-- "v - ( rpn( v/x ) * x )" 
+		rem [eval]( fp2 x )( fp2 );		
 
-		pow [upd]( fp_ x );								-- v to x power
+		pow [upd]( fp2 x );								-- v to x power
 		pow [upd]( int n, int d );							-- v to (n/d) power 
-		pow [eval]( fp_ x )( fp_ );
-		pow [eval]( int n, int d )( fp_ );
+		pow [eval]( fp2 x )( fp2 );
+		pow [eval]( int n, int d )( fp2 );
 
 		scl [upd]( int n );									-- "v * pow( #, n )"
-		scl [eval]( int n )( fp_ );
+		scl [eval]( int n )( fp2 );
 
-		fma [upd]( fp_ m, fp_ b );						-- fused mul add 
-		fma [eval]( fp_ m, fp_ b )( fp_ );
+		fma [upd]( fp2 m, fp2 b );						-- fused mul add 
+		fma [eval]( fp2 m, fp2 b )( fp2 );
 
-		dis [upd]( fp_ x );								-- distance between v and x (abs diff)
-		dis [eval]( fp_ x )( fp_ );
+		dis [upd]( fp2 x );								-- distance between v and x (abs diff)
+		dis [eval]( fp2 x )( fp2 );
 
 		neg [upd];									
-		neg [eval]()( fp_);
+		neg [eval]()( fp2);
 
 		abs [upd];
-		abs [eval]()( fp_ );
+		abs [eval]()( fp2 );
 
 		inc [upd];											--  v + epsilon
-		inc [eval]()( fp_ );
+		inc [eval]()( fp2 );
 
 		dec [upd];											--  v - epsilon
-		dec [eval]()( fp_ );
+		dec [eval]()( fp2 );
 
-		rpu [upd]( fp_ u [opt] );							-- round to precision up	
-		rpu [eval]( fp_ u [opt] )( fp_ );
+		rpu [upd]( fp2 u [opt] );							-- round to precision up	
+		rpu [eval]( fp2 u [opt] )( fp2 );
 
-		rpd [upd]( fp_ u [opt] );							-- round to precision down 
-		rpd [eval]( fp_ u [opt] )( fp_ );
+		rpd [upd]( fp2 u [opt] );							-- round to precision down 
+		rpd [eval]( fp2 u [opt] )( fp2 );
 
-		rpi [upd]( fp_ u [opt] );							-- round to precision in
-		rpi [eval]( fp_ u [opt] )( fp_ );
+		rpi [upd]( fp2 u [opt] );							-- round to precision in
+		rpi [eval]( fp2 u [opt] )( fp2 );
 
-		rpo [upd]( fp_ u [opt] );							-- round to precision out
-		rpo [eval]( fp_ u [opt] )( fp_ );
+		rpo [upd]( fp2 u [opt] );							-- round to precision out
+		rpo [eval]( fp2 u [opt] )( fp2 );
 		
-		rpn [upd]( fp_ u [opt] );							-- round to precision near 
-		rpn [eval]( fp_ u [opt] )( fp_ );	
+		rpn [upd]( fp2 u [opt] );							-- round to precision near 
+		rpn [eval]( fp2 u [opt] )( fp2 );	
 
-		rpn [upd]( fp_ u [opt] ) with rh ( fp_ x, fp_ u )( fp_ );			-- co-routine for .5
-		rpn [eval]( fp_ u [opt] )( fp_ ) with rh ( fp_ x, fp_ u )( fp_ );
+		rpn [upd]( fp2 u [opt] ) with rh ( fp2 x, fp2 u )( fp2 );			-- co-routine for .5
+		rpn [eval]( fp2 u [opt] )( fp2 ) with rh ( fp2 x, fp2 u )( fp2 );
 	}
 
 }

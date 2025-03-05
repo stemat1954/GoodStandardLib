@@ -59,13 +59,9 @@ type message
 	rendered by Alpha message methods. 
 		
 	Applications can write their own methods but in most 
-	cases it's easier to simply define an image as part of
+	cases it's easier to simply define a format as part of
 	the type definition and let the compiler write both 
-	methods automatically. An image defines	a composition 
-	of sub-objects and their formats.  Each image is 
-	associated with a format label.  A type can have 
-	multiple images and the compiler will write methods
-	that select the correct one from a given fex.
+	methods automatically. 
 	
 	If an application chooses to write custom message
 	methods, it can usually do so by simply reading and
@@ -245,9 +241,9 @@ type message
 	compatible memory boundaries.  
 
 
-	Several methods support readable images.  A readable 
-	image is a default image format that has indented and 
-	labeled sub-objects similar to JSON. 
+	Several methods support readable formats.  A readable 
+	format is a default format that has indented and labeled 
+	sub-objects similar to JSON. 
 	
 	:inc_indent and :dec_indent adjust the indention level by 
 	one, plus and minus respectively.  :get_indent returns the

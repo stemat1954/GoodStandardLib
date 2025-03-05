@@ -74,55 +74,55 @@ type word<#> -- elementary, compatible (up to word32), conventional
 		fwrite ( message [upd], expr fex ) ;	
 		
 
-		is_equal? ( word<#> w )( bool );
+		is_equal? ( word<<#>> w )( bool );
 
-		is_before? ( word<#> w )( bool );
+		is_before? ( word<<#>> w )( bool );
 
-		is_less? ( word<#> w )( bool );
+		is_less? ( word<<#>> w )( bool );
 	
 		is_zero? ()( bool );
 	
-		and [upd]( word<#> w );							-- bitwise
-		and [eval]( word<#> w )( word<#> );
+		and [upd]( word<<#>> w );							-- bitwise
+		and [eval]( word<<#>> w )( word<<#>> );
 
-		or [upd]( word<#> w );							-- bitwise
-		or [eval]( word<#> w )( word<#> );
+		or [upd]( word<<#>> w );							-- bitwise
+		or [eval]( word<<#>> w )( word<<#>> );
 
-		xor [upd]( word<#> w );							-- bitwise
-		xor [eval]( word<#> w )( word<#> );
+		xor [upd]( word<<#>> w );							-- bitwise
+		xor [eval]( word<<#>> w )( word<<#>> );
 
 		not [upd];										-- bitwise
-		not [eval]()( word<#> );
+		not [eval]()( word<<#>> );
 
-		add [upd]( word<#> w );							-- bitwise
-		add [eval]( word<#> w )( word<#> );
+		add [upd]( word<<#>> w );							-- bitwise
+		add [eval]( word<<#>> w )( word<<#>> );
 
-		adc [upd]( word<#> w, word1 c [upd] );			-- add with carry, bitwise
-		adc [eval]( word<#> w, word1 c [upd] )( word<#> );
+		adc [upd]( word<<#>> w, word<'1'> c [upd] );			-- add with carry, bitwise
+		adc [eval]( word<<#>> w, word<'1'> c [upd] )( word<<#>> );
 
 		neg [upd];										-- two's complement negate 
-		neg [eval]()( word<#> );
+		neg [eval]()( word<<#>> );
 
 		lsl [upd]( int n );								-- logical shift left
-		lsl [eval]( int n )( word<#> );
+		lsl [eval]( int n )( word<<#>> );
 
 		lsr [upd]( int n );								-- logical shift right
-		lsr [eval]( int n )( word<#> );
+		lsr [eval]( int n )( word<<#>> );
 
 		asr [upd]( int n );								-- arithmetic shift right
-		asr [eval]( int n )( word<#> );
+		asr [eval]( int n )( word<<#>> );
 
 		rol [upd]( int n );								-- rotate left 
-		rol [eval]( int n )( word<#> );
+		rol [eval]( int n )( word<<#>> );
 
 		ror [upd]( int n );								-- rotate right
-		ror [eval]( int n )( word<#> );
+		ror [eval]( int n )( word<<#>> );
 
-		rcl [upd]( int n, word1 c [upd] );				-- rotate thru carry left
-		rcl [eval]( int n, word1 c [upd] )( word<#> );
+		rcl [upd]( int n, word<'1'> c [upd] );				-- rotate thru carry left
+		rcl [eval]( int n, word<'1'> c [upd] )( word<<#>> );
 
-		rcr [upd]( int n, word1 c [upd] );				-- rotate thru carry right
-		rcr [eval]( int n, word1 c [upd] )( word<#> );
+		rcr [upd]( int n, word<'1'> c [upd] );				-- rotate thru carry right
+		rcr [eval]( int n, word<'1'> c [upd] )( word<<#>> );
 	}
 }
 

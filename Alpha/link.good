@@ -12,10 +12,6 @@ type <t>link   -- intrinsic
 	type, but in general, a link's adhoc type can be any
 	related (possibly incomplete) type.  
 
-	Note: The link that creates an object must a complete
-	adhoc type, but links that copy other links need only
-	be related.
-	
 	Logically, a link is a runtime reference object. That
 	is, the binding of link to object is made at runtime.
 	In this sense, links are similar to proxies.  However, 
@@ -34,29 +30,21 @@ type <t>link   -- intrinsic
 	The conversion is optimized and may in fact be virtual.
 	
  	The proxy returned by :use has [upd] access and it can 
-	be used to call any method of <t> except :begin.  To
-	initialize the global object, call :use_actual to
-	get an [init] proxy.
+	be used to call any method of <t> except :begin.  
 
 	The object bound to a link is created when the link 
 	is initialized. 
 	
 	The object created by :begin is null and it must be
-	initialized before it can be used.  Thus, it's common 
-	to see two levels of initialization when a link is
-	created. This expression:
+	initialized before it can be used.  :begin returns 
+	an [init] proxy which allows the new null object to
+	be initialized immediately:
 	
-		<thing>link tl begin:use_actual:begin; 
+		<thing>link tl begin:begin; 
 
-	creates and initializes a link named tl, bound to a
-	global object of adhoc type thing, then accesses the 
-	object with :use_actual to initialize the global
-	object with default :begin.  
-
-	Note: It would be possible to eliminate :use_actual
-	in favor of :use:as_actual<t> but the specialized method 
-	is potentially more efficient and avoids redundant type
-	specification in a typical initialization sequence.
+	Thise expression creates and initializes a link named
+	tl, bound to a global object of adhoc type thing, then
+	initializes the new global object with default :begin.  
 
 	Note:  It's important to distinquish between a null
 	link and a possibly null object accessed by the link.
@@ -98,7 +86,7 @@ type <t>link   -- intrinsic
 
 	subroutine foo
 	{
-		<widget>link wl:begin:use_actual:begin; -- new link to actual widget
+		<widget>link wl:begin:begin; -- new link to actual widget
 		<thing>link tl:begin( wl );  -- copy wl
 
 		wl:use:foo;	-- ok (foo is inherited)
@@ -123,7 +111,7 @@ type <t>link   -- intrinsic
 
 	If al is a link to an actual object of type A,
 
-		<A>link al:begin:use_actual:begin;
+		<A>link al:begin:begin;
 
 	then 
 
@@ -200,15 +188,15 @@ type <t>link   -- intrinsic
 {
 	general 
 	{
-		begin;						-- create and bind null <t> object, complete <t> (may quit)
+		begin = <t> proxy [init];				-- access new <t> object, complete <t> (may quit)
 
-		begin ( typename );			-- create and bind null <t> object, typename:is<t>? must be true (may quit)
+		begin ( typename ) = <t> proxy [init];	-- access new <t> object, typename:is<t>? must be true (may quit)
 
-		begin<xt> ( <<xt>>link );	-- copy compatible link, <xt> related to <t> (may quit)
-	
-		use = <t> proxy [upd];		-- always works (never void)
+		begin<xt> = <xt> proxy [init];			-- access new <xt> object, <xt> related to <t> (may quit)
 
-		use_actual = <t> proxy [init]; -- if <t> is actual object type (may be void)
+		begin<xt> ( <<xt>>link );				-- copy compatible link, <xt> related to <t> (may quit)
+
+		use = <t> proxy [upd];					-- always works (never void)
 
 		is_equal<xt>? ( <<xt>>link )( bool );
 

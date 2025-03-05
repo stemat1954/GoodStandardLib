@@ -270,7 +270,7 @@ type single_link_list from serial<node1><list_cursor>
 	{
 		insert<nt> [upd] with begin ()( <nt> )  -- after current
 		{
-			begin()( <<nt>>link nl:begin:use_actual );
+			begin()( <<nt>>link nl:begin );
 			io:insert( nl as <node1>link );
 		}
 		
@@ -367,7 +367,7 @@ type <nt>lifo_list from single_link_list  -- typed stack
 			io:base<single_link_list>:begin;
 			for ( ~node in other )
 			{
-				copy( ~node )( <<nt>>link nl:begin:use_actual );
+				copy( ~node )( <<nt>>link nl:begin );
 				io:insert( nl ):go_next;
 			}
 		}
@@ -427,7 +427,7 @@ type <nt>fifo_list from single_link_list  -- typed queue
 			io:base<single_link_list>:begin;
 			for ( ~node in other )
 			{
-				copy( ~node )( <<nt>>link nl:begin:use_actual );
+				copy( ~node )( <<nt>>link nl:begin );
 				io:insert( nl ):go_next;
 			}
 		}

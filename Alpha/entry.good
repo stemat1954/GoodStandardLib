@@ -2,7 +2,7 @@
 page entry in AlphaByGood
 
 type entry [incomplete]
-/*
+{{
 	An entry is a base type for types that represent app-
 	lication entry points.
 
@@ -33,7 +33,7 @@ type entry [incomplete]
 	
 	Note:  An application's main entry point doesn't receive
 	an inter-thread object from the startup routine.
-*/
+}}
 {
 	general 
 	{

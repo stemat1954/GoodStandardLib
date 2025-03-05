@@ -44,7 +44,7 @@ type tally from indicator
 {
 	general
 	{
-		begin ( int min, int max, int init, etm wait [opt], bool auto [opt] );
+		begin ( int min, int max, int n, etm wait [opt], bool auto [opt] );
 
 		inc [upd];
 
