@@ -63,7 +63,7 @@ subroutine
 
 	console_open_channel ( handle hcon, handle hch [upd], addr pnote [upd] );
 	
-	console_get_protocol ( handle hcon, int unit [upd], word16 bom [upd], int eol [upd] );
+	console_get_protocol ( handle hcon, int unit [upd], word<'16'> bom [upd], int eol [upd] );
 }
 
 
