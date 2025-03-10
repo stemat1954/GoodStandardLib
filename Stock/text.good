@@ -4,6 +4,8 @@ page text in StockByGood
 
 enum type match_mode ( 'exact', 'similar', 'regex' );
 
+type ucdb;  -- hypothetical unicode database
+
 
 subroutine
 {
@@ -22,7 +24,7 @@ subroutine
 		else -- 'negative'
 			pattern:get_rp()( int mark ):fread( fex )( code ):set_rp( mark ):dec_rp;
 			
-		if ( "code |not=| c:as_int" ) yes:begin( false )
+		if ( "code as unicode |not=| c" ) yes:begin( false )
 		else if ( "rp_end?( pattern )" ) yes:begin( true );
 	}
 
@@ -155,9 +157,9 @@ type text from message
 				~f -> other:use_utf;
 				~e -> other:use_endian;
 			}
-			yes:begin( "io:use_utf |=| ~f" );
+			yes:begin( "get_utf( io ) |=| ~f" );
 			if ( "not( yes )" ) return;
-			yes:and( "io:use_endian |=| ~e" );
+			yes:and( "get_endian( io ) |=| ~e" );
 		}
 
 		make ()( text t )		-- compatible
@@ -288,7 +290,7 @@ type text from message
 		write [upd]( text t [upd] ) -- any encoding
 		{
 			if ( "is_compatible?( io, t )" ) 
-				io:base<message>:copy( t, null, zero ); 
+				io:base<message>:copy( t, null, zero ) 
 			else
 				io:merge( *t );
 		}
@@ -456,29 +458,22 @@ type text from message
 	}
 
 
-	common word16  
+	common 
 	{
-		xD800:begin( 'x:D800' ) [const];
-		xDC00:begin( 'x:D800' ) [const];
-		xDFFF:begin( 'x:DFFF' ) [const];
+		word16 xD800:begin( 'x:D800' ) [const];
+		word16 xDC00:begin( 'x:D800' ) [const];
+		word16 xDFFF:begin( 'x:DFFF' ) [const];
+
+		word8 x80:begin( 'x:80' ) [const];
+		word8 x20:begin( 'x:20' ) [const];
+		word8 x10:begin( 'x:10' ) [const];
+		word8 xC0:begin( 'x:C0' ) [const];
+
+		int	two:begin( '2' )   [const];
+		int three:begin( '3' ) [const];
+		int four:begin( '4' )  [const];
 	}
 
-	common word8
-	{
-		x80:begin( 'x:80' ) [const];
-		x20:begin( 'x:20' ) [const];
-		x10:begin( 'x:10' ) [const];
-		xC0:begin( 'x:C0' ) [const];
-	}
-
-	common int
-	{
-		two:begin( '2' )   [const];
-		three:begin( '3' ) [const];
-		four:begin( '4' )  [const];
-	}
-
-	
 	misc method
 	{
 		write_chr<t> [upd]( <t> c )  
@@ -486,7 +481,7 @@ type text from message
 			c:fwrite( io, 'code' )()( io.code_fex );
 		}
 
-		write_str<t> [upd]( <t>array arr ) 
+		write_str<t> [upd]( <<t>>array arr ) 
 		{
 			for ( ~c in arr ) ~c:fwrite( io, 'code' )()( io.code_fex );
 		}
@@ -497,7 +492,7 @@ type text from message
 			c:begin( n );
 		}
 
-		read_str<t> [upd]( int q )( <t>array arr )
+		read_str<t> [upd]( int q )( <<t>>array arr )
 		{
 			arr:begin;
 			int q2:begin( q );
@@ -511,7 +506,7 @@ type text from message
 
 		copy_pattern [upd]( expr x )( text t )
 		{
-			if ( "x:length |=| zero" ) quit fault ( 'bug', 'no pattern' );  
+			if ( "count( x ) |=| zero" ) quit fault ( 'bug', 'no pattern' );  
 			io:make()( =t ):base<message>:fwrite<expr>( x, 't' );
 		}
 				
@@ -552,7 +547,7 @@ type text from message
 				q:inc; -- result pending
 			}
 
-			if ( "is_null?( ok )" ) ok:begin( false );
+			if ( "is_null?( ok )" ) ok:begin( false )
 			else if ( ok ) q:inc; -- account for final match
 
 			io:get_rp()( rp ):set_rp( mark );
@@ -563,12 +558,12 @@ type text from message
 		{
 			if ( "rp_end?( io )" ) return after ok:begin( false );
 			fix( d, 'positive' as sign ) ~d;
-			int cn ( c:as_int );
+			int cn:begin( c:ordinal );
 			if ( "~d |=| 'positive'" )
 			{
 				loop
 				{
-					io:base<message>:fread<int>( io.code_fex )( int n )
+					io:base<message>:fread<int>( io.code_fex )( int n );
 					if ( "n |=| cn" ) return after ok:begin( 'true' );
 					if ( "rp_end?( io )" ) return after ok:begin( 'false' );
 				}

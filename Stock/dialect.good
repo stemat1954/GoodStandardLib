@@ -46,27 +46,26 @@ common
 	handle no_handle:begin [const];		
 }
 	
-common fp2
+common -- fp2
 {
-	max_fp2:begin( 'max' ) [const];
+	fp2 max_fp2:begin( 'max' ) [const];
 	-- MORE TBD
 }
 
 
-common fp10
+common -- fp10
 {
-	max_fp10:begin( 'max' ) [const];
-	-- MORE TBD
+	-- TBD
 }
 
 
-common int
+common -- int
 {
-	zero:begin( '0' ) [const];
+	int zero:begin( '0' ) [const];
 
-	one:begin( '1' ) [const];
+	int one:begin( '1' ) [const];
 
-	neg_one:begin( '-1' ) [const];
+	int neg_one:begin( '-1' ) [const];
 
 	int max_int:begin( 'max' ) [const];
 
@@ -147,7 +146,7 @@ subroutine  --  coroutines
 		b:begin( a );
 	}
 
-	std_move<t> ( <t> [upd] a )( <t> b )
+	std_move<t> ( <t> a [upd] )( <t> b )
 	{
 		b:begin( *a );
 	}

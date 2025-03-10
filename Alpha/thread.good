@@ -68,16 +68,17 @@ subroutine
 
 	this_process_id = expr proxy [eval]; 
 
-	start_thread<ept> ( <object>link [opt] )( <thread>link ); 
+	start_thread<ept> ( smp<object> [opt] )( smp<thread> ); 
 	{{
 		This subroutine creates an entry point object of 
 		type <ept> which derives from alpha\entry, then 
 		calls adaptable entry method :run on a new thread,
-		forwarding the given object link. The entry point 
-		object is created in the new thread's local storage.
+		forwarding the given shared memory pointer. The 
+		entry point object is created in the new thread's 
+		local memory.
 
-		A <thread>link object that controls the new thread
-		is returned in an output.
+		A thread object that controls the new thread
+		is returned in an output smp.
 	}}
 }
 

@@ -26,9 +26,9 @@ type console
 		begin  -- system console
 		{
 			kernel\console_identify( no_addr, *handle hcon:begin );
-			if ( "hcon |=| no_addr" ) quit ( 'platform', 'no system console' );
+			if ( "hcon |=| no_addr" ) quit fault ( 'platform', 'no system console' );
 			io:configure( hcon )( text err );
-			if ( "is_not_null?( err )" ) quit ( 'platform', 'system console broken' );
+			if ( "is_not_null?( err )" ) quit fault ( 'platform', 'system console broken' );
 			io.ready:begin( true );
 		}
 
@@ -88,7 +88,7 @@ type console
 		write [upd]( text output [upd] )( text error )  
 		{
 			if ( io.ready )
-				io.channel.write( *output )( error )
+				io.channel:write( *output )( error )
 			else
 				error:begin( not_ready );
 		}
@@ -113,12 +113,12 @@ type console
 					value ( '1' ) io.utf:begin ( 'UTF-8' );
 					value ( '2' ) io.utf:begin ( 'UTF-16' );
 					value ( '4' ) io.utf:begin ( 'UTF-32' );
-					else quit ( 'bug', 'unexpected code unit value' );
+					else quit fault ( 'bug', 'unexpected code unit value' );
 				}
 
 				if ( "bom |=| 'x:FEFF'" ) io.endian:begin ( 'big_endian' )
 				else if ( "bom |=| 'x:FFFE'" ) io.endian:begin ( 'little_endian' )
-				else if ( "bom |not=| 'x:0000'" ) quit ( 'bug', 'invalid byte order mark' );
+				else if ( "bom |not=| 'x:0000'" ) quit fault ( 'bug', 'invalid byte order mark' );
 
 				io.eol:begin( eol );
 			}
@@ -131,17 +131,16 @@ type console
 		}
 	}
 
-	nom type channel = read_write_text_channel;
+	nom type nom_channel = read_write_text_channel;
 
 	common text not_ready:begin( 'not ready' ) [const];
 
 	instance
 	{
-		channel				[opt];
+		nom_channel	channel	[opt];
 		utf					[opt];
 		endian				[opt];  -- n/a for UTF-8
 		unicode		eol		[opt];
-
 		bool		ready;
 	}
 

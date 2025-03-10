@@ -1,0 +1,209 @@
+
+page smp in AlphaByGood
+
+
+
+type smp<t>   -- intrinsic
+{{
+	An smp<t> object is an object that creates and/or 
+	accesses a common object in shared memory.
+
+	NOte: smp = shared memory pointer
+
+	An smp is used to create a common object at runtime in 
+	shared memory. The type of object created must be a 
+	complete type, but in general, the smp adhoc type can
+	be any related (possibly incomplete) type.  
+
+	Logically, an smp is a runtime reference object. That
+	is, the binding of smp to object is made at runtime.
+	In this sense, smps are similar to proxies.  However, 
+	smps are first class objects with methods (proxies
+	aren't) and access to an smp's bound object requires
+	an explicit accessor call, while access to a proxy's
+	bound object is implicit.
+	
+	The smp object accessor method is called :use.  Like
+	other accessors, :use returns a result proxy, which
+	can be used in any object context as a reference to 
+	the common object. Thus, logically, there are two
+	levels of indirection to get to the common object.
+	
+	Note:  In a sense, :use converts an smp into a proxy.  
+	The conversion is optimized and may in fact be virtual.
+	
+ 	The proxy returned by :use has [upd] access and it can 
+	be used to call any method of <t> except :begin and 
+	:end.
+
+	The common object bound to an smp is created when the
+	smp is initialized. The new object is null and it must
+	be initialized before it can be used.  
+	
+	:begin returns an [init] proxy which allows the new
+	null object to be initialized immediately:
+	
+		smp<thing> pt begin:begin; 
+
+	This expression creates and initializes an smp named pt,
+	bound to a common object of adhoc type thing, then
+	initializes the new common object using default :begin.  
+
+	Note:  It's important to distinquish between a null
+	smp and a possibly null object accessed by the smp.
+	A null smp can't be used, but a properly intialized 
+	smp can always be used and it may or may not bind
+	a null common object.
+	
+	An smp can be initialized by copying an existing 
+	compatible smp. When smps are copied, the new smp
+	is bound to some external subobject of the existing
+	common object. 
+	
+	The common object bound to an smp is automatically
+	deleted when all smps that reference the object are
+	deleted.
+	
+	Note:  It's common to say that the common object bound 
+	to an smp is "reference counted."
+
+	Note:  Copying smps and reference counting is thread-
+	safe. Smps are essential for sharing objects between
+	threads.
+
+	An existing smp is compatible with another smp if 
+	the two adhoc smp types are related.
+	
+	For example:
+
+
+	type thing
+	{
+		general method foo [eval];
+	}
+
+	type widget from thing
+	{
+		general method goo [eval];
+	}
+
+	subroutine foo
+	{
+		smp<widget> wp:begin:begin; -- new smp to actual widget
+		smp<thing> tp:begin( wp );  -- copy wp
+
+		wp:use:foo;	-- ok (foo is inherited)
+		wp:use:goo;	-- ok
+
+		tp:use:foo;	-- ok
+		tp:use:goo;	-- error! (goo not a method of thing)
+		tp:use:as<widget>:goo;  -- ok after type translation
+	}
+		
+
+	In general, two types are related and compatible if they
+	occur in a common type hierarchy.
+
+	      A
+	     / \
+		B   C
+
+	In this (bottom-up) hierarchy, A derives from B and C.
+	A, B, and C are all related.  Note that B and C are
+	related through A, but are otherwise not related.
+
+	If ap is an smp to an actual object of type A,
+
+		smp<A> ap:begin:begin;
+
+	then 
+
+		smp<B> bp:begin( ap );
+		smp<C> cp:begin( ap );
+
+		smp<B> bp2:begin( cp );
+		smp<C> cp2:begin( bp );
+
+	are all legit and refer to the same actual object bound
+	to ap.
+
+	This works because 
+
+	  ap:use:base<B>
+	  ap:use:base<C>
+	  bp:use:as<A>
+	  cp:use:as<A>
+	  bp:use:as<C>
+	  cp:use:as<B>
+
+	are all legit and return valid proxies.
+
+	Smps can be used to create logically heterogenous 
+	arrays. They're also essential for creating dynamically
+	linked object collections like trees, lists, and 
+	networks.
+
+	Smps are not portable.  However, since an smp can be 
+	created from a typename, and typenames ARE portable, 
+	applications can devise ways to persist	and restore
+	smps.
+
+	Although a single smp is relatively easy to persist, 
+	a complex network of smps is significantly	more
+	difficult. In general, applications usually have to 
+	devise a scheme to store smps and objects separately.
+
+	The basic idea is to create a portable smp using a 
+	typename and some other portable reference, e.g. an int
+	that indexes an object in a set of objects.
+
+	A portable smp of this sort can be imported as a type-
+	name and int.  The typename is used to create a	smp
+	to a null object and the int can be used to lookup a 
+	copy of the object for initialization.  Of course, where 
+	objects may have multiple smps, there has to be a way
+	to recognize when an original smp has been restored so
+	that others can copy it.
+
+	Links can be compared using standard methods. Cross
+	type comparisions are allowed, even if the smps are
+	copy-incompatible.  Comparisons are based on object 
+	storage address, so equal smps reference the same 
+	actual object.  Furthermore, if a:before?(b) is false 
+	and b:before?(a) is false, then a and b are par equal
+	( "a |par| b" is true).
+		
+	Note:  Par equality is persistent provided smps are
+	properly restored using techniques already described.
+	However, ordinality is a completely transient property
+	and any ordered collection of smps is only ordered fo
+	r a single runtime session.
+
+	Note: In some applications, it may be preferable to
+	compare smps by passing the comparison on to the common
+	object.  A general solution is too complicated.  For
+	particular scenarios, an application can define a new
+	type that encapsulates an smp and provides the desired
+	pass-through methods.
+
+
+}}
+{
+	general 
+	{
+		begin = <t> proxy [init];				-- access new <t> object, complete <t> (may quit)
+
+		begin ( typename ) = <t> proxy [init];	-- access new <t> object, typename:is<t>? must be true (may quit)
+
+		begin<xt> = <xt> proxy [init];			-- access new <xt> object, <xt> related to <t> (may quit)
+
+		begin<xt> ( smp<<xt>> );				-- copy compatible smp, <xt> related to <t> (may quit)
+
+		use = <t> proxy [upd];					-- always works (never void)
+
+		is_equal<xt>? ( smp<<xt>> )( bool );
+
+		is_before<xt>? ( smp<<xt>> )( bool );
+	}
+}
+

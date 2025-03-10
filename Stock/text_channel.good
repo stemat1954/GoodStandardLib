@@ -31,7 +31,7 @@ page text_channel in StockByGood
 		loop
 		{
 			read_channel_chr( *reader, *data )( error );
-			if (" not_null?( error ) ") escape;
+			if ( "is_not_null?( error )" ) escape;
 
 			need:dec;
 			if ( "need |=| zero" ) escape;
@@ -46,7 +46,7 @@ page text_channel in StockByGood
 			read_channel_chr( *reader, *data )( error );
 			if ( "is_not_null?( error )" ) escape;
 
-			t:read()( unicode c2 );  -- last char
+			data:read()( unicode c2 );  -- last char
 			if ( "c2 |=| c" ) escape;
 		}
 		data:set_rp( mark );
@@ -105,13 +105,13 @@ page text_channel in StockByGood
 			value ( 'error' )
 			{
 				error:begin:write( 'channel error [' );
-				if ( "not_null?( note )" ) error:write( note );
+				if ( "is_not_null?( note )" ) error:write( note );
 				error:write( ']' );
 			}
 
 			else -- 'pending', 'busy', 'end', 'other'
 			{
-				error:begin:write( 'unexpected channel report [' ):write( cr:as_expr ):write( ']' );
+				error:begin:write( 'unexpected channel report [' ):write( cr:token ):write( ']' );
 			}
 		}
 	}
@@ -147,7 +147,7 @@ type read_write_text_channel from sync_read_write_channel
 	{
 		begin ( handle )
 		{
-			io:base<sync_read_write_channel>:begin( [handle] );
+			io:base<sync_read_write_channel>:begin( given\handle );
 		}
 
 		read [upd]( text data [upd], int q )( text error ) -- q chars

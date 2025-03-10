@@ -5,15 +5,20 @@ page node in StockByGood
 {{
 	On this page:
 	
+	node_link
 	node			variable-way base
+
+	node<#>_link
 	node<#>			generic fixed-way base 
 	<t>node<#>		generic fixed-way synthetic node 
 
+	node1_link
 	node1			specialized one-way base
 	<t>node1		specialized one-way synthetic node
 }}
 
 
+nom type node_link = smp<node>;
 
 type node [incomplete]
 {{
@@ -31,8 +36,6 @@ type node [incomplete]
 	instead.
 }}
 {
-	nom type link = <node>link;
-	nom type linkage = <link>array;
 
 	general method
 	{
@@ -41,12 +44,12 @@ type node [incomplete]
 			io.linkage:begin( dim );
 		}
 
-		get_link ( int i )( link nl )
+		get_link ( int i )( node_link nl )
 		{
 			nl:begin( io.linkage:use_object( i ) );
 		}
 
-		set_link [upd]( int i, link nl )
+		set_link [upd]( int i, node_link nl )
 		{
 			io:make_room( i );
 			io.linkage:use_object( i ) <= nl;
@@ -63,16 +66,22 @@ type node [incomplete]
 		make_room [upd]( int i )
 		{
 			io.linkage:count()( int q );
-			int need:begin( "i - q + 1" );			--i:sub( q )( =int ):add( one )( int need );
+			int need:begin( "i - q + one" );	--i:sub( q )( =int ):add( one )( int need );
 			if ( "need |>| zero" ) io.linkage:insert( q, need ); -- at i = q
 		}
 	}
+
+	nom type linkage = <node_link>array;
 
 	instance
 	{
 		linkage;
 	}
 }
+
+
+
+nom type node<#>_link = smp<node<<#>>>;
 
 
 type node<#> [incomplete]
@@ -90,8 +99,7 @@ type node<#> [incomplete]
 	alternative.
 }}
 {
-	nom type link = <node<<#>>>link;
-	nom type linkage = <link>tuple<<#>>;
+	nom type linkage = < node<<#>>_link >tuple<<#>>;
 
 	general method
 	{
@@ -100,13 +108,13 @@ type node<#> [incomplete]
 			io.linkage:begin;  -- all links null
 		}
 
-		get_link ( int i )( link nl ) 
+		get_link ( int i )( node<<#>>_link nl ) 
 		{
 			io.linkage:use_object( i ) ~nl;
 			if ( "is_not_null?( ~nl )" ) nl:begin( ~nl );
 		}
 
-		set_link [upd](int i, <node<<#>>>link> nl )
+		set_link [upd](int i, node<<#>>_link nl )
 		{
 			io.linkage:use_object( i ) <= nl;
 		}
@@ -167,26 +175,25 @@ type <t>node<#> from ( <t>, node<<#>> )
 }
 
 
+nom type node1_link = smp<node1>;
 
 type node1 
 {{
 	A node1 is a specialized one-way node.
 }}
 {
-	nom type link = <node1>link;
-
 	general method
 	{
 		begin  -- null link
 		{
 		}
 
-		get_link ()( link nl )
+		get_link ()( node1_link nl )
 		{
 			if ( "is_not_null?( io.link )" ) nl:begin( io.link );
 		}
 
-		set_link [upd]( link nl )
+		set_link [upd]( node1_link nl )
 		{
 			io.link:reuse:begin( nl );
 		}
@@ -199,11 +206,9 @@ type node1
 
 	instance
 	{
-		link;
+		node1_link link;
 	}
 }
-
-
 
 
 type <t>node1 from ( <t>, node1 )
