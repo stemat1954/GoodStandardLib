@@ -26,7 +26,7 @@ type console
 		begin  -- system console
 		{
 			kernel\console_identify( no_addr, *handle hcon:begin );
-			if ( "hcon |=| no_addr" ) quit fault ( 'platform', 'no system console' );
+			if ( "hcon |=| no_handle" ) quit fault ( 'platform', 'no system console' );
 			io:configure( hcon )( text err );
 			if ( "is_not_null?( err )" ) quit fault ( 'platform', 'system console broken' );
 			io.ready:begin( true );
@@ -38,7 +38,7 @@ type console
 			kernel\console_identify( pname, *handle hcon:begin );
 			kernel\heap_free( pname );
 
-			if ( "hcon |=| no_addr" )
+			if ( "hcon |=| no_handle" )
 			{
 				error:begin:write( 'unknown console: ' ):write( name );
 				io.ready:begin( false );
@@ -102,7 +102,7 @@ type console
 		{
 			kernel\console_open_channel( hcon, *handle hch:begin, *addr pnote:begin );
 			
-			if ( "hch |not=| no_addr" )
+			if ( "hch |not=| no_handle" )
 			{
 				io.channel:begin( hch ); 
 
