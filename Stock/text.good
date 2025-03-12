@@ -125,7 +125,7 @@ type text from message
 
 			describe_utf( f )( io.code_unit, io.code_fex );
 
-			io:copy( other, zero ); -- all
+			io:copy( other, null, zero )(); -- all
 			io:set_wp( zero );
 		}
 
@@ -139,32 +139,32 @@ type text from message
 
 		get_encoding ()( utf f, endian e )
 		{
-			f:begin( io:use_utf );
-			e:begin( io:use_endian );
+			io:get_utf()( f );
+			io:get_endian()( e );
 		}
 
 		is_compatible? ( text other [opt] )( bool yes ) -- compare to platform if other null
 		{
-			utf proxy ~f;
-			endian proxy ~e;
+			utf f;
+			endian e;
 			if ( "is_null?( other )" )
 			{
-				~f -> platform_utf;
-				~e -> platform_endian;
+				f:begin( platform_utf );
+				e:begin( platform_endian );
 			}
 			else
 			{
-				~f -> other:use_utf;
-				~e -> other:use_endian;
+				other:get_utf()( f );
+				other:get_endian()( e );
 			}
-			yes:begin( "get_utf( io ) |=| ~f" );
-			if ( "not( yes )" ) return;
-			yes:and( "get_endian( io ) |=| ~e" );
+			yes:begin( "get_utf( io ) |=| f" );
+			if ( "not( yes )" ) return; 
+			yes:and( "get_endian( io ) |=| e" );
 		}
 
 		make ()( text t )		-- compatible
 		{
-			t:begin( io:use_utf, io:use_endian );
+			t:begin( "get_utf( io )", "get_endian( io )" );
 		}
 		
 
@@ -172,7 +172,7 @@ type text from message
 
 		import [upd]( int q, message m [upd] )
 		{
-			describe_utf( m:use_utf )( null, expr m_fex );
+			describe_utf( "get_utf( m )" )( null, expr m_fex );
 			io:set_size( zero ):set_wp( zero );
 			int q2:begin;
 			loop ( "q2 |<| q" )
@@ -185,7 +185,7 @@ type text from message
 
 		export [upd]( message m [upd] )
 		{
-			describe_utf( m:use_utf )( null, expr m_fex );
+			describe_utf( "get_utf( m )" )( null, expr m_fex );
 			io:set_rp( zero );
 			loop ( "not( rp_end?( io ) )" )
 			{
@@ -196,8 +196,8 @@ type text from message
 
 		merge [upd]( text other [upd], int q [opt] )( int q2 )  -- using current pointers 
 		{
-			fix( q, int_max ) ~q;
-			describe_utf( other:use_utf )( null, expr other_fex );
+			fix( q, max_int ) ~q;
+			describe_utf( "get_utf( other )" )( null, expr other_fex );
 			q2:begin;
 			loop ( "( q2 |<| ~q ) |and| not( rp_end?( other ) )" )
 			{
@@ -245,12 +245,13 @@ type text from message
 		 
 		add_zero [upd] 
 		{
-			io:set_wp_end:write<int>( zero, io.code_fex );
+			io:set_wp_end:fwrite<int>( zero, io.code_fex );
 		}
+
 		
 		trim_zero [upd]
 		{
-			io:set_rp( zero ):seek_chr<unicode>( zero, 'positive' ):set_size_rp;
+			io:set_rp( zero ):seek_chr<unicode>( zero, 'positive' )():set_size_rp;
 		}
 		
 			
@@ -284,15 +285,15 @@ type text from message
 		write [upd]( text t ) -- compatible only
 		{
 			if ( "not( is_compatible?( io, t ) )" ) quit fault ( 'bug', 'incompatible text' );
-			io:base<message>:copy( t, null, zero ); -- all
+			io:base<message>:copy( t, null, zero )(); -- all, ignore output
 		}
 
 		write [upd]( text t [upd] ) -- any encoding
 		{
 			if ( "is_compatible?( io, t )" ) 
-				io:base<message>:copy( t, null, zero ) 
+				io:base<message>:copy( t, null, zero )()  -- all, ignore output 
 			else
-				io:merge( *t );
+				io:merge( *t )();
 		}
 			
 		fwrite<t> [upd]( <t> x, expr fex [opt] )		-- single fex
@@ -317,7 +318,7 @@ type text from message
 
 		read [upd]()( ascii c )  
 		{
-			io:read_chr( c );
+			io:read_chr()( c );
 		}
 
 		read [upd]( int q )( <unicode>array s )

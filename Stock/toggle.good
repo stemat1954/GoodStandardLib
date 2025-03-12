@@ -46,7 +46,7 @@ type toggle
 
 		release [upd]
 		{
-			io.semaphore:add_no_wait( one ); -- ignore output
+			io.semaphore:add_no_wait( one )(); -- ignore output
 		}
 	}
 
