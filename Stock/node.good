@@ -52,12 +52,12 @@ type node [incomplete]
 		set_link [upd]( int i, node_link nl )
 		{
 			io:make_room( i );
-			io.linkage:use_object( i ) <= nl;
+			io.linkage:use_object( i )[init] <= nl;
 		}
 
 		unlink [upd]( int i )
 		{
-			io.linkage:use_object( i ):reuse;
+			io.linkage:use_object( i )[init]:reuse;
 		}
 	}
 

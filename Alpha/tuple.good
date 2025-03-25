@@ -38,13 +38,13 @@ type <t>tuple<#> from indexed<<t>> -- compatible and conventional per <t>
 
 	general -- <t> dependent with coroutine
 	{
-		begin ( <t> seed ) with copy ( <t> )( <t> );	-- replicate
-		begin ( <<t>>tuple<<#>> other )  with copy ( <t> )( <t> );
-		begin ( message [upd], expr fex ) with fread ( message [upd], expr fex )( <t> ); 
-		begin ( message [upd], expr fex )()( extra ) with fread ( message [upd], expr fex )( <t> )( extra ); 
+		begin ( <t> seed ) with copier ( <t> )( <t> );	-- replicate
+		begin ( <<t>>tuple<<#>> other )  with copier ( <t> )( <t> );
+		begin ( message [upd], expr fex ) with reader ( message [upd], expr fex )( <t> ); 
+		begin ( message [upd], expr fex )()( extra ) with reader ( message [upd], expr fex )( <t> )( extra ); 
 
-		fwrite ( message [upd], expr fex ) with fread ( message [upd], expr fex )( <t> ); 
-		fwrite ( message [upd], expr fex )()( extra ) with fread ( message [upd], expr fex )( <t> )( extra ); 
+		fwrite ( message [upd], expr fex ) with writer ( message [upd], expr fex )( <t> ); 
+		fwrite ( message [upd], expr fex )()( extra ) with writer ( message [upd], expr fex )( <t> )( extra ); 
 	}
 
 	abstract in indexed<<t>>
