@@ -23,7 +23,7 @@ page text_channel in StockByGood
 }}
 
 
-[internal] subroutine
+[page] subroutine
 {
 	read_channel_str ( sync_channel_reader reader [upd], text data [upd], int q )( text error )  -- q chars
 	{

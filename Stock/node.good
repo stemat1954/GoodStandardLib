@@ -98,16 +98,16 @@ type node<#> [incomplete]
 	{
 		begin  -- all links null
 		{
-			io.linkage:begin;  -- all links null
+			io.linkage:begin;  
 		}
 
 		get_link ( int i )( link ) 
 		{
-			io.linkage:use_object( i ) ~link;
-			if ( "is_not_null?( ~link )" ) given\link:begin( ~link );
+			io.linkage:use_object( i ) ~nl;
+			if ( "is_not_null?( ~nl )" ) given\link:begin( ~nl );
 		}
 
-		set_link [upd](int i, link )
+		set_link [upd]( int i, link )
 		{
 			io.linkage:use_object( i ) <= given\link;
 		}

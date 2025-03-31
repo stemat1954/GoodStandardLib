@@ -2,7 +2,7 @@
 page channel in StockByGood
 
 
-[internal] common
+[page] common
 {
 	int sizeof_request [const];
 
@@ -14,7 +14,7 @@ page channel in StockByGood
 
 
 
-[internal] type request
+[page] type request
 {{
 	This is an i/o request data structure.  
 			
@@ -124,7 +124,7 @@ page channel in StockByGood
 }
 
 
-[internal] subroutine 
+[page] subroutine 
 {
 	format_request ( request r )( addr pr )  -- orphan pr
 	{
