@@ -284,7 +284,7 @@ type text from message
 
 		write [upd]( text t ) -- compatible only
 		{
-			if ( "not( is_compatible?( io, t ) )" ) quit fault ( 'bug', 'incompatible text' );
+			if ( "not( is_compatible?( io, t ) )" ) quit with fault:begin( 'bug', 'incompatible text' );
 			io:base<message>:copy( t, null, zero )(); -- all, ignore output
 		}
 
@@ -360,14 +360,14 @@ type text from message
 				value ( 'similar' ) io:skip( *pattern )( ok, null, rp ) with similar_match?;
 				value ( 'regex' )   io:skip( *pattern )( ok, null, rp ) with regex_match?;
 			}
-			if ( ok:not ) quit fault ( 'format', 'skip pattern mismatch' );
+			if ( ok:not ) quit with fault:begin( 'format', 'skip pattern mismatch' );
 			io:set_rp( rp );
 		}
 
 		skip [upd]( text pattern [upd] )( bool ok, int q, int rp )  -- general
 		 with match? ( text pattern [upd], unicode, sign, expr fex )( bool )
 		{
-			if ( "not( is_compatible?( io, pattern ) )" ) quit fault ( 'bug', 'incompatible pattern' );
+			if ( "not( is_compatible?( io, pattern ) )" ) quit with fault:begin( 'bug', 'incompatible pattern' );
 			io:match( *pattern, 'positive' )( ok, q, rp ) with match?;  
 			if ( ok ) io:set_rp( rp );
 		}
@@ -428,7 +428,7 @@ type text from message
 		seek [upd]( text pattern [upd], sign d [opt] )( int q ) -- q = chars matched (zero = no match)
 		 with match? ( text pattern [upd], unicode c, sign d, expr fex )( bool )
 		{
-			if ( "not( is_compatible?( io, pattern ) )" ) quit fault ( 'bug', 'incompatible pattern' );
+			if ( "not( is_compatible?( io, pattern ) )" ) quit with fault:begin( 'bug', 'incompatible pattern' );
 			fix<sign>( d, 'positive' ) ~d;
 			loop 
 			{
@@ -507,7 +507,7 @@ type text from message
 
 		copy_pattern [upd]( expr x )( text t )
 		{
-			if ( "count( x ) |=| zero" ) quit fault ( 'bug', 'no pattern' );  
+			if ( "count( x ) |=| zero" ) quit with fault:begin( 'bug', 'no pattern' );  
 			io:make()( =t ):base<message>:fwrite<expr>( x, 't' );
 		}
 				

@@ -42,7 +42,7 @@ page channel in StockByGood
 
 		begin ( ascii action, addr pdata, int offset, int size, int seek [opt], int id [opt] )
 		{
-			if ( "( action |not=| 'r' ) |and| ( action |not=| 'w' )" ) quit fault ( 'bug', 'invalid i/o action' );
+			if ( "( action |not=| 'r' ) |and| ( action |not=| 'w' )" ) quit with fault:begin( 'bug', 'invalid i/o action' );
 			ascii_to_word( action )( .action );
 			.pdata:begin( pdata );
 			.offset:begin( offset );

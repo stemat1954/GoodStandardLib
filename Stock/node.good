@@ -5,37 +5,33 @@ page node in StockByGood
 {{
 	On this page:
 	
-	node_link
 	node			variable-way base
 
-	node<#>_link
 	node<#>			generic fixed-way base 
 	<t>node<#>		generic fixed-way synthetic node 
 
-	node1_link
 	node1			specialized one-way base
 	<t>node1		specialized one-way synthetic node
 }}
 
 
-nom type node_link = smp<node>;
 
 type node [incomplete]
 {{
-	A node is a multi-link adapatable base type.
+	A node is a linkable object.
 	
 	Nodes interconnect with other nodes using indexed links.
 
 	A node can have any number of links and link allocation
 	is dynamic.  
 	
-	This node type is used when a nexus interconnects in 
-	diverse ways. 
-
 	When node dimension is known and uniform, use a node<#>
 	instead.
 }}
 {
+	nom type link = smp<node>;
+	nom type linkage = <link>array;
+
 
 	general method
 	{
@@ -44,15 +40,15 @@ type node [incomplete]
 			io.linkage:begin( dim );
 		}
 
-		get_link ( int i )( node_link nl )
+		get_link ( int i )( link )
 		{
-			nl:begin( io.linkage:use_object( i ) );
+			given\link:begin( io.linkage:use_object( i ) );
 		}
 
-		set_link [upd]( int i, node_link nl )
+		set_link [upd]( int i, link )
 		{
 			io:make_room( i );
-			io.linkage:use_object( i )[init] <= nl;
+			io.linkage:use_object( i )[init] <= given\link;
 		}
 
 		unlink [upd]( int i )
@@ -71,8 +67,6 @@ type node [incomplete]
 		}
 	}
 
-	nom type linkage = <node_link>array;
-
 	instance
 	{
 		linkage;
@@ -81,12 +75,10 @@ type node [incomplete]
 
 
 
-nom type node<#>_link = smp<node<<#>>>;
-
-
 type node<#> [incomplete]
 {{
-	A node<#> is a generic fixed dimension node.
+	A node<#> is an interlinkable object with fixed number
+	of links.
 	
 	node<#> linkage is uniform.  That is, all nodes in a
 	<#n>-way nexus are of the same dimension.
@@ -99,7 +91,8 @@ type node<#> [incomplete]
 	alternative.
 }}
 {
-	nom type linkage = < node<<#>>_link >tuple<<#>>;
+	nom type link = smp<node<<#>>>;
+	nom type linkage = <link>tuple<<#>>;
 
 	general method
 	{
@@ -108,15 +101,15 @@ type node<#> [incomplete]
 			io.linkage:begin;  -- all links null
 		}
 
-		get_link ( int i )( node<<#>>_link nl ) 
+		get_link ( int i )( link ) 
 		{
-			io.linkage:use_object( i ) ~nl;
-			if ( "is_not_null?( ~nl )" ) nl:begin( ~nl );
+			io.linkage:use_object( i ) ~link;
+			if ( "is_not_null?( ~link )" ) given\link:begin( ~link );
 		}
 
-		set_link [upd](int i, node<<#>>_link nl )
+		set_link [upd](int i, link )
 		{
-			io.linkage:use_object( i ) <= nl;
+			io.linkage:use_object( i ) <= given\link;
 		}
 
 		unlink [upd]( int i )
@@ -124,6 +117,7 @@ type node<#> [incomplete]
 			io.linkage:use_object( i ):reuse;
 		}
 	}
+
 
 	instance
 	{
@@ -160,42 +154,46 @@ type <t>node<#> from ( <t>, node<<#>> )
 {
 	general method
 	{
-		begin
+		begin  -- default <t> initializer
 		{
-			io:base< node<<#>> >:begin;
+			io:base<node<<#>>>:begin;
 			io:base<<t>>:begin;
 		}
 
-		begin with co_begin ()( <t> )
+		begin with initializer ()( <t> )  
 		{
 			io:base< node<<#>> >:begin;
-			co_begin()( io:base<<t>> );
+			initializer()( io:base<<t>> );
 		}
 	}
 }
 
 
-nom type node1_link = smp<node1>;
 
 type node1 
 {{
 	A node1 is a specialized one-way node.
+
+	A node1 is essentially an smp wrapped in node
+	methodology.
 }}
 {
+	nom type link = smp<node1>;
+
 	general method
 	{
 		begin  -- null link
 		{
 		}
 
-		get_link ()( node1_link nl )
+		get_link ()( link )
 		{
-			if ( "is_not_null?( io.link )" ) nl:begin( io.link );
+			if ( "is_not_null?( io.link )" ) given\link:begin( io.link );
 		}
 
-		set_link [upd]( node1_link nl )
+		set_link [upd]( link )
 		{
-			io.link:reuse:begin( nl );
+			io.link <= given\link;
 		}
 
 		unlink [upd]
@@ -206,7 +204,7 @@ type node1
 
 	instance
 	{
-		node1_link link;
+		link [opt];
 	}
 }
 
@@ -218,16 +216,16 @@ type <t>node1 from ( <t>, node1 )
 {
 	general method
 	{
-		begin
+		begin -- default <t> initializer
 		{
 			io:base<node1>:begin;
 			io:base<<t>>:begin;
 		}
 
-		begin with co_begin ()( <t> )
+		begin with initializer ()( <t> )
 		{
 			io:base<node1>:begin;
-			co_begin()( io:base<<t>> );
+			initializer()( io:base<<t>> );
 		}
 	}
 }

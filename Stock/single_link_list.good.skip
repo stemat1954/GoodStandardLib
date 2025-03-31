@@ -14,42 +14,42 @@ page single_link_list in StockByGood
 
 type list_cursor
 {{
-	A list cursor is inoperable if io.nl is null.
+	A list cursor is inoperable if io.link is null.
 
 	Note:  the cursor itself is not null.
 }}
 {
 	general
 	{
-		begin ( node1_link nl [opt] )
+		begin ( node1_link link [opt] )
 		{
-			if ( "is_not_null?( nl )" ) io.nl:begin( nl );
+			if ( "is_not_null?( link )" ) io.link:begin( link );
 		}
 
 		move [upd]
 		{
-			if ( "is_not_null?( io.nl )" ) 
+			if ( "is_not_null?( io.link )" ) 
 			{
-				io.nl:use:get_link()( node1_link next );
-				io.nl:reuse;
-				if ( "is_not_null?( next )" ) io.nl:begin( next );
+				io.link:use:get_link()( node1_link next );
+				io.link:reuse;
+				if ( "is_not_null?( next )" ) io.link:begin( next );
 			}
 		}
 
 		flip [upd]
 		{
-			io.nl:reuse;  -- not supported
+			io.link:reuse;  -- not supported
 		}
 
 		use_node = node1 proxy ~n
 		{
-			if ( "is_not_null?( io.nl )" ) ~n -> io.nl:use; 
+			if ( "is_not_null?( io.link )" ) ~n -> io.link:use; 
 		}
 	}
 
 	instance
 	{
-		node1_link nl [opt];
+		node1_link link [opt];
 	}
 }
 
@@ -95,7 +95,7 @@ type single_link_list from serial<node1><list_cursor>
 	:insert adds a node link after the current position.
 	The current position doesn't change.  The given node 
 	should be a new (unlinked) node, but the method clears
-	the link just in value.
+	the link just in case.
 
 	NOTE! It's possible to re-insert (move) a node in the
 	list if it's removed before reinserting.  Failure to
@@ -113,14 +113,15 @@ type single_link_list from serial<node1><list_cursor>
 	Once a named link is copied, the list is traversed by
 	calling 
 
-		nl:use:get_link()( node1_link next )
+		link:use:get_link()( node1_link next )
 
 	until next is null.
 
-	Typed methods are provided in a segregated group. Most
-	of them work with a given coroutine allowing for generic
-	subtypes that compile with any type provided a proper 
-	coroutine can be given for the method and node type.
+	Type dependent methods are provided in a seperate group.
+	Most of them work with a given coroutine allowing for
+	generic subtypes that compile with any type provided a
+	proper coroutine can be given for the method and node 
+	type.
 
 	Note: standard coroutines make calling these methods
 	straight forward.
@@ -174,61 +175,61 @@ type single_link_list from serial<node1><list_cursor>
 			}
 			else
 			{
-				io.current:use:get_link()( node1_link nl ); 
-				if ( "is_not_null?( nl )" ) io.current <= nl;
+				io.current:use:get_link()( node1_link link ); 
+				if ( "is_not_null?( link )" ) io.current <= link;
 			}
 		}
 
-		go_here [upd]( node1_link nl )  
+		go_here [upd]( node1_link link )  
 		{
-			io.current:reset:begin( nl );
+			io.current <= link;
 		}
 		
 		
-		get_first [eval]()( node1_link nl )
+		get_first [eval]()( node1_link link )
 		{
-			if ( "is_not_null?( io.first )" ) nl:begin( io.first );
+			if ( "is_not_null?( io.first )" ) link:begin( io.first );
 		}
 
-		get_last [eval]()( node1_link nl )
+		get_last [eval]()( node1_link link )
 		{
-			if ( "is_not_null?( io.last )" ) nl:begin( io.last );
+			if ( "is_not_null?( io.last )" ) link:begin( io.last );
 		}
 
-		get_current [eval]()( node1_link nl )
+		get_current [eval]()( node1_link link )
 		{
-			if ( "is_not_null?( io.current )" ) nl:begin( io.current );
+			if ( "is_not_null?( io.current )" ) link:begin( io.current );
 		}
 
-		get_next [eval]()( node1_link nl ) 
+		get_next [eval]()( node1_link link ) 
 		{
-			if ( "is_not_null?( io.current )" ) io.current:use:get_link()( nl );
+			if ( "is_not_null?( io.current )" ) io.current:use:get_link()( link );
 		}
 
 
-		insert [upd]( node1_link nl )  -- after current  
+		insert [upd]( node1_link link )  -- after current  
 		{
-			nl:use:unlink;  -- just in value
+			link:use:unlink;  -- just in value
 			if ( "is_not_null?( io.current )" )  
 			{
 				-- after current
-				io.current:use:get_link()( node1_link before ):set_link( nl ); 
+				io.current:use:get_link()( node1_link before ):set_link( link ); 
 				if ( "is_null?( before )" )
-					io.last <= nl 
+					io.last <= link 
 				else
-					nl:use:set_link( before );
+					link:use:set_link( before );
 			}
 			else if ( "is_not_null?( io.first )" )
 			{
 				-- front (before first)
-				nl:use:set_link( io.first );
-				io.first <= nl;
+				link:use:set_link( io.first );
+				io.first <= link;
 			}
 			else 
 			{
 				-- first and only node
-				io.first:begin( nl );
-				io.last:begin( nl );
+				io.first:begin( link );
+				io.last:begin( link );
 			}
 		}
 	
@@ -268,22 +269,22 @@ type single_link_list from serial<node1><list_cursor>
 
 	general method  -- typed node <nt> must derive from node1
 	{
-		insert<nt> [upd] with begin ()( <nt> )  -- after current
+		insert<nt> [upd] with initializer ()( <nt> )  -- after current
 		{
-			begin()( <<nt>>link nl:begin );
-			io:insert( nl as node1_link );
+			initializer()( node1_link link:begin<<nt>> );
+			io:insert( link );
 		}
 		
-		copy_next<nt> ()( <nt> node ) with copy ( <nt> )( <nt> )
+		copy_next<nt> ()( <nt> node ) with copier ( <nt> )( <nt> )
 		{
-			io:get_next()( node1_link nl );
-			if ( "is_not_null?( nl )" )	copy( nl:use:as<<nt>> )( node );
+			io:get_next()( node1_link link );
+			if ( "is_not_null?( link )" ) copier ( link:use:as<<nt>> )( node );
 		}
 
-		move_next<nt> [upd] ()( <nt> node ) with move ( <nt> [upd] )( <nt> ) 
+		move_next<nt> [upd] ()( <nt> node ) with copier ( <nt> [upd] )( <nt> ) 
 		{
-			io:get_next()( node1_link nl );
-			if ( "is_not_null?( nl )" ) move( nl:use:as<<nt>> )( node );
+			io:get_next()( node1_link link );
+			if ( "is_not_null?( link )" ) copier( *link:use:as<<nt>> )( node );
 		}
 
 		use_current<nt> = <nt> proxy [upd] ~n   -- void possible
@@ -362,34 +363,34 @@ type <nt>lifo_list from single_link_list  -- typed stack
 			io:base<single_link_list>:begin( *other );
 		}
 
-		begin ( <<nt>>lifo_list other ) with copy ( <nt> )( <nt> )
+		begin ( <<nt>>lifo_list other ) with copier ( <nt> )( <nt> )
 		{
 			io:base<single_link_list>:begin;
 			for ( ~node in other )
 			{
-				copy( ~node )( <<nt>>link nl:begin );
-				io:insert( nl ):go_next;
+				copier( ~node )( <<nt>>link link:begin );
+				io:insert( link ):go_next;
 			}
 		}
 
-		push [upd] with initiate ()( <nt> node )
+		push [upd] with initializer ()( <nt> node )
 		{
-			io:insert<<nt>> with initiate;  
+			io:insert<<nt>> with initializer;  
 		}
 
-		pull [upd]()( <nt> node ) with copy ( <nt> )( <nt> )
+		pull [upd]()( <nt> node ) with copier ( <nt> )( <nt> )
 		{
-			io:copy_next()( node ) with copy;
+			io:copy_next()( node ) with copier;
 			io:remove_next();
 		}
 
-		pull [upd]()( <nt> node ) with move ( <nt> [upd] )( <nt> )
+		pull [upd]()( <nt> node ) with copier ( <nt> [upd] )( <nt> )
 		{
-			io:move_next()( node ) with move;
+			io:move_next()( node ) with copier;
 			io:remove_next();
 		}
 
-		pull [upd] -- no transfer
+		pull [upd] -- no copy
 		{
 			io:remove_next;
 		}
@@ -427,8 +428,8 @@ type <nt>fifo_list from single_link_list  -- typed queue
 			io:base<single_link_list>:begin;
 			for ( ~node in other )
 			{
-				copy( ~node )( <<nt>>link nl:begin );
-				io:insert( nl ):go_next;
+				copy( ~node )( <<nt>>link link:begin );
+				io:insert( link ):go_next;
 			}
 		}
 

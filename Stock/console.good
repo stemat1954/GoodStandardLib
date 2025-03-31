@@ -26,9 +26,9 @@ type console
 		begin  -- system console
 		{
 			kernel\console_identify( no_addr, *handle hcon:begin );
-			if ( "hcon |=| no_handle" ) quit fault ( 'platform', 'no system console' );
+			if ( "hcon |=| no_handle" ) quit with fault:begin( 'platform', 'no system console' );
 			io:configure( hcon )( text err );
-			if ( "is_not_null?( err )" ) quit fault ( 'platform', 'system console broken' );
+			if ( "is_not_null?( err )" ) quit with fault:begin( 'platform', 'system console broken' );
 			io.ready:begin( true );
 		}
 
@@ -113,12 +113,12 @@ type console
 					value ( '1' ) io.utf:begin ( 'UTF-8' );
 					value ( '2' ) io.utf:begin ( 'UTF-16' );
 					value ( '4' ) io.utf:begin ( 'UTF-32' );
-					else quit fault ( 'bug', 'unexpected code unit value' );
+					else quit with fault:begin( 'bug', 'unexpected code unit value' );
 				}
 
 				if ( "bom |=| 'x:FEFF'" ) io.endian:begin ( 'big_endian' )
 				else if ( "bom |=| 'x:FFFE'" ) io.endian:begin ( 'little_endian' )
-				else if ( "bom |not=| 'x:0000'" ) quit fault ( 'bug', 'invalid byte order mark' );
+				else if ( "bom |not=| 'x:0000'" ) quit with fault:begin( 'bug', 'invalid byte order mark' );
 
 				io.eol:begin( eol );
 			}
