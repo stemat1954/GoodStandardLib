@@ -146,7 +146,7 @@ subroutine  --  coroutines
 		b:begin( a );
 	}
 
-	std_move<t> ( <t> a [upd] )( <t> b )
+	std_take<t> ( <t> a [upd] )( <t> b )
 	{
 		b:begin( *a );
 	}

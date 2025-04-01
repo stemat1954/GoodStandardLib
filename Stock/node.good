@@ -5,13 +5,9 @@ page node in StockByGood
 {{
 	On this page:
 	
-	node			variable-way base
-
-	node<#>			generic fixed-way base 
-	<t>node<#>		generic fixed-way synthetic node 
-
-	node1			specialized one-way base
-	<t>node1		specialized one-way synthetic node
+	node		variable-way base
+	node<#>		generic fixed-way base 
+	node1		specialized one-way base
 }}
 
 
@@ -126,6 +122,50 @@ type node<#> [incomplete]
 }
 
 
+type node1 
+{{
+	A node1 is a specialized one-way node.
+
+	A node1 is essentially an smp wrapped in node
+	methodology.
+}}
+{
+	nom type link = smp<node1>;
+
+	general method
+	{
+		begin  -- null link
+		{
+		}
+
+		get_link ()( link )
+		{
+			if ( "is_not_null?( io.link )" ) given\link:begin( io.link );
+		}
+
+		set_link [upd]( link )
+		{
+			io.link <= given\link;
+		}
+
+		unlink [upd]
+		{
+			io.link:reuse;
+		}
+	}
+
+	instance
+	{
+		link [opt];
+	}
+}
+
+
+
+
+%ignore
+
+
 type <t>node<#> from ( <t>, node<<#>> )
 {{
 	A <t>node<#> is a generic synthetic node.
@@ -168,47 +208,6 @@ type <t>node<#> from ( <t>, node<<#>> )
 	}
 }
 
-
-
-type node1 
-{{
-	A node1 is a specialized one-way node.
-
-	A node1 is essentially an smp wrapped in node
-	methodology.
-}}
-{
-	nom type link = smp<node1>;
-
-	general method
-	{
-		begin  -- null link
-		{
-		}
-
-		get_link ()( link )
-		{
-			if ( "is_not_null?( io.link )" ) given\link:begin( io.link );
-		}
-
-		set_link [upd]( link )
-		{
-			io.link <= given\link;
-		}
-
-		unlink [upd]
-		{
-			io.link:reuse;
-		}
-	}
-
-	instance
-	{
-		link [opt];
-	}
-}
-
-
 type <t>node1 from ( <t>, node1 )
 {{
 	specialized synthetic node1
@@ -230,6 +229,7 @@ type <t>node1 from ( <t>, node1 )
 	}
 }
 
+%end
 
 
 
