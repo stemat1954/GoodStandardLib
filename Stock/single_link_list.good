@@ -142,10 +142,8 @@ type single_link_list from serial<node1><node1_cursor>
 			if ( "is_not_null?( other.first )" )
 			{
 				-- ignore current in other
-				io.first:begin( other.first );  
-				io.last:begin( other.last );
-				other.first:reuse;
-				other.last:reuse;
+				io.first:begin( *other.first );  
+				io.last:begin( *other.last );
 				other.current:reuse;  -- go front
 			}
 		}
@@ -241,7 +239,7 @@ type single_link_list from serial<node1><node1_cursor>
 			if ( "is_not_null?( io.current )" ) 
 			{
 				-- node after current
-				io.current:use:get_link()( link next );
+				io.current:use_object:get_link()( link next );
 				if ( "is_not_null?( next )" ) 
 				{
 					next:use_object[upd]:get_link()( link next_next ):unlink;
@@ -278,16 +276,16 @@ type single_link_list from serial<node1><node1_cursor>
 			io:insert( nl );
 		}
 		
-		copy_next<nt> [eval]()( <nt> node ) with node_copier ( <nt> )( <nt> )
+		copy_next<nt> [eval]()( <nt> obj ) with node_copier ( <nt> )( <nt> )
 		{
 			io:get_next()( link next );
-			if ( "is_not_null?( next )" ) node_copier ( next:use_object:as<<nt>> )( node );
+			if ( "is_not_null?( next )" ) node_copier ( next:use_object:as<<nt>> )( obj );
 		}
 
-		take_next<nt> [upd] ()( <nt> node ) with node_taker ( <nt> [upd] )( <nt> ) 
+		take_next<nt> [upd] ()( <nt> obj ) with node_taker ( <nt> [upd] )( <nt> ) 
 		{
 			io:get_next()( link next );
-			if ( "is_not_null?( next )" ) node_taker( *next:use_object:as<<nt>> )( node );
+			if ( "is_not_null?( next )" ) node_taker( *next:use_object:as<<nt>> )( obj );
 		}
 	}
 
@@ -349,6 +347,8 @@ type <nt>lifo_list from single_link_list  -- typed stack
 
 }}
 {
+	nom type link = smp<node1>;
+
 	general method
 	{
 		begin --empty
@@ -364,27 +364,27 @@ type <nt>lifo_list from single_link_list  -- typed stack
 		begin ( <<nt>>lifo_list other ) with node_copier ( <nt> )( <nt> )
 		{
 			io:base<single_link_list>:begin;
-			for ( ~node in other )
+			for ( ~obj in other )
 			{
-				node_copier( ~node )( <<nt>>link nl:begin );
+				node_copier( ~obj )( link nl:begin );
 				io:insert( nl ):go_next;
 			}
 		}
 
-		push [upd] with node_initializer ()( <nt> node )
+		push [upd] with node_initializer ()( <nt> )
 		{
 			io:insert<<nt>> with node_initializer;  
 		}
 
-		pull [upd]()( <nt> node ) with node_copier ( <nt> )( <nt> )
+		pull [upd]()( <nt> obj ) with node_copier ( <nt> )( <nt> )
 		{
-			io:copy_next()( node ) with node_copier;
+			io:copy_next()( obj ) with node_copier;
 			io:remove_next();
 		}
 
-		pull [upd]()( <nt> node ) with node_taker ( <nt> [upd] )( <nt> )
+		pull [upd]()( <nt> obj ) with node_taker ( <nt> [upd] )( <nt> )
 		{
-			io:take_next()( node ) with node_taker;
+			io:take_next()( obj ) with node_taker;
 			io:remove_next();
 		}
 
@@ -409,6 +409,8 @@ type <nt>fifo_list from single_link_list  -- typed queue
 	type-dependent coroutine.
 }}
 {
+	nom type link = smp<node1>;
+
 	general method
 	{
 		begin -- empty
@@ -424,27 +426,27 @@ type <nt>fifo_list from single_link_list  -- typed queue
 		begin ( <<nt>>fifo_list other ) with node_copier ( <nt> )( <nt> )
 		{
 			io:base<single_link_list>:begin;
-			for ( ~node in other )
+			for ( ~obj in other )
 			{
-				node_copier( ~node )( <<nt>>link nl:begin );
+				node_copier( ~obj )( link nl:begin );
 				io:insert( nl ):go_next;
 			}
 		}
 
-		push [upd] with node_initializer ()( <nt> node )
+		push [upd] with node_initializer ()( <nt> )
 		{
 			io:go_last:insert with node_initializer;
 		}
 
-		pull [upd]()( <nt> node ) with node_copier ( <nt> )( <nt> )
+		pull [upd]()( <nt> obj ) with node_copier ( <nt> )( <nt> )
 		{
-			io:go_front:copy_next()( node ) with node_copier;
+			io:go_front:copy_next()( obj ) with node_copier;
 			io:remove_next;
 		}
 
-		pull [upd]()( <nt> node ) with node_taker ( <nt> [upd] )( <nt> )
+		pull [upd]()( <nt> obj ) with node_taker ( <nt> [upd] )( <nt> )
 		{
-			io:go_front:take_next()( node ) with node_taker;
+			io:go_front:take_next()( obj ) with node_taker;
 			io:remove_next;
 		}
 

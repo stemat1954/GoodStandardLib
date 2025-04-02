@@ -197,11 +197,13 @@ type smp<t>   -- intrinsic
 	{
 		begin = <t> proxy [init];				-- access new <t> object, complete <t> (may quit)
 
-		begin ( typename ) = <t> proxy [init];	-- access new <t> object, typename:is<t>? must be true (may quit)
-
 		begin<xt> = <xt> proxy [init];			-- access new <xt> object, <xt> related to <t> (may quit)
 
 		begin<xt> ( smp<<xt>> );				-- copy compatible smp, <xt> related to <t> (may quit)
+
+		begin<xt> ( smp<<xt>> [upd] );			-- take compatible smp, <xt> related to <t> (may quit)
+
+		begin ( typename ) = <t> proxy [init];	-- access new <t> object, typename:is<t>? must be true (may quit)
 
 		use_object = <t> proxy;					-- always works (never void)
 
