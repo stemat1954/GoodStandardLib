@@ -11,6 +11,9 @@ page single_link_list in StockByGood
 }}
 
 
+[page] nom type link = smp<node1>;
+
+
 type node1_cursor
 {{
 	cursor is inoperable if io.link is null.
@@ -18,7 +21,6 @@ type node1_cursor
 	Note:  the cursor itself is not null.
 }}
 {
-	nom type link = smp<node1>;
 
 	general
 	{
@@ -128,8 +130,6 @@ type single_link_list from serial<node1><node1_cursor>
 	straight forward.
 }}
 {
-	nom type link = smp<node1>;
-
 	general method
 	{
 		begin  -- original empty
@@ -214,7 +214,7 @@ type single_link_list from serial<node1><node1_cursor>
 			if ( "is_not_null?( io.current )" )  
 			{
 				-- after current
-				io.current:use_object:get_link()( link before ):set_link( given\link ); 
+				io.current:use_object[upd]:get_link()( link before ):set_link( given\link ); 
 				if ( "is_null?( before )" )
 					io.last <= given\link 
 				else
@@ -347,8 +347,6 @@ type <nt>lifo_list from single_link_list  -- typed stack
 
 }}
 {
-	nom type link = smp<node1>;
-
 	general method
 	{
 		begin --empty
@@ -409,8 +407,6 @@ type <nt>fifo_list from single_link_list  -- typed queue
 	type-dependent coroutine.
 }}
 {
-	nom type link = smp<node1>;
-
 	general method
 	{
 		begin -- empty
