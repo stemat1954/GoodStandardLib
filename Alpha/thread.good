@@ -68,7 +68,7 @@ subroutine
 
 	this_process_id = expr proxy [eval]; 
 
-	start_thread<ept> ( smp<object> [opt] )( smp<thread> ); 
+	start_thread<ept> ( hp<object> [opt] )( hp<thread> ); 
 	{{
 		This subroutine creates an entry point object of 
 		type <ept> which derives from alpha\entry, then 
@@ -78,7 +78,7 @@ subroutine
 		local memory.
 
 		A thread object that controls the new thread
-		is returned in an output smp.
+		is returned in an output hp.
 	}}
 }
 

@@ -11,7 +11,7 @@ page single_link_list in StockByGood
 }}
 
 
-[page] nom type link = smp<node1>;
+[page] nom type link = hp<node1>;
 
 
 type node1_cursor

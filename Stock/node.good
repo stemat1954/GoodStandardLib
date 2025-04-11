@@ -25,7 +25,7 @@ type node [incomplete]
 	instead.
 }}
 {
-	nom type link = smp<node>;
+	nom type link = hp<node>;
 	nom type linkage = <link>array;
 
 
@@ -87,7 +87,7 @@ type node<#> [incomplete]
 	alternative.
 }}
 {
-	nom type link = smp<node<<#>>>;
+	nom type link = hp<node<<#>>>;
 	nom type linkage = <link>tuple<<#>>;
 
 	general method
@@ -126,11 +126,11 @@ type node1
 {{
 	A node1 is a specialized one-way node.
 
-	A node1 is essentially an smp wrapped in node
+	A node1 is essentially an hp wrapped in node
 	methodology.
 }}
 {
-	nom type link = smp<node1>;
+	nom type link = hp<node1>;
 
 	general method
 	{

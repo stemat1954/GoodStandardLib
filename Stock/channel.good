@@ -54,9 +54,15 @@ page channel in StockByGood
 			.pnote:begin;
 		}
 
-		begin ( message [upd], expr fex );	-- per format
+		begin ( message [upd], expr fex );	
+--		{
+--			%generate
+--		}
 
-		fwrite ( message [upd], expr fex );	-- per format
+		fwrite ( message [upd], expr fex );	
+--		{
+--			%generate
+--		}
 
 		get_group1 ()( ascii action, addr pdata, int offset, int size, int seek, int id )
 		{
@@ -121,6 +127,9 @@ page channel in StockByGood
 
 
 	format 'b' [compatible,align];
+--	{
+--		%generate
+--	};
 }
 
 

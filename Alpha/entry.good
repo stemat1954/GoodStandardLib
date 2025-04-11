@@ -27,12 +27,12 @@ type entry [incomplete]
 	define a given output trace if the thread is disrupted.
 
 	When the application starts a thread, it can pass a 
-	common object of any type using an smp. An smp  is 
+	common object of any type using an hp. An hp  is 
 	optional, and generally it's used for inter-thread
 	communication. 
 	
 	Note:  An application's main entry point doesn't receive
-	an smp from the startup routine.
+	an hp from the startup routine.
 }}
 {
 	general 
@@ -42,7 +42,7 @@ type entry [incomplete]
 
 	abstract 
 	{
-		~run ( signal active, signal stop, smp<object> [opt] )( trace );
+		~run ( signal active, signal stop, hp<object> [opt] )( trace );
 	}
 }
 
