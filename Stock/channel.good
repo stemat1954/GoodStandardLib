@@ -107,7 +107,7 @@ page channel in StockByGood
 
 		ascii_to_word ( ascii a )( word8 w )
 		{
-			w:begin( a:ordinal, 'b:ascii' );
+			w:begin( a:use_int, 'b:ascii' );
 		}
 	}
 	

@@ -559,7 +559,7 @@ type text from message
 		{
 			if ( "rp_end?( io )" ) return after ok:begin( false );
 			fix( d, 'positive' as sign ) ~d;
-			int cn:begin( c:ordinal );
+			int cn:begin( c:use_int );
 			if ( "~d |=| 'positive'" )
 			{
 				loop

@@ -111,7 +111,7 @@ page text_channel in StockByGood
 
 			else -- 'pending', 'busy', 'end', 'other'
 			{
-				error:begin:write( 'unexpected channel report [' ):write( cr:token ):write( ']' );
+				error:begin:write( 'unexpected channel report [' ):write( cr:use_expr ):write( ']' );
 			}
 		}
 	}

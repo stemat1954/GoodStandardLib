@@ -40,7 +40,7 @@ type ascii from enumerated
 	also be used to insert non-standard extended characters. 
 
 
-	ordinal vs notation
+	code vs notation
 
 	  0  'NUL' 'SOH' 'STX' 'ETX' 'EOT' 'ENQ' 'ACK' 'BEL'   
 	  8  'BS'  'TAB' 'LF'  'VT'  'FF'  'CR'  'SO'  'SI'	
@@ -115,7 +115,7 @@ type ascii from enumerated
 
 		fwrite ( message [upd], expr fex )()( extra );
 
-		notation = expr proxy [eval];
+		use_notation = expr proxy [eval];
 
 		is_before? ( ascii )( bool );
 
