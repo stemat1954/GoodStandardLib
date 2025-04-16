@@ -7,7 +7,6 @@ grammar Good;
 // =====================  LEXER  =============================
 /*
 
-
 	Good tokens fall into 3 categories: reserved words,
 	punctuation, and synthetic tokens.
 
@@ -25,9 +24,9 @@ grammar Good;
 		book
 		page
 
-	An SID can be a simple name or a complex reference
+	A SID can be a simple name or a complex reference
 	composed of several parts.  It's the compiler's job to
-	determine the validity of an SID in context.  
+	determine the validity of a SID in context.  
 
 	The rule for a simple, unqualified SID matches every
 	reserved word, but reserved words have precedence
@@ -40,12 +39,11 @@ grammar Good;
 	but it's possible to code a syntactically valid reference
 	SID using reserved words that can't possibly reference a
 	real entity. But no big deal, because reference validation
-	is what compilers do.
+	is what the compiler does.
 
 	Good has reserved names that are not reserved words.
-	"ao" is the reserved assumed object name, and these 
-	generic domain names are reserved: @book, @page, @type,
-	@this.
+	"io" is the reserved name for a method's implicit object.
+	These generic namespaces are also reserved:  near, given.
 
 	All printable ascii chars are assigned except
 	
@@ -66,8 +64,8 @@ grammar Good;
 		<>	factor
 		()	list, precedence 
 		||	bar-operator
-		->	bind proxy to object
-		<=  assignment
+		->	bind proxy (to object)
+		<=  copy object (assignment)
 		.	subobject ref
 		\	namespace qualification
 		;	group item delimiter
@@ -94,6 +92,7 @@ grammar Good;
 
 IGNORE_				:	'%ignore'		;
 END					:	'%end'			;
+INFER				:	'%infer'		;
 
 ABSTRACT			:	'abstract'		;
 AFTER				:	'after'			;
@@ -117,7 +116,6 @@ IN_					:	'in'			;
 INCOMPLETE			:	'incomplete'	;
 INIT				:	'init'			;		// initiate
 INSTANCE			:	'instance'		;
-INTERNAL			:	'internal'		;	
 ISOLATE				:	'isolate'		;
 LOOP				:	'loop'			;
 METHOD				:	'method'		;
@@ -222,7 +220,7 @@ ID2					: '#' [a-zA-Z0-9]* 				// symbolic dimension
 					;
 
 fragment												
-ID3					: '<' ID0* ( ( ID2 | ID5 ) ID0* )? '>'	// factor   
+ID3					: '<' ID0* ( ID2 | ID5 ) ID0* '>'	// factor   
 					;
 
 fragment											// with factors (type,method,subroutine)
@@ -349,12 +347,8 @@ SPACE				: [ \t\r\n]+			-> skip
 */
 
 
-operator_				:  OPERATOR
-						| ( PLUS | MINUS | ASTERISK | DIVIDE )
-						;
 
-
-// EXECUTABLE 
+// -------------------------------------------------   IMPERATIVE
 
 
 
@@ -435,6 +429,12 @@ assignment_obj_right	: NULL_
 						;
 
 assignment				: assignment_obj_left ASSIGN ASTERISK? assignment_obj_right conversion_chain?
+						;
+
+
+
+operator_				:  OPERATOR
+						| ( PLUS | MINUS | ASTERISK | DIVIDE )
 						;
 
 
@@ -584,10 +584,10 @@ subroutine_call			: subroutine_ref call_provision
 quit_type_ref			: SID			
 						;
 
-quit_obj				: quit_type_ref  input_obj_list?
+quit_obj				: quit_type_ref  method_call  // call to :begin
 						;
 
-quit					: QUIT quit_obj?	
+quit					: QUIT ( WITH quit_obj )?	
 						;
 
 
@@ -747,9 +747,13 @@ proc_block				: LEFT_CURLY non_exec_item* exec_item* RIGHT_CURLY
 						;
 
 
+infer_block				: LEFT_CURLY INFER RIGHT_CURLY
+						;
 
 
-//---------------------------------------------------------------------  NON-EXECUTABLE
+//-----------------------------------------------------------------  DECLARATIVE
+
+
 
 
 
@@ -879,7 +883,7 @@ method_interface		: method_attribution? reg_obj_spec_list? coroutine_spec? proxy
 method_name				: SID
 						;
 
-method_def				: method_name method_interface ( proc_block | SEMI_COLON )
+method_def				: method_name method_interface ( proc_block | infer_block | SEMI_COLON )
 						;
 
 method					: ( GENERAL | ABSTRACT | BASE | MISC  ) METHOD method_def
@@ -967,7 +971,7 @@ format_attribute		: READABLE
 format_attribution		: LEFT_SQUARE format_attribute RIGHT_SQUARE 
 						;
 
-format_def				: format_name? format_key? format_attribution? ( format_block | SEMI_COLON )
+format_def				: format_name? format_key? format_attribution? ( format_block | infer_block | SEMI_COLON )
 						;
 
 format					: FORMAT format_def
@@ -1130,7 +1134,7 @@ type					: TYPE type_def
 
 
 
-page_internal			: LEFT_SQUARE INTERNAL RIGHT_SQUARE
+page_internal			: LEFT_SQUARE PAGE RIGHT_SQUARE
 						;
 
 page_item				: page_internal? common_obj
