@@ -196,14 +196,14 @@ type <t>node<#> from ( <t>, node<<#>> )
 	{
 		begin  -- default <t> initializer
 		{
-			io:base<node<<#>>>:begin;
-			io:base<<t>>:begin;
+			io:as_base<node<<#>>>:begin;
+			io:as_base<<t>>:begin;
 		}
 
 		begin with initializer ()( <t> )  
 		{
-			io:base< node<<#>> >:begin;
-			initializer()( io:base<<t>> );
+			io:as_base< node<<#>> >:begin;
+			initializer()( io:as_base<<t>> );
 		}
 	}
 }
@@ -217,14 +217,14 @@ type <t>node1 from ( <t>, node1 )
 	{
 		begin -- default <t> initializer
 		{
-			io:base<node1>:begin;
-			io:base<<t>>:begin;
+			io:as_base<node1>:begin;
+			io:as_base<<t>>:begin;
 		}
 
 		begin with initializer ()( <t> )
 		{
-			io:base<node1>:begin;
-			initializer()( io:base<<t>> );
+			io:as_base<node1>:begin;
+			initializer()( io:as_base<<t>> );
 		}
 	}
 }

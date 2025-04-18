@@ -103,14 +103,14 @@ type text from message
 	{
 		begin ( utf f [opt], endian e [opt] )  -- original, empty
 		{
-			io:base<message>:begin( e, f );
+			io:as_base<message>:begin( e, f );
 			describe_utf( f )( io.code_unit, io.code_fex );
 		}
 
 		begin ( text other [upd] )		-- move
 		{
 			other:get_encoding()( utf f, endian e );
-			io:base<message>:begin( e, f );
+			io:as_base<message>:begin( e, f );
 
 			describe_utf( f )( io.code_unit, io.code_fex );
 
@@ -121,7 +121,7 @@ type text from message
 		begin ( text other )			-- copy
 		{
 			other:get_encoding()( utf f, endian e );
-			io:base<message>:begin( e, f );
+			io:as_base<message>:begin( e, f );
 
 			describe_utf( f )( io.code_unit, io.code_fex );
 
@@ -178,7 +178,7 @@ type text from message
 			loop ( "q2 |<| q" )
 			{
 				m:fread<int>( m_fex )( int n );
-				io:base<message>:fwrite<int>( n, io.code_fex );
+				io:as_base<message>:fwrite<int>( n, io.code_fex );
 				q2:inc;
 			}
 		}
@@ -189,7 +189,7 @@ type text from message
 			io:set_rp( zero );
 			loop ( "not( rp_end?( io ) )" )
 			{
-				io:base<message>:fread<int>( io.code_fex )( int n );
+				io:as_base<message>:fread<int>( io.code_fex )( int n );
 				m:fwrite<int>( n, m_fex );
 			}
 		}
@@ -201,8 +201,8 @@ type text from message
 			q2:begin;
 			loop ( "( q2 |<| ~q ) |and| not( rp_end?( other ) )" )
 			{
-				other:base<message>:fread<int>( other_fex )( int n );
-				io:base<message>:fwrite<int>( n, io.code_fex );
+				other:as_base<message>:fread<int>( other_fex )( int n );
+				io:as_base<message>:fwrite<int>( n, io.code_fex );
 				q2:inc;
 			}
 		}
@@ -285,13 +285,13 @@ type text from message
 		write [upd]( text t ) -- compatible only
 		{
 			if ( "not( is_compatible?( io, t ) )" ) quit with fault:begin( 'bug', 'incompatible text' );
-			io:base<message>:copy( t, null, zero )(); -- all, ignore output
+			io:as_base<message>:copy( t, null, zero )(); -- all, ignore output
 		}
 
 		write [upd]( text t [upd] ) -- any encoding
 		{
 			if ( "is_compatible?( io, t )" ) 
-				io:base<message>:copy( t, null, zero )()  -- all, ignore output 
+				io:as_base<message>:copy( t, null, zero )()  -- all, ignore output 
 			else
 				io:merge( *t )();
 		}
@@ -299,13 +299,13 @@ type text from message
 		fwrite<t> [upd]( <t> x, expr fex [opt] )		-- single fex
 		{
 			fix( fex, 't' ) ~fex;	
-			io:base<message>:fwrite<<t>>( x, ~fex );
+			io:as_base<message>:fwrite<<t>>( x, ~fex );
 		}
 
 		fwrite<t> [upd]( <t> x, expr fex [opt] )()( extra etc )  -- multiple fex
 		{
 			fix( fex, 't' ) ~fex;
-			io:base<message>:fwrite<<t>>( x, ~fex )()( etc );
+			io:as_base<message>:fwrite<<t>>( x, ~fex )()( etc );
 		}
 							
 			
@@ -334,13 +334,13 @@ type text from message
 		fread<t> [upd]( expr fex [opt] )( <t> x )	-- single fex
 		{
 			fix( fex, 't' ) ~fex;
-			io:base<message>:fread<<t>>( ~fex )( x );
+			io:as_base<message>:fread<<t>>( ~fex )( x );
 		}
 
 		fread<t> [upd]( expr fex [opt] )( <t> x )( extra etc ) -- multiple fex
 		{
 			fix( fex, 't' ) ~fex;
-			io:base<message>:fread<<t>>( ~fex )( x )( etc );
+			io:as_base<message>:fread<<t>>( ~fex )( x )( etc );
 		}
 				
 		skip [upd]( expr pattern, match_mode [opt] )  -- strict (quits)
@@ -484,12 +484,12 @@ type text from message
 
 		write_str<t> [upd]( <<t>>array arr ) 
 		{
-			for ( ~c in arr ) ~c:fwrite( *io, 'code' )()( io.code_fex );
+			for each ( ~c in arr ) ~c:fwrite( *io, 'code' )()( io.code_fex );
 		}
 
 		read_chr<t> [upd]()( <t> c )
 		{
-			io:base<message>:fread<int>( io.code_fex )( int n );
+			io:as_base<message>:fread<int>( io.code_fex )( int n );
 			c:begin( n );
 		}
 
@@ -499,7 +499,7 @@ type text from message
 			int q2:begin( q );
 			loop ( "( q2 |>| zero ) |and| not( rp_end?( io ) )" ) 
 			{
-				io:base<message>:fread<int>( io.code_fex )( int n );
+				io:as_base<message>:fread<int>( io.code_fex )( int n );
 				arr:insert:begin( n );
 				q2:dec;
 			}
@@ -508,7 +508,7 @@ type text from message
 		copy_pattern [upd]( expr x )( text t )
 		{
 			if ( "count( x ) |=| zero" ) quit with fault:begin( 'bug', 'no pattern' );  
-			io:make()( =t ):base<message>:fwrite<expr>( x, 't' );
+			io:make()( =t ):as_base<message>:fwrite<expr>( x, 't' );
 		}
 				
 
@@ -564,7 +564,7 @@ type text from message
 			{
 				loop
 				{
-					io:base<message>:fread<int>( io.code_fex )( int n );
+					io:as_base<message>:fread<int>( io.code_fex )( int n );
 					if ( "n |=| cn" ) return after ok:begin( 'true' );
 					if ( "rp_end?( io )" ) return after ok:begin( 'false' );
 				}
@@ -573,7 +573,7 @@ type text from message
 			{
 				loop
 				{
-					io:base<message>:get_rp()( int mark ):fread<int>( io.code_fex )( int n );
+					io:as_base<message>:get_rp()( int mark ):fread<int>( io.code_fex )( int n );
 					if ( "n |=| cn" ) return after ok:begin( 'true' );
 					if ( "rp_end?( io )" ) return after ok:begin( 'false' );
 					io:set_rp( mark ):dec_rp;
@@ -604,7 +604,7 @@ type text from message
 			else if ( "io.code_unit |=| two" )
 			{
 				rp:sub( two );  -- prev code point
-				io:base<message>:set_rp( rp ):fread( 'b' )( word16 w );  
+				io:as_base<message>:set_rp( rp ):fread( 'b' )( word16 w );  
 				if ( "(w |>=| xDC00 ) |and| ( w |<=| xDFFF )" ) rp:sub( two );  -- sub 2 more if surrogate
 				io:set_rp( rp ); 
 			}
@@ -613,7 +613,7 @@ type text from message
 				loop
 				{
 					rp:dec;
-					io:base<message>:set_rp( rp ):fread( 'b' )( word8 w ):set_rp( rp );
+					io:as_base<message>:set_rp( rp ):fread( 'b' )( word8 w ):set_rp( rp );
 					if ( "( w |and| xC0 ) |not=| x80" ) escape;		-- if not 10xx xxxx
 				}
 			}
@@ -636,7 +636,7 @@ type text from message
 			io:get_rp()( rp ); 
 			if ( "io.code_unit |=| two" )
 			{
-				io:base<message>:fread<word16>( 'b' )( word16 w );
+				io:as_base<message>:fread<word16>( 'b' )( word16 w );
 				if ( "(w |<| xD800 ) |or| ( w |>| xDFFF )" )
 					rp:add( two )
 				else
@@ -644,7 +644,7 @@ type text from message
 			}
 			else if ( "io.code_unit |=| one" )
 			{
-				io:base<message>:fread<word8>( 'b' )( word8 w );
+				io:as_base<message>:fread<word8>( 'b' )( word8 w );
 				if ( "w |<| x80" )					-- 0xxx xxxx
 					rp:inc
 				else if ( "is_zero?( w |and| x20 )" )	-- 110x xxxx

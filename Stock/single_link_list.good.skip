@@ -134,7 +134,7 @@ type single_link_list from serial<node1><node1_cursor>
 	{
 		begin  -- original empty
 		{
-			io:base<serial<node1><node1_cursor>>:begin;
+			io:as_base<serial<node1><node1_cursor>>:begin;
 		}
 
 		begin ( single_link_list other [upd] )  -- take 
@@ -351,17 +351,17 @@ type <nt>lifo_list from single_link_list  -- typed stack
 	{
 		begin --empty
 		{
-			io:base<single_link_list>:begin;
+			io:as_base<single_link_list>:begin;
 		}
 
 		begin ( <<nt>>lifo_list other [upd] )  -- take 
 		{
-			io:base<single_link_list>:begin( *other );
+			io:as_base<single_link_list>:begin( *other );
 		}
 
 		begin ( <<nt>>lifo_list other ) with node_copier ( <nt> )( <nt> )
 		{
-			io:base<single_link_list>:begin;
+			io:as_base<single_link_list>:begin;
 			for ( ~obj in other )
 			{
 				node_copier( ~obj )( link nl:begin );
@@ -411,17 +411,17 @@ type <nt>fifo_list from single_link_list  -- typed queue
 	{
 		begin -- empty
 		{
-			io:base<single_link_list>:begin;
+			io:as_base<single_link_list>:begin;
 		}
 
 		begin ( <<nt>>fifo_list other [upd] )  -- take 
 		{
-			io:base<single_link_list>:begin( *other );
+			io:as_base<single_link_list>:begin( *other );
 		}
 				
 		begin ( <<nt>>fifo_list other ) with node_copier ( <nt> )( <nt> )
 		{
-			io:base<single_link_list>:begin;
+			io:as_base<single_link_list>:begin;
 			for ( ~obj in other )
 			{
 				node_copier( ~obj )( link nl:begin );

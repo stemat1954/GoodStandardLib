@@ -24,15 +24,15 @@ general method
 
 	use_addr [eval] = addr proxy [eval];
 
-	isfoo? [eval]()( bool );  
+	is<t>? [eval]()( bool );  
 
-	is_actualfoo? [eval]()( bool );
+	as<t> [eval] = foo proxy [eval,upd];	-- may be void
 
-	asfoo [eval] = foo proxy [eval,upd];	-- may be void
+	is_actual<t>? [eval]()( bool );
 
-	as_actualfoo [eval] = foo proxy [init];  -- may be void
+	as_actual<t> [eval] = foo proxy [init];  -- may be void
 
-	basefoo [eval] = foo proxy [eval,upd,init]; -- verified at compile-time, reserved proxy permission syntax
+	as_base<t> [eval] = foo proxy [eval,upd,init]; -- verified at compile-time, reserved proxy permission syntax
 
 	reuse [term];	 
 

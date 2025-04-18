@@ -130,8 +130,8 @@ type hp<t>   -- intrinsic
 
 	This works because 
 
-	  ap:use_object:base<B>
-	  ap:use_object:base<C>
+	  ap:use_object:as_base<B>
+	  ap:use_object:as_base<C>
 	  bp:use_object:as<A>
 	  cp:use_object:as<A>
 	  bp:use_object:as<C>
