@@ -2,9 +2,10 @@
 page list1 in StockByGood
 
 {{
-	public types on this page:
+	This page has several types related to one-way
+	linked lists:
 
-	link1
+	link1	
 	node1
 	list1_cursor
 	list1
@@ -13,8 +14,6 @@ page list1 in StockByGood
 	<t>stack	
 	<t>queue	
 }}
-
-
 
 
 
@@ -381,11 +380,11 @@ type <t>list1 from list1
 
 		begin ( t_list other ) with copier ( <t> )( <t> ) -- copy
 		{
-			for each ( ~node in other ) -- node1 proxy [eval] ~node
+			for each ( ~node in other ) -- node1 proxy [eval] 
 			{
-				link1 nl:begin<t_node>:begin ~new_item;  -- <t> proxy [init] ~new_item, null
+				link1 nl:begin<t_node>:begin ~new_item;  -- <t> proxy [init] ~new_item (is null)
 				copier( ~node:as<t_node>:use_item )( ~new_item );
-				io:as_base<list1>:insert( nl );
+				io:as_base<list1>:insert( nl ):go_next;
 			}
 		}
 
@@ -444,50 +443,69 @@ type <t>list1 from list1
 
 type <t>stack 
 {{
+	current node is front node and doesn't change.
+	first node is top of stack
 }}
 {
+	nom type t_stack = <<t>>stack;
+
+	nom type t_list = <<t>>list;
+
 	general_method
 	{
 		begin  -- empty
 		{
+			io.t_list:begin;
 		}
 
-		begin ( <<t>>stack other [upd] ) -- take
+		begin ( t_stack other [upd] ) -- take
 		{
+			io.t_list:begin( *other.t_list );
 		}
 
-		begin ( <<t>>stack other ) -- copy
+		begin ( t_stack other ) -- copy
 		{
+			io.t_list:begin( other.t_list );
 		}
 
 		is_empty? ()( bool yes )
 		{
+			io.t_list:is_empty?()( yes );
 		}
 
-		push_top [upd] = <t> proxy [init]  
+		push_top [upd] = <t> proxy [init]  ~item
 		{
+			~item -> io.t_list:insert;
 		}
 
-		use_top = <t> proxy [eval,init]
+		use_top = <t> proxy [eval,init] ~item
 		{
+			~item -> io.list:use_first;
 		}
 
 		pop_top [upd]()( <t> item ) with copier ( <t> )( <t> )
 		{
+			io.t_list:use_first ~item;  -- <t> proxy
+			if ( "is_not_void?( [~item] )" ) copier( ~item )( item );
+			io.t_list:remove_next;
 		}
 
 		pop_top [upd]()( <t> item ) with taker ( <t> [upd] )( <t> )
 		{
+			io.t_list:use_first ~item;  -- <t> proxy
+			if ( "is_not_void?( [~item] )" ) taker( *~item )( item );
+			io.t_list:remove_next;
 		}
 
 		pop_top [upd ]
 		{
+			io.t_list:remove_next;
 		}
 	}
 
 	instance
 	{
-		<<t>>list1;
+		t_list;
 	}
 }
 
