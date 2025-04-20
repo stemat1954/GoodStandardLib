@@ -343,7 +343,7 @@ type list1 from serial<node1><list1_cursor>
 		begin = <t> proxy [init] ~item
 		{
 			io:as_base<node1>:begin;
-			~item -> io.item
+			~item -> io.item;
 		}
 
 		use_item = <t> proxy [eval,init] ~item
@@ -443,15 +443,18 @@ type <t>list1 from list1
 
 type <t>stack 
 {{
-	current node is front node and doesn't change.
-	first node is top of stack
+	first-in-first-out list
+
+	front is current and doesn't change.
+
+	first is on top.
 }}
 {
 	nom type t_stack = <<t>>stack;
 
-	nom type t_list = <<t>>list;
+	nom type t_list = <<t>>list1;
 
-	general_method
+	general method
 	{
 		begin  -- empty
 		{
@@ -463,43 +466,48 @@ type <t>stack
 			io.t_list:begin( *other.t_list );
 		}
 
-		begin ( t_stack other ) -- copy
+		begin ( t_stack other ) with copier ( <t> )( <t> ) -- copy
 		{
-			io.t_list:begin( other.t_list );
+			io.t_list:begin( other.t_list ) with copier;
 		}
+
 
 		is_empty? ()( bool yes )
 		{
 			io.t_list:is_empty?()( yes );
 		}
 
-		push_top [upd] = <t> proxy [init]  ~item
+		push [upd] = <t> proxy [init]  ~item
 		{
 			~item -> io.t_list:insert;
 		}
-
-		use_top = <t> proxy [eval,init] ~item
+	
+		pull [upd]()( <t> item ) with copier ( <t> )( <t> )
 		{
-			~item -> io.list:use_first;
+			if ( io.t_list:is_empty?()( =bool ):not )
+			{
+				copier( io.t_list:use_first )( item );
+				io.t_list:remove_next;
+			}
 		}
 
-		pop_top [upd]()( <t> item ) with copier ( <t> )( <t> )
+		pull [upd]()( <t> item ) with taker ( <t> [upd] )( <t> )
 		{
-			io.t_list:use_first ~item;  -- <t> proxy
-			if ( "is_not_void?( [~item] )" ) copier( ~item )( item );
-			io.t_list:remove_next;
+			if ( io.t_list:is_empty?()( =bool ):not )
+			{
+				taker( *io.t_list:use_first )( item );
+				io.t_list:remove_next;
+			}
 		}
 
-		pop_top [upd]()( <t> item ) with taker ( <t> [upd] )( <t> )
+		pull [upd ]
 		{
-			io.t_list:use_first ~item;  -- <t> proxy
-			if ( "is_not_void?( [~item] )" ) taker( *~item )( item );
 			io.t_list:remove_next;
 		}
-
-		pop_top [upd ]
+		
+		use_item = <t> proxy [eval,init] ~item
 		{
-			io.t_list:remove_next;
+			~item -> io.t_list:use_first;
 		}
 	}
 
@@ -510,9 +518,10 @@ type <t>stack
 }
 
 
+
 type <t>queue 
 {
-	general_method
+	general method
 	{
 		begin  -- empty
 		{
@@ -530,168 +539,33 @@ type <t>queue
 		{
 		}
 
-		push_last [upd] = <t> proxy [init]  
+		push [upd] = <t> proxy [init]  
 		{
 		}
 
-		use_first = <t> proxy [eval,init]
+		pull [upd]()( <t> item ) with copier ( <t> )( <t> )
 		{
 		}
 
-		pull_first [upd]()( <t> item ) with copier ( <t> )( <t> )
+		pull [upd]()( <t>  item ) with taker ( <t> [upd] )( <t> )
 		{
 		}
 
-		pull_first [upd]()( <t>  item ) with taker ( <t> [upd] )( <t> )
+		pull [upd]
 		{
 		}
 
-		pull_first [upd]
+		use_item = <t> proxy [eval,init]
 		{
 		}
 	}
 
 	instance
 	{
-		<<t>>list1;
+		<<t>>list1  foo;
 	}
 }
 
 
-
-
-%ignore
-
-type <nt>lifo from list1  -- typed stack
-{{
-	<nt> derived from node
-
-	push (insert) front node
-	pull (remove) front node
-	
-	NOTE!  Implementation assumes current node starts at
-	front and doesn't change.  Application must restore
-	current node if base methods are called. 
-
-	:begin with copy and :pull with transfer require a
-	type-dependent coroutine.
-
-	Example:
-
-	type thing from node;
-	<thing>lifo my_stack ( other_stack ) with std_copy<thing>;
-	my_stack:pull()( thing next ) with std_take<thing>;
-	my_stack:pull()( thing next ) with std_copy<thing>;
-
-}}
-{
-	general method
-	{
-		begin --empty
-		{
-			io:as_base<list1>:begin;
-		}
-
-		begin ( <<nt>>lifo other [upd] )  -- take 
-		{
-			io:as_base<list1>:begin( *other );
-		}
-
-		begin ( <<nt>>lifo other ) with node_copier ( <nt> )( <nt> )
-		{
-			io:as_base<list1>:begin;
-			for ( ~obj in other )
-			{
-				node_copier( ~obj )( link1 nl:begin );
-				io:insert( nl ):go_next;
-			}
-		}
-
-		push [upd] with node_initializer ()( <nt> )
-		{
-			io:insert<<nt>> with node_initializer;  
-		}
-
-		pull [upd]()( <nt> obj ) with node_copier ( <nt> )( <nt> )
-		{
-			io:copy_next()( obj ) with node_copier;
-			io:remove_next();
-		}
-
-		pull [upd]()( <nt> obj ) with node_taker ( <nt> [upd] )( <nt> )
-		{
-			io:take_next()( obj ) with node_taker;
-			io:remove_next();
-		}
-
-		pull [upd] -- no transfer
-		{
-			io:remove_next;
-		}
-	}
-}
-
-
-
-
-type <nt>fifo_list from list1  -- typed queue
-{{
-	<nt> derived from node
-
-	push (insert) last node
-	pull (remove) first node
-
-	:begin with copy and :pull with transfer require a 
-	type-dependent coroutine.
-}}
-{
-	general method
-	{
-		begin -- empty
-		{
-			io:as_base<list1>:begin;
-		}
-
-		begin ( <<nt>>fifo_list other [upd] )  -- take 
-		{
-			io:as_base<list1>:begin( *other );
-		}
-				
-		begin ( <<nt>>fifo_list other ) with node_copier ( <nt> )( <nt> )
-		{
-			io:as_base<list1>:begin;
-			for ( ~obj in other )
-			{
-				node_copier( ~obj )( link1 nl:begin );
-				io:insert( nl ):go_next;
-			}
-		}
-
-		push [upd] with node_initializer ()( <nt> )
-		{
-			io:go_last:insert with node_initializer;
-		}
-
-		pull [upd]()( <nt> obj ) with node_copier ( <nt> )( <nt> )
-		{
-			io:go_front:copy_next()( obj ) with node_copier;
-			io:remove_next;
-		}
-
-		pull [upd]()( <nt> obj ) with node_taker ( <nt> [upd] )( <nt> )
-		{
-			io:go_front:take_next()( obj ) with node_taker;
-			io:remove_next;
-		}
-
-		pull [upd]  -- no transfer
-		{
-			io:go_front:remove_next;
-		}
-	}
-}
-
-
-%end
 
 
