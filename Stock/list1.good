@@ -8,11 +8,12 @@ page list1 in StockByGood
 	link1	
 	node1
 	list1_cursor
-	list1
 
-	<t>list1
-	<t>stack	
-	<t>queue	
+	list1 - general list with heterogenous nodes
+
+	<t>list1  - typed list
+	<t>stack  - typed stack	
+	<t>queue  -	typed queue
 }}
 
 
@@ -443,11 +444,15 @@ type <t>list1 from list1
 
 type <t>stack 
 {{
-	first-in-first-out list
+	last-in-first-out (lifo) list
 
 	front is current and doesn't change.
 
 	first is on top.
+
+	push = insert after front, access new first item
+
+	pull = remove first
 }}
 {
 	nom type t_stack = <<t>>stack;
@@ -505,7 +510,7 @@ type <t>stack
 			io.t_list:remove_next;
 		}
 		
-		use_item = <t> proxy [eval,init] ~item
+		use_item = <t> proxy [eval,init] ~item  -- top 
 		{
 			~item -> io.t_list:use_first;
 		}
@@ -520,49 +525,78 @@ type <t>stack
 
 
 type <t>queue 
+{{
+	first-in-first-out (fifo) list
+
+	push = insert after last, access new last item 
+
+	pull = remove first
+
+}}
 {
+	nom type t_queue = <<t>>queue;
+
+	nom type t_list = <<t>>list1;
+
 	general method
 	{
 		begin  -- empty
 		{
+			io.t_list:begin;
 		}
 
-		begin ( <<t>>queue other [upd] ) -- take
+		begin ( t_queue other [upd] ) -- take
 		{
+			io.t_list:begin( *other.t_list );
 		}
 
-		begin ( <<t>>queue other ) -- copy
+		begin ( t_queue other ) with copier ( <t> )( <t> ) -- copy
 		{
+			io.t_list:begin( other.t_list ) with copier;
 		}
 
 		is_empty? ()( bool yes )
 		{
+			io.t_list:is_empty?()( yes );
 		}
 
-		push [upd] = <t> proxy [init]  
+		push [upd] = <t> proxy [init] ~item 
 		{
+			~item -> io.t_list:go_last:insert;
 		}
 
 		pull [upd]()( <t> item ) with copier ( <t> )( <t> )
 		{
+			if ( io.t_list:is_empty?()( =bool ):not )
+			{
+				copier( io.t_list:use_first )( item );
+				io.t_list:go_front:remove_next;
+			}
 		}
 
-		pull [upd]()( <t>  item ) with taker ( <t> [upd] )( <t> )
+		pull [upd]()( <t> item ) with taker ( <t> [upd] )( <t> )
 		{
+			if ( io.t_list:is_empty?()( =bool ):not )
+			{
+				taker( *io.t_list:use_first )( item );
+				io.t_list:go_front:remove_next;
+			}
 		}
 
 		pull [upd]
 		{
+			io.t_list:go_front:remove_next;
 		}
 
-		use_item = <t> proxy [eval,init]
+		use_item = <t> proxy [eval,init] ~item -- first
 		{
+			~item -> io.t_list:use_first;
 		}
 	}
 
 	instance
 	{
-		<<t>>list1  foo;
+		t_list;
 	}
 }
 
