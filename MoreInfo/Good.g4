@@ -5,94 +5,10 @@ grammar Good;
     
 
 // =====================  LEXER  =============================
-/*
 
-	Good tokens fall into 3 categories: reserved words,
-	punctuation, and synthetic tokens.
-
-	Reserved words and punctuation are straight forward
-	literal tokens. Synthetic tokens are composed by rule.
-	
-	The most important synthetic token is an SID (source
-	identifier). A SID is a name or reference to
-
-		type 
-		object (type instance)
-		proxy 
-		method 
-		subroutine 
-		book
-		page
-
-	A SID can be a simple name or a complex reference
-	composed of several parts.  It's the compiler's job to
-	determine the validity of a SID in context.  
-
-	The rule for a simple, unqualified SID matches every
-	reserved word, but reserved words have precedence
-	(they're listed first), so a simple SID can't be a 
-	reserved word.  However, a complex general SID may
-	contain embedded reserved words.
-
-	This means that a reserved word won't be returned
-	as an SID and can't be used to name new entities (good),
-	but it's possible to code a syntactically valid reference
-	SID using reserved words that can't possibly reference a
-	real entity. But no big deal, because reference validation
-	is what the compiler does.
-
-	Good has reserved names that are not reserved words.
-	"io" is the reserved name for a method's implicit object.
-	These generic namespaces are also reserved:  near, given.
-
-	All printable ascii chars are assigned except
-	
-		$ (dollar sign ) and ` (accent )
-
-	which are reserved for internal compiler use.
-
-	basic identifier...
-
-		a-z A-Z 0-9 _ ~ @ & ? ! 
-
-	punctuation...
-	
-		''	literal
-		""	formula
-		[]	attribute list,new analog 
-		{}	group
-		<>	factor
-		()	list, precedence 
-		||	bar-operator
-		->	bind proxy (to object)
-		<=  copy object (assignment)
-		.	subobject ref
-		\	namespace qualification
-		;	group item delimiter
-		,	list item separator
-		^	literal insert
-		=	equivalence, synonomous (operation,nom_type,result)
-		#	factor dimension
-		:	method call
-		+	plus special operator
-		-	minus special operator
-		*	mul special operator, var input recognition
-		/	div special operator
-
-		%	compiler directive
-
-		--		remark
-		{{}}	narrative
-
-*/
-
-
-// reserved words and directives
 // trailing underscores avoid collisions in generated C++ code
 
-IGNORE_				:	'%ignore'		;
-END					:	'%end'			;
-INFER				:	'%infer'		;
+// keywords
 
 ABSTRACT			:	'abstract'		;
 AFTER				:	'after'			;
@@ -102,6 +18,7 @@ BASE				:	'base'			;
 COMMON				:	'common'		;	
 COMPATIBLE			:	'compatible'	;		
 CONST_				:	'const'			;		// constant
+EACH				:	'each'			;
 ELSE				:	'else'			;
 ENUM				:	'enum'			;		// enumerated
 ESCAPE				:	'escape'		;
@@ -116,6 +33,7 @@ IN_					:	'in'			;
 INCOMPLETE			:	'incomplete'	;
 INIT				:	'init'			;		// initiate
 INSTANCE			:	'instance'		;
+IS					:	'is'			;
 ISOLATE				:	'isolate'		;
 LOOP				:	'loop'			;
 METHOD				:	'method'		;
@@ -133,7 +51,6 @@ QUIT				:	'quit'			;
 READABLE			:	'readable'		;
 RETURN				:	'return'		;
 SELECT				:	'select'		;	
-STATIC				:	'static'		;
 SUBROUTINE			:	'subroutine'	;
 TBD					:	'tbd'			;		// to-be-defined 
 TERM				:	'term'			;		// terminate
@@ -145,8 +62,14 @@ VALUE				:	'value'			;
 VOID_				:	'void'			;
 WITH				:	'with'			;
 
+// directives
 
-// punctuation
+IGNORE_				:	'%ignore'		;
+END					:	'%end'			;
+INFER				:	'%infer'		;
+
+
+// delimiters
 
 LEFT_CURLY			:	'{'				;
 RIGHT_CURLY			:	'}'				;
@@ -156,20 +79,19 @@ LEFT_SQUARE			:	'['				;
 RIGHT_SQUARE		:	']'				;	
 COMMA				:	','				;
 SEMI_COLON			:	';'				;
-COLON				:	':'				;
-EQUAL				:	'='				;
 DOUBLE_QUOTE		:	'"'				;
+
+
+// punctuation
+
+EQUAL				:	'='				;
+COLON				:	':'				;
 ASTERISK			:	'*'				;
-PLUS				:	'+'				;
-MINUS				:	'-'				;
-DIVIDE				:	'/'				;
 BIND				:	'->'			;
-ASSIGN				:	'<='			;
 
 
 // literal 
-
-				
+			
 fragment
 LIT0				:	'\''						// delim
 					;
@@ -188,6 +110,7 @@ LIT3				: '^' ( '^' | LIT0 | LIT2 )		// insert subexpr
 
 LITERAL				: LIT0 ( LIT1 | LIT3 )*?  LIT0
 					;
+		
 
 
 // operator
@@ -197,13 +120,13 @@ fragment
 OP1					: [!-z{}~]						// char subset: printable, except SP and |
 					;
 
-
 OPERATOR			:  '|' OP1+? '|'
-					| ( PLUS | MINUS | ASTERISK | DIVIDE )
+					| ( '+' | '-' | '*' | '/' )
 					;
 
 
-// source identifier
+
+// identification
 
 
 fragment
@@ -238,7 +161,7 @@ SID					: ID5							// no sub-object
 					;
 					
 
-// exclude 
+// exclusion 
 
 
 REGION				: IGNORE_ .*? END		-> skip
@@ -251,7 +174,8 @@ REMARK				: '--' ~[\r\n]*			-> skip
 					;
 
 
-// inter-token space (lowest precedence)
+
+// space (lowest precedence)
 
 SPACE				: [ \t\r\n]+			-> skip
 					;
@@ -307,7 +231,7 @@ SPACE				: [ \t\r\n]+			-> skip
 	Executable items can be grouped into executable blocks.
 	
 	Items and blocks can be incorporated into executable
-	forms:  if/else, loop, for, select/value/else, 
+	forms:  if/else, loop, for-each, select/value/else, 
 	isolate/trap.
 
 	A formula is an expression enclosed in double quotes.
@@ -428,14 +352,14 @@ assignment_obj_right	: NULL_
 						| subroutine_call
 						;
 
-assignment				: assignment_obj_left ASSIGN ASTERISK? assignment_obj_right conversion_chain?
+assignment				: assignment_obj_left IS ASTERISK? assignment_obj_right conversion_chain?
 						;
 
 
 
-operator_				:  OPERATOR
-						| ( PLUS | MINUS | ASTERISK | DIVIDE )
-						;
+//OPERATOR				:  OPERATOR
+//						| ( PLUS | MINUS | ASTERISK | DIVIDE )
+//					;
 
 
 
@@ -446,10 +370,10 @@ formula_operand			: LITERAL
 						| formula_operand ( AS SID )+  // special case conversion
 						;
 
-formula_term			: operator_? formula_operand
+formula_term			: OPERATOR? formula_operand
 						;
 
-formula_product			: formula_term ( operator_ formula_term )*   
+formula_product			: formula_term ( OPERATOR formula_term )*   
 						;
 
 formula_closure			: LEFT_PAREN formula_product RIGHT_PAREN
@@ -635,28 +559,29 @@ loop_block				: LOOP condition? exec_block
 						;
 
 
-for_collection_obj		: SID	
+
+for_each_collection_obj	: SID	
 						| method_call_sequence
 						| subroutine_call
 						;
 
-for_index_obj			: SID	
+for_each_index_obj		: SID	
 						| new_obj	
 						;
 
-for_proxy_attribution	: LEFT_SQUARE ( EVAL | UPD | INIT ) RIGHT_SQUARE
+for_each_proxy_attrib	: LEFT_SQUARE ( EVAL | UPD | INIT ) RIGHT_SQUARE
 						;
 
-for_proxy_name			: SID  
+for_each_proxy_name		: SID  
 						;
 
-for_spec				: LEFT_PAREN for_proxy_attribution? for_proxy_name IN_ for_collection_obj ( COMMA for_index_obj )? RIGHT_PAREN
+for_each_spec			: LEFT_PAREN for_each_proxy_attrib? for_each_proxy_name IN_ for_each_collection_obj ( COMMA for_each_index_obj )? RIGHT_PAREN
 						;
 
-for						: FOR for_spec exec_element
+for_each				: FOR EACH for_each_spec exec_element
 						;
 
-for_block				: FOR for_spec exec_block
+for_each_block			: FOR EACH for_each_spec exec_block
 						;
 
 
@@ -717,7 +642,7 @@ exec_element			: new_obj
 						| subroutine_call
 						| if
 						| loop
-						| for
+						| for_each
 						| isolate
 						| quit
 						| escape
@@ -727,7 +652,7 @@ exec_element			: new_obj
 exec_block				: plain_block			
 						| if_block
 						| loop_block
-						| for_block
+						| for_each_block
 						| isolate_block
 						| select_block
 						;
@@ -1031,10 +956,10 @@ operation_function		: operation_ref LEFT_PAREN operation_input ( COMMA operation
 operation_operand		: SID		
 						;
 
-operation_unary_expr	: operator_ operation_operand
+operation_unary_expr	: OPERATOR operation_operand
 						;
 
-operation_qnary_expr	: operation_operand ( operator_ operation_operand )+ 
+operation_qnary_expr	: operation_operand ( OPERATOR operation_operand )+ 
 						;
 
 operation_expr			: operation_unary_expr

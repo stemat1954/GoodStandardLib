@@ -40,7 +40,7 @@ type node1 [incomplete]
 
 		set_link [upd]( link1 )
 		{
-			io.link1 <= given\link1;
+			io.link1 is given\link1;
 		}
 
 		unlink [upd]
@@ -215,30 +215,30 @@ type list1 from serial<node1><list1_cursor>
 
 		go_first [upd]
 		{
-			if ( "is_not_null?( io.first )" ) io.current <= io.first;
+			if ( "is_not_null?( io.first )" ) io.current is io.first;
 		}
 
 		go_last [upd]
 		{
-			if ( "is_not_null?( io.last )" ) io.current <= io.last;
+			if ( "is_not_null?( io.last )" ) io.current is io.last;
 		}
 
 		go_next [upd]
 		{
 			if ( "is_null?( io.current )" )
 			{
-				if ( "is_not_null?( io.first )" ) io.current <= io.first;
+				if ( "is_not_null?( io.first )" ) io.current is io.first;
 			}
 			else
 			{
 				io.current:use_object:get_link()( link1 nl ); 
-				if ( "is_not_null?( nl )" ) io.current <= nl;
+				if ( "is_not_null?( nl )" ) io.current is nl;
 			}
 		}
 
 		go_here [upd]( link1 )  
 		{
-			io.current <= given\link1;
+			io.current is given\link1;
 		}
 				
 		insert [upd]( link1 )  -- after current  
@@ -249,7 +249,7 @@ type list1 from serial<node1><list1_cursor>
 				-- after current
 				io.current:use_object[upd]:get_link()( link1 before ):set_link( given\link1 ); 
 				if ( "is_null?( before )" )
-					io.last <= given\link1 
+					io.last is given\link1 
 				else
 					given\link1:use_object[upd]:set_link( before );
 			}
@@ -257,7 +257,7 @@ type list1 from serial<node1><list1_cursor>
 			{
 				-- front (before first)
 				given\link1:use_object[upd]:set_link( io.first );
-				io.first <= given\link1;
+				io.first is given\link1;
 			}
 			else 
 			{
@@ -277,7 +277,7 @@ type list1 from serial<node1><list1_cursor>
 				{
 					next:use_object[upd]:get_link()( link1 next_next ):unlink;
 					if ( "is_null?( next_next )" )
-						io.last <= io.current -- new last
+						io.last is io.current -- new last
 					else 
 						io.current:use_object[upd]:set_link( next_next );
 				}
@@ -294,7 +294,7 @@ type list1 from serial<node1><list1_cursor>
 				}
 				else
 				{
-					io.first <= next_next;  -- new first
+					io.first is next_next;  -- new first
 				}
 			}
 		}

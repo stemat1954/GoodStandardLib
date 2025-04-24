@@ -329,8 +329,8 @@ type channel [incomplete]
 			if ( "report |=| 'error' " )
 			{
 				fix( note, unspecified_error ) ~note;
-				io:internal_close( ~note )( text first );
-				if ( "is_not_null?( first )" ) note <= first;
+				io:internal_close( ~note )( text og_note );
+				if ( "is_not_null?( og_note )" ) note is og_note;
 			}
 		}
 	}
