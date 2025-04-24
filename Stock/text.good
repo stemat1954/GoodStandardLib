@@ -60,9 +60,11 @@ type text from message
 	There are 3 binary integer formats corresponding to
 	the utf type associated with the message:
 
-	'UTF-8'	 -> 'b:utf8'
-	'UTF-16' -> 'b:utf16'
-	'UTF-32' -> 'b:utf32'
+	fex				encoding
+
+	'b:utf8'		'UTF-8'
+	'b:utf16'		'UTF-16'
+	'b:utf32'		'UTF-32'
 
 	By default, text objects are encoded using the current
 	modal message format, which is initially set to 
@@ -435,7 +437,7 @@ type text from message
 				io:match( *pattern, ~d )( bool ok, q:reuse, int rp ) with match?;
 
 				if ( ok ) return;
-				if ( "is_null?( rp )" ) return after q <= zero;
+				if ( "is_null?( rp )" ) return after q:begin( zero );
 
 				io:set_rp( rp );  -- next unmatched char
 			}

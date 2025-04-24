@@ -26,13 +26,13 @@ general method
 
 	is<t>? [eval]()( bool );  
 
-	as<t> [eval] = foo proxy [eval,upd];	-- may be void
+	as<t> [eval] = <t> proxy [eval,upd];	-- may be void
 
 	is_actual<t>? [eval]()( bool );
 
-	as_actual<t> [eval] = foo proxy [init];  -- may be void
+	as_actual<t> [eval] = <t> proxy [init];  -- may be void
 
-	as_base<t> [eval] = foo proxy [eval,upd,init]; -- verified at compile-time, reserved proxy permission syntax
+	as_base<t> [eval] = <t> proxy [eval,upd,init]; -- verified at compile-time, reserved proxy permission syntax
 
 	reuse [term];	 
 
