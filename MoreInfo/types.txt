@@ -13,6 +13,7 @@ can be called for null objects without causing disruption.
 :reuse reconstructs an object without changing the
 object's addr. A reused object has a null value.
 
+------
 
 general method
 {
