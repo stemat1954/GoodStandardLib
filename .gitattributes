@@ -67,5 +67,5 @@
 #  Good extensions
 ##############################################################################
 
-*.good	linguist-language =Good
+*.good	linguist-language=Good
 
