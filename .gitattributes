@@ -67,5 +67,8 @@
 #  Good extensions
 ##############################################################################
 
-*.good	linguist-generated=true
+Alpha/*.good	linguist-language=Good
+Kernel/*.good	linguist-language=Good
+Stock/*.good	linguist-language=Good
+
 
