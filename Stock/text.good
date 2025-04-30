@@ -1,11 +1,10 @@
 
 page text in StockByGood
 
+type ucdb;  -- hypothecate unicode database pending standard pre-load 
+
 
 enum type match_mode ( 'exact', 'similar', 'regex' );
-
-type ucdb;  -- hypothetical unicode database
-
 
 subroutine
 {
