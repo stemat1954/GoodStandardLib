@@ -1,7 +1,18 @@
 
 page text in StockByGood
 
-type ucdb;  -- hypothecate unicode database pending standard pre-load 
+{{
+	hypothecate ucdb pending real facility
+}}
+
+[page] type ucdb  
+{
+	general method begin
+	{
+	}
+}
+
+[page] common ucdb the_ucdb:begin [const];
 
 
 enum type match_mode ( 'exact', 'similar', 'regex' );
@@ -17,6 +28,7 @@ subroutine
 		If output is null, the match is pending.
 	}}
 	{
+%ignore
 		int code;
 		if ( "d |=| 'positive'" )
 			pattern:fread( fex )( code )
@@ -25,6 +37,7 @@ subroutine
 			
 		if ( "code as unicode |not=| c" ) yes:begin( false )
 		else if ( "rp_end?( pattern )" ) yes:begin( true );
+%end
 	}
 
 
@@ -358,8 +371,8 @@ type text from message
 			select ( ~mode )
 			{
 				value ( 'exact' )   io:skip( *pattern )( ok, null, rp ) with exact_match?;
-				value ( 'similar' ) io:skip( *pattern )( ok, null, rp ) with similar_match?;
-				value ( 'regex' )   io:skip( *pattern )( ok, null, rp ) with regex_match?;
+				value ( 'similar' ) io:skip( *pattern )( ok, null, rp ) with similar_match?(( the_ucdb ));
+				value ( 'regex' )   io:skip( *pattern )( ok, null, rp ) with regex_match?(( the_ucdb )) ;
 			}
 			if ( ok:not ) quit with fault:begin( 'format', 'skip pattern mismatch' );
 			io:set_rp( rp );
@@ -421,8 +434,8 @@ type text from message
 			select ( ~mode  )
 			{
 				value ( 'exact' )   io:seek( *pattern, d )( q ) with exact_match?;
-				value ( 'similar' ) io:seek( *pattern, d )( q ) with similar_match?;
-				value ( 'regex' )   io:seek( *pattern, d )( q ) with regex_match?;
+				value ( 'similar' ) io:seek( *pattern, d )( q ) with similar_match?(( the_ucdb ));
+				value ( 'regex' )   io:seek( *pattern, d )( q ) with regex_match?(( the_ucdb ));
 			}
 		}
 			
