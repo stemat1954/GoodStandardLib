@@ -60,6 +60,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stock", "Stock", "{0A5181F7
 		Stock\text.good = Stock\text.good
 		Stock\text_channel.good = Stock\text_channel.good
 		Stock\toggle.good = Stock\toggle.good
+		Stock\ucdb.good = Stock\ucdb.good
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MoreInfo", "MoreInfo", "{922EE76A-8570-484F-804C-C4D426B96A0C}"

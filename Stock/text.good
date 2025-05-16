@@ -1,18 +1,6 @@
 
 page text in StockByGood
 
-{{
-	hypothecate ucdb pending real facility
-}}
-
-[page] type ucdb  
-{
-	general method begin
-	{
-	}
-}
-
-[page] common ucdb the_ucdb:begin [const];
 
 
 enum type match_mode ( 'exact', 'similar', 'regex' );

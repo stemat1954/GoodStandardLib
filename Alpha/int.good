@@ -37,7 +37,7 @@ type int -- elementary, compatible, conventional
 
 		begin ( int other );	-- copy
 
-		begin<wt> ( <wt> w, expr fex );	 -- fread (word conversion)
+		begin<#n> ( word<<#n>> w, expr fex );	 -- fread (word conversion)
 
 		begin ( message [upd], expr fex );	-- fread
 

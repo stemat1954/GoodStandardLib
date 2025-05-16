@@ -79,7 +79,7 @@ type fp2 -- elementary, compatible, conventional
 
 		begin ( fp10 x );  -- copy conversion
 
-		begin<wt> ( <wt> w, expr fex );	-- fread from word
+		begin<#n> ( word<<#n>> w, expr fex );	-- fread from word
 
 		begin ( message [upd], expr fex );	-- fread from message
 
