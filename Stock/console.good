@@ -7,18 +7,16 @@ type console
 	A console is an interactive peripheral that displays 
 	text output and accepts text input from a user. 
 
-	Console i/o text format is device specific. Applications
-	must call :make_text to initialize a device compatible 
+	Console text format is device specific. Applications
+	must call :prep_text to initialize a device compatible 
 	output string.  Input strings are naturally device
 	compatible.
 
-	names and errors in method interfaces are platform 
-	dependent.
-
-	Note: In general, console i/o text format is different
+	Note: In general, console text format is different
 	from platform text format. However, they're one and the
 	same for system consoles.  Thus, the system console can
-	always dispay error text.
+	always dispay text that is known to be platform compat-
+	ible.
 }}
 {
 	general method
@@ -51,7 +49,7 @@ type console
 		}
 
 
-		make_text ()( text )  -- i/o compatible
+		prep_text ()( text )  -- compatible
 		{
 			if ( io.ready ) given\text:begin( io.utf, io.endian );
 		}
@@ -77,7 +75,7 @@ type console
 		{
 			if ( io.ready )
 			{
-				io:make_text()( input );
+				io:prep_text()( input );
 				io.channel:read( *input, io.eol )( error );
 			}
 			else

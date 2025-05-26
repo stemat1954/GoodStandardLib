@@ -131,7 +131,7 @@ type text from message
 			io:set_wp( zero );
 		}
 
-		begin ( expr source )			-- expr conversion
+		begin ( expr source )	-- expr conversion, platform compatible
 		{
 			-- pending
 		}

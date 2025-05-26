@@ -24,7 +24,7 @@ type entry [incomplete]
 	stop, returning when indicated.  
 	
 	Generally, :~run should internally trap disruptions	and
-	define a given output trace if the thread is disrupted.
+	capture whatever it needs for posterity.
 
 	When the application starts a thread, it can pass a 
 	common object of any type using an hp. An hp  is 
@@ -42,7 +42,7 @@ type entry [incomplete]
 
 	abstract 
 	{
-		~run ( signal active, signal stop, hp<object> [opt] )( trace );
+		~run [upd]( signal active [upd], signal stop, hp<object> [opt] );
 	}
 }
 

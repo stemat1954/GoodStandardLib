@@ -29,7 +29,7 @@ type monitor
 	{
 		begin;
 
-		add [upd]( hp<indicator>, int id );
+		add [upd]( indicator, int id );
 
 		delete [upd]( int id );
 
