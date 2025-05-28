@@ -42,7 +42,7 @@ type main_thread from entry
 			{
 				report:write( 'abnormal exit, quit location = ' ):write( ~disruption:use_object( zero ):use_location );
 			}
-			sys:use_console:write( *report )();
+			sys:use_console:write( *report ); -- ignore errors
 		}
 	}
 }
@@ -84,7 +84,7 @@ subroutine main ( signal active [upd], signal stop )()( extra )
 		-- timer tick
 
 		text greeting:begin:fwrite( tick:inc ):write( ' - Hello World!' );
-		sys:use_console:write( *greeting )();
+		sys:use_console:write( *greeting );  -- ignore errors
 	}
 }
 
@@ -95,7 +95,5 @@ subroutine hello
 	It displays 'Hello World!" on the system console and returns.
 }}
 {
-	text greeting:begin( 'Hello World!' );
---	sys:use_console:write( *'Hello World!' )();
-	sys:use_console:write( *greeting )();
+	sys:use_console:write( *'Hello World!' as text );
 }
