@@ -71,6 +71,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MoreInfo", "MoreInfo", "{92
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{E45DFF69-0C37-4392-93DD-31FDE37D417F}"
 	ProjectSection(SolutionItems) = preProject
+		Examples\demo1.good = Examples\demo1.good
 		Examples\hello.good = Examples\hello.good
 	EndProjectSection
 EndProject
