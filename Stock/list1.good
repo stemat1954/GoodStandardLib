@@ -452,7 +452,7 @@ type <t>stack
 
 	push = insert after front, access new first item
 
-	pull = remove first
+	pop = remove first
 }}
 {
 	nom type t_stack = <<t>>stack;
@@ -486,31 +486,13 @@ type <t>stack
 		{
 			~item -> io.t_list:insert;
 		}
-	
-		pull [upd]()( <t> item ) with copier ( <t> )( <t> )
-		{
-			if ( io.t_list:is_empty?()( =bool ):not )
-			{
-				copier( io.t_list:use_first )( item );
-				io.t_list:remove_next;
-			}
-		}
 
-		pull [upd]()( <t> item ) with taker ( <t> [upd] )( <t> )
-		{
-			if ( io.t_list:is_empty?()( =bool ):not )
-			{
-				taker( *io.t_list:use_first )( item );
-				io.t_list:remove_next;
-			}
-		}
-
-		pull [upd ]
+		pop [upd ]
 		{
 			io.t_list:remove_next;
 		}
 		
-		use_item = <t> proxy [eval,init] ~item  -- top 
+		use_top = <t> proxy [eval,init] ~item  -- top 
 		{
 			~item -> io.t_list:use_first;
 		}
@@ -530,7 +512,7 @@ type <t>queue
 
 	push = insert after last, access new last item 
 
-	pull = remove first
+	pull = copy/take and remove first
 
 }}
 {
@@ -583,12 +565,7 @@ type <t>queue
 			}
 		}
 
-		pull [upd]
-		{
-			io.t_list:go_front:remove_next;
-		}
-
-		use_item = <t> proxy [eval,init] ~item -- first
+		use_first = <t> proxy [eval,init] ~item -- first
 		{
 			~item -> io.t_list:use_first;
 		}

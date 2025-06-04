@@ -2,8 +2,15 @@ page demo1 in ExamplesByGood
 
 [page] subroutine demo
 {
+	int n;
+
+	<int>queue my_queue:begin;
+	my_queue:push:begin( zero );
+	my_queue:pull()( n ) with std_copy<int>;
+
 	<int>stack my_stack:begin;
 	my_stack:push:begin( zero );
-	my_stack:pull()( int n ) with std_copy<int>;
+	n:add( my_stack:use_top );
+	my_stack:pop;
 }
 
