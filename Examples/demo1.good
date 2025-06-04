@@ -6,3 +6,4 @@ page demo1 in ExamplesByGood
 	my_stack:push:begin( zero );
 	my_stack:pull()( int n ) with std_copy<int>;
 }
+

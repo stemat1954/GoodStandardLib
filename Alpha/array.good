@@ -2,7 +2,7 @@
 page array in AlphaByGood
 
 
-nom type array_cursor = <int>tuple<'2'>;
+nom type array_cursor = <'2'><int>tuple;
 
 
 type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and conventional per <t>

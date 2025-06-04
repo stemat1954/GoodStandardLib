@@ -2,8 +2,7 @@
 page utc in AlphaByGood
 
 
-nom type utc_pair = <int>tuple<'2'>;
-
+nom type utc_pair = <'2'><int>tuple;
 
 common utc_pair utc_origin [const];	 -- (years,days)
 

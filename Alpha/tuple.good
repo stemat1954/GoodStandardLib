@@ -2,9 +2,9 @@
 page tuple in AlphaByGood
 
 
-type <t>tuple<#> from indexed<<t>> -- compatible and conventional per <t>
+type <#><t>tuple from indexed<<t>> -- compatible and conventional per <t>
 {{
-	A <t>tuple<#> is a fixed-size object set, aka n-tuple.
+	A <#><t>tuple is a dimensioned n-tuple.
 
 	<#> is the symbolic dimension. <t> is the symbolic 
 	object type. The adhoc type must be a complete type.
@@ -21,14 +21,16 @@ type <t>tuple<#> from indexed<<t>> -- compatible and conventional per <t>
 
 	Example:
 
-	<int>tuple<'3'> point:begin( zero ) with std_copy<int>;
+	<'3'><int>tuple point:begin( zero ) with std_copy<int>;
 }}
 {
+	nom type nt_tuple = <<#>><<t>>tuple;
+
 	general 
 	{
 		begin;	-- all objects null
 		
-		begin ( <<t>>tuple<<#>> other [upd] );  -- move
+		begin ( nt_tuple other [upd] );  -- move
 	}
 
 	general -- similar in indexed<<t>>
@@ -39,7 +41,7 @@ type <t>tuple<#> from indexed<<t>> -- compatible and conventional per <t>
 	general -- <t> dependent with coroutine
 	{
 		begin ( <t> seed ) with copier ( <t> )( <t> );	-- replicate
-		begin ( <<t>>tuple<<#>> other )  with copier ( <t> )( <t> );
+		begin ( nt_tuple other )  with copier ( <t> )( <t> );
 		begin ( message [upd], expr fex ) with reader ( message [upd], expr fex )( <t> ); 
 		begin ( message [upd], expr fex )()( extra ) with reader ( message [upd], expr fex )( <t> )( extra ); 
 

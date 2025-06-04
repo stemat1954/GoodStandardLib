@@ -77,9 +77,9 @@ common -- int
 
 nom type
 {
-	double<t> = <<t>>tuple<'2'>;
-	triple<t> = <<t>>tuple<'3'>;
-	quad<t> = <<t>>tuple<'4'>;
+	double<t> = <'2'><<t>>tuple;
+	triple<t> = <'3'><<t>>tuple;
+	quad<t> = <'4'><<t>>tuple;
 
 	word1  = word<'1'>;		-- bit
 	word4  = word<'4'>;		-- nibble

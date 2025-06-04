@@ -1,7 +1,7 @@
 
 page matrix in AlphaByGood
 
-type <t>matrix<#r><#c>
+type <#r><#c><t>matrix
 {{
 	Rectangular matrix <#r> rows by <#c> columns with 
 	elements of numeric type <t>
