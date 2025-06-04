@@ -33,7 +33,6 @@ IN_					:	'in'			;
 INCOMPLETE			:	'incomplete'	;
 INIT				:	'init'			;		// initiate
 INSTANCE			:	'instance'		;
-IS					:	'is'			;
 ISOLATE				:	'isolate'		;
 LOOP				:	'loop'			;
 METHOD				:	'method'		;
@@ -115,13 +114,15 @@ LITERAL				: LIT0 ( LIT1 | LIT3 )*?  LIT0
 
 // operator
 
+PLUS				: '+';
+MINUS				: '-';
+DIVIDE				: '/';
 
 fragment
 OP1					: [!-z{}~]						// char subset: printable, except SP and |
 					;
 
 OPERATOR			:  '|' OP1+? '|'
-					| ( '+' | '-' | '*' | '/' )
 					;
 
 
@@ -352,15 +353,14 @@ assignment_obj_right	: NULL_
 						| subroutine_call
 						;
 
-assignment				: assignment_obj_left IS ASTERISK? assignment_obj_right conversion_chain?
+assignment				: assignment_obj_left EQUAL ASTERISK? assignment_obj_right conversion_chain?
 						;
 
 
 
-//OPERATOR				:  OPERATOR
-//						| ( PLUS | MINUS | ASTERISK | DIVIDE )
-//					;
-
+operator_				:  OPERATOR
+						| ( PLUS | MINUS | ASTERISK | DIVIDE )
+						;
 
 
 formula_operand			: LITERAL
@@ -370,10 +370,10 @@ formula_operand			: LITERAL
 						| formula_operand ( AS SID )+  // special case conversion
 						;
 
-formula_term			: OPERATOR? formula_operand
+formula_term			: operator_? formula_operand
 						;
 
-formula_product			: formula_term ( OPERATOR formula_term )*   
+formula_product			: formula_term ( operator_ formula_term )*   
 						;
 
 formula_closure			: LEFT_PAREN formula_product RIGHT_PAREN
@@ -956,10 +956,10 @@ operation_function		: operation_ref LEFT_PAREN operation_input ( COMMA operation
 operation_operand		: SID		
 						;
 
-operation_unary_expr	: OPERATOR operation_operand
+operation_unary_expr	: operator_ operation_operand
 						;
 
-operation_qnary_expr	: operation_operand ( OPERATOR operation_operand )+ 
+operation_qnary_expr	: operation_operand ( operator_ operation_operand )+ 
 						;
 
 operation_expr			: operation_unary_expr
