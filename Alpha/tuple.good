@@ -30,7 +30,7 @@ type <#><t>tuple from indexed<<t>> -- compatible and conventional per <t>
 	{
 		begin;	-- all objects null
 		
-		begin ( nt_tuple other [upd] );  -- move
+		begin ( nt_tuple other [upd] );  -- take
 	}
 
 	general -- similar in indexed<<t>>

@@ -40,11 +40,13 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 	cursor is inoperable.
 }}
 {
+	nom type t_array = <<t>>array;
+
 	general method 
 	{
 		begin ( int reserve [opt] ); 
 
-		begin ( <<t>>array other [upd] );	-- vacate other
+		begin ( t_array other [upd] );		-- take other
 
 		insert [upd]( int i, int q );		-- q null objs at i
 
@@ -68,20 +70,20 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 
 	general method  -- <t> dependent with coroutine
 	{
-		begin ( <<t>>array other ) with copy ( <t> )( <t> );
-		begin ( message [upd], expr fex ) with fread ( message [upd], expr fex )( <t> );	
-		begin ( message [upd], expr fex )()( extra ) with fread ( message [upd], expr fex )( <t> )( extra ); 
+		begin ( t_array other ) with copy ( <t> )( <t> );
+		begin ( message [upd], expr fex ) with reader ( message [upd], expr fex )( <t> );	
+		begin ( message [upd], expr fex )()( extra ) with reader ( message [upd], expr fex )( <t> )( extra ); 
 
-		fwrite [eval]( message [upd], expr fex ) with fwrite ( message [upd], expr fex, <t> );
-		fwrite [eval]( message [upd], expr fex )()( extra ) with fwrite ( message [upd], expr fex, <t> )()( extra );
+		fwrite [eval]( message [upd], expr fex ) with writer ( message [upd], expr fex, <t> );
+		fwrite [eval]( message [upd], expr fex )()( extra ) with writer ( message [upd], expr fex, <t> )()( extra );
 
-		copy [eval]( int i [opt] )( <t> obj ) with copy ( <t> )( <t> );			-- OUT: one obj at i (end) to obj
-		move [upd]( int i [opt] )( <t> obj ) with move ( <t> [upd] )( <t> );	-- ditto
+		import [upd]( int i [opt], int q [opt], t_array other, int j [opt] ) with copier ( <t> )( <t> );			-- import with copier: q (1) objs to i (end) from other at j (0)
+		import [upd]( int i [opt], int q [opt], t_array other [upd], int j [opt] ) with taker ( <t> [upd] )( <t> );	-- import with taker: ditto
 
-		copy [upd]( int i, int q, <<t>>array other, int j [opt] ) with copy ( <t> )( <t> );				-- INTO: q null objs at i from other at j (0)
-		move [upd]( int i, int q, <<t>>array other [upd], int j [opt] ) with move ( <t> [upd] )( <t> ); -- ditto
+		export [eval]( int i [opt] )( <t> obj ) with copier ( <t> )( <t> );			-- export with copier: one obj at i (end) to obj
+		export [upd]( int i [opt] )( <t> obj ) with taker ( <t> [upd] )( <t> );		-- export with taker: ditto 
 
-		rank [eval]( <t> )( int i, bool unique ) with is_before? ( <t> a, <t> b )( bool ); -- find ordered insertion point
+		rank [eval]( <t> )( int i, bool unique ) with sorter ( <t> a, <t> b )( bool ); -- find ordered insertion point
 	}
 
 	abstract method in indexed<<t>>
