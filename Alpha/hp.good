@@ -142,27 +142,13 @@ type hp<t>   -- intrinsic
 	hps can be used to create logically heterogenous arrays.
 	They're also essential for creating dynamically linked
 	object collections like trees, lists, and networks.
-
-	hps are not portable.  However, since an hp can be created
-	from a typename, and typenames ARE portable, applications
-	can devise ways to persist and restore hps.
-
-	Although a single hp is relatively easy to persist, a 
-	complex network of hps is significantly	more difficult.
-	In general, applications usually have to  devise a scheme 
-	to store hps and objects separately.
-
-	The basic idea is to create a portable hp using a type-
-	name and some other portable reference, e.g. an int that
-	indexes an object in a set of objects.
-
-	A portable hp of this sort can be imported as a type-
-	name and int.  The typename is used to create a	hp to a
-	null object and the int can be used to lookup a copy
-	of the object for initialization.  Of course, where 
-	objects may have multiple hps, there has to be a way to
-	recognize when an original hp has been restored so that
-	others can copy it.
+	
+	hps are generally portable if <t> is portable.  The 
+	portability message	must be configured with an open heap. 
+	See type message for more info.  :fwrite disables the 
+	pointer and any attempt to use it after calling :fwrite
+	will disrupt the application.  Object formats are given
+	as extras.
 
 	hps can be compared using standard methods. Cross type
 	comparisions are allowed, even if the hps are copy-
@@ -199,11 +185,19 @@ type hp<t>   -- intrinsic
 
 		begin ( typename ) = <t> proxy [init];	-- access new <t> object, typename:is<t>? must be true (may quit)
 
+
 		use_object = <t> proxy;				-- always works (never void)
 
 		is_equal<xt>? ( hp<<xt>> )( bool );
 
 		is_before<xt>? ( hp<<xt>> )( bool );
+	}
+
+	general -- <t> dependent portability
+	{
+		begin ( message [upd], expr fex )()( extra );		-- fread
+
+		fwrite [eval]( message [upd], expr fex )()( extra );
 	}
 }
 

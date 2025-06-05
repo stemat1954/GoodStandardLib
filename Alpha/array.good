@@ -28,16 +28,17 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 	efficient.
 
 	An array can be configured from any type <t> but some
-	methods can only be called with a type dependent co-
-	routine.  See stock dialect for standard coroutines.
+	methods are type dependent.
 
-	Note: This technique verifies type compatibility and
-	adds flexibility.
+	An array is portable if <t> is portable.  <t> formats
+	are given as extras.
 
 	An array cursor is bidirectional and represented by
 	a pair of ints.  One int carries the current position,
 	while the other carries step.  If step is zero, the 
 	cursor is inoperable.
+
+
 }}
 {
 	nom type t_array = <<t>>array;
@@ -46,16 +47,14 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 	{
 		begin ( int reserve [opt] ); 
 
-		begin ( t_array other [upd] );		-- take other
+		begin ( t_array other [upd] );	-- take other
 
-		insert [upd]( int i, int q );		-- q null objs at i
+		insert [upd]( int i [opt], int q );				-- q null objs at i (end)
 
 		insert [upd]( int i [opt] ) = <t> proxy [init];  -- one null obj at i (end), return access
 
-		delete [upd]( int i, int q );		-- q objs at i
+		delete [upd]( int i [opt], int q [opt] );	-- q (1) objs at i (end)
 
-		delete [upd]( int i [opt] );		-- one obj at i (end)
-				
 		resize [upd]( int q );				-- insert or delete at end, new count = q
 
 		shrink [upd];						-- release unused memory
@@ -68,20 +67,24 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 		use_object ( int i ) = <t> proxy [eval,init];
 	}
 
-	general method  -- <t> dependent with coroutine
+	general method  -- <t> dependent
 	{
-		begin ( t_array other ) with copy ( <t> )( <t> );
-		begin ( message [upd], expr fex ) with reader ( message [upd], expr fex )( <t> );	
-		begin ( message [upd], expr fex )()( extra ) with reader ( message [upd], expr fex )( <t> )( extra ); 
+		begin ( t_array other );							-- with <t> copy
+		begin ( t_array other ) with copier ( <t> )( <t> );	-- with copier
 
-		fwrite [eval]( message [upd], expr fex ) with writer ( message [upd], expr fex, <t> );
-		fwrite [eval]( message [upd], expr fex )()( extra ) with writer ( message [upd], expr fex, <t> )()( extra );
+		begin ( message [upd], expr fex )()( extra );		-- fread
+		fwrite [eval]( message [upd], expr fex )()( extra );
 
-		import [upd]( int i [opt], int q [opt], t_array other, int j [opt] ) with copier ( <t> )( <t> );			-- import with copier: q (1) objs to i (end) from other at j (0)
-		import [upd]( int i [opt], int q [opt], t_array other [upd], int j [opt] ) with taker ( <t> [upd] )( <t> );	-- import with taker: ditto
+		insert [upd]( int i [opt], int q [opt], t_array other, int j [opt] );										-- with <t> copy: q (1) objs from other at j (0) to i (end) 
+		insert [upd]( int i [opt], int q [opt], t_array other, int j [opt] ) with copier ( <t> )( <t> );			-- with copier:  ditto
+		insert [upd]( int i [opt], int q [opt], t_array other [upd], int j [opt] );									-- with <t> take: ditto
+		insert [upd]( int i [opt], int q [opt], t_array other [upd], int j [opt] ) with taker ( <t> [upd] )( <t> );	-- with taker:  ditto
 
-		export [eval]( int i [opt] )( <t> obj ) with copier ( <t> )( <t> );			-- export with copier: one obj at i (end) to obj
-		export [upd]( int i [opt] )( <t> obj ) with taker ( <t> [upd] )( <t> );		-- export with taker: ditto 
+		copy [eval]( int i [opt] )( <t> obj );								-- with <t> copy: one obj at i (end) to obj
+		copy [eval]( int i [opt] )( <t> obj ) with copier ( <t> )( <t> );	-- with copier: ditto
+
+		take [upd]( int i [opt] )( <t> obj );									-- with <t> taker: one obj at i (end) to obj
+		take [upd]( int i [opt] )( <t> obj ) with taker ( <t> [upd] )( <t> );	-- with taker: ditto
 
 		rank [eval]( <t> )( int i, bool unique ) with sorter ( <t> a, <t> b )( bool ); -- find ordered insertion point
 	}

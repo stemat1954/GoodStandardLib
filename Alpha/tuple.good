@@ -13,11 +13,10 @@ type <#><t>tuple from indexed<<t>> -- compatible and conventional per <t>
 	tation can be optimized.
 
 	A tuple can be constructed from any type <t> but some
-	methods can only be called with a type dependent co-
-	routine.  See stock dialect for standard coroutines.
+	methods are type dependent.
 
-	Note: This technique verifies type compatibility and
-	adds flexibility.
+	A tuple is portable if <t> is portable.  <t> formats
+	are given as extras.
 
 	Example:
 
@@ -38,14 +37,15 @@ type <#><t>tuple from indexed<<t>> -- compatible and conventional per <t>
 		use_object ( int i ) = <t> proxy [eval,init]; 
 	}
 
-	general -- <t> dependent with coroutine
+	general -- <t> dependent
 	{
-		begin ( <t> seed ) with copier ( <t> )( <t> );	-- replicate
-		begin ( nt_tuple other )  with copier ( <t> )( <t> );
-		begin ( message [upd], expr fex ) with reader ( message [upd], expr fex )( <t> ); 
-		begin ( message [upd], expr fex )()( extra ) with reader ( message [upd], expr fex )( <t> )( extra ); 
+		begin ( <t> seed );								-- with <t> copy
+		begin ( <t> seed ) with copier ( <t> )( <t> );	-- with copier
 
-		fwrite ( message [upd], expr fex ) with writer ( message [upd], expr fex )( <t> ); 
+		begin ( nt_tuple other );								-- with <t> copy
+		begin ( nt_tuple other ) with copier ( <t> )( <t> );	-- with copier
+
+		begin ( message [upd], expr fex )()( extra );  -- fread
 		fwrite ( message [upd], expr fex )()( extra ) with writer ( message [upd], expr fex )( <t> )( extra ); 
 	}
 

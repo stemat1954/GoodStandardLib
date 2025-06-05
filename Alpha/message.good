@@ -273,6 +273,34 @@ type message
 	written, and assigns 'true' to an output bool.  If the
 	next char is not 'NUL', rp is not moved and the output
 	is 'false'.
+
+	:open_heap and :close_heap allow hp<t> objects to be
+	represented in a message. 
+	
+	Logically, a message heap is a seperate memory segment
+	together with internal indexes and methods that support 
+	reading and writing hp<> pointers and their objects to
+	a message.  
+
+	Before writing an object sequence that contains hp<>
+	pointers, call :open_heap to prepare the message. After
+	the sequence is written, call :close_heap.  
+	
+	The addrs assigned by :detach and :close_heap can be
+	used to persist the message segments.
+
+	:write_checksum and :read_checksum can be used to 
+	verify message integrity.
+	
+	:write_checksum writes a checksum at wp calculated from
+	all bytes before wp.
+
+	:read_checksum reads a checksum at rp and compares it 
+	to the actual checksum of bytes before rp. A disagreement
+	disrupts the app.
+
+	Note: a heap segment has an internal checksum that is
+	maintained by :open_heap and :close_heap.
 }}
 {
 
@@ -296,6 +324,13 @@ type message
 		attach [upd]( addr pmem, int size [opt] );
 
 		detach [upd]()( addr pmem, int size ); 
+
+
+		open_heap [upd];  -- empty
+
+		open_heap [upd]( addr pmem, int size );  -- previous
+
+		close_heap [upd]()( addr pmem, int size );
 
 
 		set_size [upd]( int );			-- size = given
@@ -341,6 +376,7 @@ type message
 
 		get_indent ()( int );			-- out = indent
 
+
 		write_new_line [upd]( expr label );	
 
 		read_new_line [upd]()( expr label );
@@ -348,6 +384,11 @@ type message
 		write_nul [upd];
 
 		read_nul [upd]()( bool );
+
+		
+		write_checksum [upd];
+
+		read_checksum [upd];
 
 
 		fread<t> [upd]( expr fex )( <t> obj );			-- read object, one fex

@@ -64,7 +64,7 @@ type timer from indicator
 	time settings or the next tick.
 
 
-	timer t:begin:start;  -- trivial and useless
+	timer t:begin:start;  -- trivial and useless (tick once immediately)
 
 	timer t:begin:set_first( 'today 9:00' as utc ):start;  -- tick once at 9am today
 
