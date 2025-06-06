@@ -328,9 +328,10 @@ type message
 
 		open_heap [upd];  -- empty
 
-		open_heap [upd]( addr pmem, int size );  -- previous
+		close_heap [upd]()( <message>array );
 
-		close_heap [upd]()( addr pmem, int size );
+		restore_heap [upd]( <message>array [upd] );  -- previous
+
 
 
 		set_size [upd]( int );			-- size = given
