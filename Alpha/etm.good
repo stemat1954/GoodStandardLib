@@ -71,9 +71,9 @@ type etm  -- conventional
 
 		begin ( etm other );	-- copy
 
-		begin ( message [upd], expr fex );		-- fread	
+		begin ( translator [upd], expr fex );		-- fread	
 
-		fwrite ( message [upd], expr fex );	
+		fwrite ( translator [upd], expr fex );	
 
 		is_equal? ( etm other )( bool );
 

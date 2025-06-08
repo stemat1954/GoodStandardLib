@@ -91,7 +91,7 @@ type utc  -- conventional
 
 	Note: text formats express utc as calander date and 
 	time for some timezone specified in the fex.  Various 
-	text formats are supported.  Text message initialization
+	text formats are supported.  Text translator initialization
 	and literal	vex initialization are consistent.
 
 }}
@@ -105,9 +105,9 @@ type utc  -- conventional
 
 		begin ( utc other );		-- copy
 
-		begin ( message [upd], expr fex );	-- fread
+		begin ( translator [upd], expr fex );	-- fread
 
-		fwrite ( message [upd], expr fex );
+		fwrite ( translator [upd], expr fex );
 
 
 		is_equal? ( utc t )( bool );

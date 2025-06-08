@@ -33,9 +33,9 @@ type unicode from enumerated
 
 		begin ( unicode other );	-- copy
 
-		begin ( message m [upd], expr fex )()( extra );  -- fread
+		begin ( translator m [upd], expr fex )()( extra );  -- fread
 
-		fwrite ( message m [upd], expr fex )()( extra ); 
+		fwrite ( translator m [upd], expr fex )()( extra ); 
 
 		use_notation = expr proxy [eval];
 

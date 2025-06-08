@@ -61,19 +61,20 @@ type word<#> -- elementary, compatible (up to word32), conventional
 	
 	general 
 	{
-		begin ( expr vex [opt] );							-- literal, default = zero
+		begin ( expr vex [opt] );					-- literal, default = zero
 
 		begin<#n> ( word<<#n>> w, bool sign_extend [opt] );	-- copy w/ width conversion
 
-		begin ( int n, expr fex );							-- int conversion, int fex for encoding
+		begin ( int n, expr fex );					-- int conversion, int fex for encoding
 
-		begin ( fp2 r, expr fex );							-- fp2 conversion, fp fex for encoding
+		begin ( fp2 r, expr fex );					-- fp2 conversion, fp fex for encoding
 
-		begin ( fp10 r, expr fex );							-- fp10 conversion, fp fex for encoding
+		begin ( fp10 r, expr fex );					-- fp10 conversion, fp fex for encoding
 
-		begin ( message [upd], expr fex );					-- fread
 
-		fwrite ( message [upd], expr fex ) ;	
+		begin ( translator [upd], expr fex );		-- fread
+
+		fwrite ( translator [upd], expr fex ) ;	
 		
 
 		is_equal? ( word<<#>> w )( bool );

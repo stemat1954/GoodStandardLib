@@ -101,9 +101,9 @@ type expr -- intrinsic, conventional
 
 		begin ( expr other );	-- copy
 
-		begin ( message [upd], expr fex );	-- fread
+		begin ( translator [upd], expr fex );	-- fread
 
-		fwrite ( message [upd], expr fex ) ;
+		fwrite ( translator [upd], expr fex ) ;
 
 		is_equal? ( expr other, int q [opt] )( bool ); 
 

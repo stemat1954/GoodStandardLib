@@ -111,9 +111,9 @@ type ascii from enumerated
 		
 		begin ( ascii other );	-- copy
 
-		begin ( message [upd], expr fex )()( extra );	--fread
+		begin ( translator [upd], expr fex )()( extra );	--fread
 
-		fwrite ( message [upd], expr fex )()( extra );
+		fwrite ( translator [upd], expr fex )()( extra );
 
 		use_notation = expr proxy [eval];
 

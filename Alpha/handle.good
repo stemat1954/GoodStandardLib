@@ -26,9 +26,9 @@ type handle -- compatible
 
 		begin ( handle other );	-- copy
 
-		begin ( message [upd], expr fex [opt] ); -- fread
+		begin ( translator [upd], expr fex [opt] ); -- fread
 
-		fwrite ( message [upd], expr fex [opt ] );
+		fwrite ( translator [upd], expr fex [opt ] );
 
 		is_equal? ( handle other )( bool );
 	}

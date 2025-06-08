@@ -151,26 +151,6 @@ subroutine  --  coroutines
 		b:begin( *a );
 	}
 
-	std_fread<t> ( message m [upd], expr fex )( <t> obj )
-	{
-		obj:begin( *m, fex );
-	}
-
-	std_fread<t> ( message m [upd], expr fex )( <t> obj )( extra )
-	{
-		obj:begin( *m, fex )()( given\extra );
-	}
-
-	std_fwrite<t> ( message m [upd], expr fex, <t> obj )
-	{
-		obj:fwrite( *m, fex );
-	}
-
-	std_fwrite<t> ( message m [upd], expr fex, <t> obj )()( extra )
-	{
-		obj:fwrite( *m, fex )()( given\extra );
-	}
-
 	std_before<t> ( <t> a, <t> b )( bool yes )
 	{
 		a:is_before?( b )( yes );

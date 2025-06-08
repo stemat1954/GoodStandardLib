@@ -75,17 +75,16 @@ type fp2 -- elementary, compatible, conventional
 	{
 		begin ( expr vex [opt] );	-- literal, default = 0
 
-		begin ( fp2 x );  -- copy same
+		begin ( fp2 x );  -- copy
 
-		begin ( fp10 x );  -- copy conversion
+		begin ( fp10 x );  -- fp10 conversion
 
-		begin<#n> ( word<<#n>> w, expr fex );	-- fread from word
+		begin<#n> ( word<<#n>> w, expr fex );	-- word conversion
 
-		begin ( message [upd], expr fex );	-- fread from message
 
-		fwrite<wt> ( <wt> w [upd], expr fex );
+		begin ( translator [upd], expr fex );	-- fread 
 
-		fwrite ( message [upd], expr fex );	
+		fwrite ( translator [upd], expr fex );	
 
 
 		is_equal? ( fp2 x )( bool );

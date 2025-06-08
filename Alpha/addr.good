@@ -29,9 +29,9 @@ type addr 	-- compatible
 
 		begin ( addr other );	-- copy
 
-		begin ( message [upd], expr fex [opt] );  -- fread 
+		begin ( translator [upd], expr fex [opt] );  -- fread 
 
-		fwrite ( message [upd], expr fex [opt] );	 
+		fwrite ( translator [upd], expr fex [opt] );	 
 
 		is_equal? ( addr other )( bool );
 

@@ -90,6 +90,13 @@ type hp<t>   -- intrinsic
 
 	subroutine foo
 	{
+		<widget>pointer wp:begin:begin;
+		<widget>point wp:begin:begin;
+		<widget>pntr wp:
+
+		widget proxy [upd] ~w -> wp:deref;
+
+
 		hp<widget> wp:begin:begin; -- new hp to actual widget
 		hp<thing> tp:begin( wp );  -- copy wp
 
@@ -144,8 +151,8 @@ type hp<t>   -- intrinsic
 	object collections like trees, lists, and networks.
 	
 	hps are generally portable if <t> is portable.  The 
-	portability message	must be configured with an open heap. 
-	See type message for more info.  :fwrite disables the 
+	portability translator	must be configured with an open heap. 
+	See type translator for more info.  :fwrite disables the 
 	pointer and any attempt to use it after calling :fwrite
 	will disrupt the application.  Object formats are given
 	as extras.
@@ -194,9 +201,9 @@ type hp<t>   -- intrinsic
 
 	general -- <t> dependent portability
 	{
-		begin ( message [upd], expr fex )()( extra );		-- fread
+		begin ( translator [upd], expr fex )()( extra );		-- fread
 
-		fwrite [eval]( message [upd], expr fex )()( extra );
+		fwrite [eval]( translator [upd], expr fex )()( extra );
 	}
 }
 

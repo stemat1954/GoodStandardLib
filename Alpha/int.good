@@ -37,13 +37,13 @@ type int -- elementary, compatible, conventional
 
 		begin ( int other );	-- copy
 
-		begin<#n> ( word<<#n>> w, expr fex );	 -- fread (word conversion)
+		begin<#n> ( word<<#n>> w, expr fex );	 -- word conversion
 
-		begin ( message [upd], expr fex );	-- fread
+		
+		begin ( translator [upd], expr fex );	-- fread
 
-		fwrite ( message [upd], expr fex );
+		fwrite ( translator [upd], expr fex );
 
-		fwrite<wt> ( <wt> w [upd], expr fex );
 
 		is_equal? ( int n )( bool );
 

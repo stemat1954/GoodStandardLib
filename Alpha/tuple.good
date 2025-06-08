@@ -17,10 +17,7 @@ type <#><t>tuple from indexed<<t>> -- compatible and conventional per <t>
 
 	A tuple is portable if <t> is portable.  <t> formats
 	are given as extras.
-
-	Example:
-
-	<'3'><int>tuple point:begin( zero ) with std_copy<int>;
+	
 }}
 {
 	nom type nt_tuple = <<#>><<t>>tuple;
@@ -45,8 +42,8 @@ type <#><t>tuple from indexed<<t>> -- compatible and conventional per <t>
 		begin ( nt_tuple other );								-- with <t> copy
 		begin ( nt_tuple other ) with copier ( <t> )( <t> );	-- with copier
 
-		begin ( message [upd], expr fex )()( extra );  -- fread
-		fwrite ( message [upd], expr fex )()( extra ) with writer ( message [upd], expr fex )( <t> )( extra ); 
+		begin ( translator [upd], expr fex )()( extra );  -- fread
+		fwrite ( translator [upd], expr fex )()( extra );
 	}
 
 	abstract in indexed<<t>>

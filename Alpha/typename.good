@@ -43,9 +43,9 @@ type typename -- intrinsic
 	{
 		begin ( typename other );				-- copy
 
-		begin ( message [upd], expr fex );		-- fread
+		begin ( translator [upd], expr fex );		-- fread
 
-		fwrite ( message [upd], expr fex );
+		fwrite ( translator [upd], expr fex );
 
 		is<t>? ()( bool );		-- iff actual <t>
 

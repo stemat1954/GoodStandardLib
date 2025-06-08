@@ -23,11 +23,11 @@ type bool  -- elementary, intrinsic, compatible, conventional
 	{
 		begin ( expr vex [opt] );	-- original, default = 'false'
 
-		begin ( bool other );		-- dup
+		begin ( bool other );		-- copy
 
-		begin ( message [upd], expr fex );	-- fread
+		begin ( translator [upd], expr fex );	-- fread
 
-		fwrite ( message [upd], expr fex );
+		fwrite ( translator [upd], expr fex );
 
 		is_equal? ( bool other )( bool );
 	
