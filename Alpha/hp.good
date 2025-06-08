@@ -185,7 +185,6 @@ type hp<t>   -- intrinsic
 
 		begin ( typename ) = <t> proxy [init];	-- access new <t> object, typename:is<t>? must be true (may quit)
 
-
 		use_object = <t> proxy;				-- always works (never void)
 
 		is_equal<xt>? ( hp<<xt>> )( bool );

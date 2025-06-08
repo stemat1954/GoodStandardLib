@@ -277,30 +277,10 @@ type message
 	:open_heap and :close_heap allow hp<t> objects to be
 	represented in a message. 
 	
-	Logically, a message heap is a seperate memory segment
-	together with internal indexes and methods that support 
-	reading and writing hp<> pointers and their objects to
-	a message.  
-
-	Before writing an object sequence that contains hp<>
-	pointers, call :open_heap to prepare the message. After
-	the sequence is written, call :close_heap.  
+	Logically, a message heap is an array of messages where
+	each message in the array contains an individual object
+	managed by a heap pointer.  
 	
-	The addrs assigned by :detach and :close_heap can be
-	used to persist the message segments.
-
-	:write_checksum and :read_checksum can be used to 
-	verify message integrity.
-	
-	:write_checksum writes a checksum at wp calculated from
-	all bytes before wp.
-
-	:read_checksum reads a checksum at rp and compares it 
-	to the actual checksum of bytes before rp. A disagreement
-	disrupts the app.
-
-	Note: a heap segment has an internal checksum that is
-	maintained by :open_heap and :close_heap.
 }}
 {
 
@@ -308,12 +288,9 @@ type message
 	{
 		begin ( endian [opt], utf [opt] ); -- original
 
-		begin ( message other [upd] );	   -- vacate
+		begin ( message other [upd] );	   -- take
 
-		begin ( message other );		   -- dup 
-
-
-		enable_auto_align [upd];		-- binary alignment
+		begin ( message other );		   -- copy
 
 
 		get_endian ()( endian );
@@ -321,17 +298,19 @@ type message
 		get_utf ()( utf );
 
 
-		attach [upd]( addr pmem, int size [opt] );
+		detach [upd]( bool checksum )( addr pmem, int size ); 
 
-		detach [upd]()( addr pmem, int size ); 
+		attach [upd]( bool checksum, addr pmem, int size [opt] );
 
 
-		open_heap [upd];  -- empty
+		open_heap [upd];  -- original
 
 		close_heap [upd]()( <message>array );
 
 		restore_heap [upd]( <message>array [upd] );  -- previous
 
+		
+		enable_auto_align [upd];		-- binary alignment
 
 
 		set_size [upd]( int );			-- size = given
@@ -387,10 +366,6 @@ type message
 		read_nul [upd]()( bool );
 
 		
-		write_checksum [upd];
-
-		read_checksum [upd];
-
 
 		fread<t> [upd]( expr fex )( <t> obj );			-- read object, one fex
 

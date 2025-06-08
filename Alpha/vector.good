@@ -2,10 +2,11 @@
 page vector in AlphaByGood
 
 
-type <t><#>vector
+type <#><t>vector
 {{
 	Linear algebra vector with <#> coordinates of numeric type <t>.
 
+	
 	DEFINITION PENDING
 }}
 {
