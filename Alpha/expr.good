@@ -109,7 +109,7 @@ type expr -- intrinsic, conventional
 
 		is_before? ( expr other )( bool );
 
-		count ()( int );
+		measure ()( int );
 
 		extract ( int i, int q )( expr );	-- sub-expression
 

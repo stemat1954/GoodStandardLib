@@ -13,13 +13,12 @@ page channel in StockByGood
 }
 
 
-
 [page] type request
 {{
-	This is an i/o request data structure.  
+	This is an i/o request object.
 			
-	:get_group2 should only be called once because text
-	output takes ownership of memory allocated by device.
+	:get_group2 should only be called once because output
+	string takes ownership of memory allocated by device.
 
 	group2 note is encoded using platform defaults 
 }}
@@ -75,7 +74,7 @@ page channel in StockByGood
 		}
 
 
-		get_group2 [upd] ()( int deficit, channel_report cr, text note ) -- invalidates pnote
+		get_group2 [upd] ()( int deficit, channel_report cr, string note ) -- invalidates io.pnote
 		{
 			deficit:begin( io.deficit );
 			select ( word_to_ascii( io.report )( =ascii ) )
@@ -91,8 +90,8 @@ page channel in StockByGood
 			}
 			if ( "io.pnote |not=| no_addr" )
 			{
-				note:begin:attach( io.pnote ):trim_zero;  -- note owns the pointer
-				io.pnote:reuse:begin;  -- prevent another attachment
+				note:begin( io.pnote, platform_utf, platform_endian );
+				io.pnote = no_addr;  -- prevent another attachment
 			}
 		}
 	}
@@ -122,7 +121,7 @@ page channel in StockByGood
 		int		seek;		-- external origin
 		int		deficit;	-- size	deficit, bytes
 		word8	report;		-- ascii NUL, p, b, t, c, x
-		addr	pnote;		-- zero terminated text
+		addr	pnote;		-- zero terminated unicode string
 	}
 
 
@@ -145,7 +144,7 @@ page channel in StockByGood
 		mediator:begin:attach( pr, sizeof_request ):fread<request>( 'b' )( r );
 	}
 
-	attach ( mediator m [upd], addr pdata, int offset, int size, int deficit, ascii action ) 
+	latch_data ( mediator m [upd], addr pdata, int offset, int size, int deficit, ascii action ) 
 	{
 		int msize:begin( "offset + size" );
 		m:attach( pdata, msize );
@@ -180,12 +179,12 @@ enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 
 	
 
 
-subroutine attach_async_data ( addr preq, mediator m [upd] )( int id, channel_report report, text note ) -- final preq
+subroutine latch_async_data ( addr preq, mediator m [upd] )( int id, channel_report report, string note ) -- final preq
 {
 	restore_request( preq )( request req );
 	req:get_group1()( ascii action, addr pdata, int offset, int size, int seek, id ); -- ignore seek
 	req:get_group2()( int deficit, report, note );
-	attach( *m, pdata, offset, size, deficit, action );
+	latch_data( *m, pdata, offset, size, deficit, action );
 }
 
  
@@ -248,13 +247,13 @@ type channel [incomplete]
 			io.open:begin( true );
 		}
 		
-		close [upd]( text note [opt] )( text other )
+		close [upd]( string note [opt] )( string other )
 		{
 			fix( note, normal_close ) ~note;
 			:internal_close( ~note )( other );
 		}
 
-		check [upd]()( text note ) 
+		check [upd]()( string note ) 
 		{
 			io.lock:wait;
 			if ( "not( io.open )" ) note:begin( io.note );  -- why closed
@@ -265,7 +264,7 @@ type channel [incomplete]
 	
 	base method
 	{
-		execute_sync [upd]( etm wait [opt], ascii action, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
+		execute_sync [upd]( etm wait [opt], ascii action, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note )
 		{
 			io:check()( note );
 			if ( "is_null?( note )" ) -- if not closed
@@ -282,7 +281,7 @@ type channel [incomplete]
 			}
 		}
 
-		execute_async [upd]( int id, handle hq, ascii action, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
+		execute_async [upd]( int id, handle hq, ascii action, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note )
 		{
 			io:check()( note );
 			if ( "is_null?( note )" ) -- if not closed
@@ -298,7 +297,7 @@ type channel [incomplete]
 			}
 		}
 										
-		internal_close [upd]( text note )( text other )
+		internal_close [upd]( string note )( string other )
 		{
 			io.lock:wait;
 			if ( io.open )
@@ -323,13 +322,13 @@ type channel [incomplete]
 			if ( io.open ) kernel\channel_close( io.hch ); 
 		}
 
-		finish [upd]( addr pr )( int deficit, channel_report report, text note )
+		finish [upd]( addr pr )( int deficit, channel_report report, string note )
 		{
 			restore_request( pr )( =request ):get_group2()( deficit, report, note );
 			if ( "report |=| 'error' " )
 			{
 				fix( note, unspecified_error ) ~note;
-				io:internal_close( ~note )( text og_note );
+				io:internal_close( ~note )( string og_note );
 				if ( "is_not_null?( og_note )" ) note = og_note;
 			}
 		}
@@ -337,9 +336,9 @@ type channel [incomplete]
 
 	common  
 	{
-		text normal_close:begin( 'normal close' ) [const];
+		string normal_close:begin( 'normal close' ) [const];
 
-		text unspecified_error:begin( 'unspecified channel error' ) [const];
+		string unspecified_error:begin( 'unspecified channel error' ) [const];
 	}
 	
 	instance	
@@ -347,7 +346,7 @@ type channel [incomplete]
 		handle		hch;
 		toggle		lock;
 		bool		open;
-		text		note [opt];	-- when closed
+		string		note [opt];	-- when closed
 	}
 }
 
@@ -385,14 +384,14 @@ type sync_channel_reader [incomplete]
 			if ( "is_not_null?( wait )" ) io.wait:begin( wait );
 		}
 	
-		read [upd]( mediator m [upd], int seek [opt], etm wait [opt] )( channel_report report, text note ) 
+		read [upd]( mediator m [upd], int seek [opt], etm wait [opt] )( channel_report report, string note ) 
 		{
 			m:get_wp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if ( "rsize |>| zero" )
 			{
 				m:detach()( addr pdata );
 				io:~read( fix( wait, io.wait ), seek, pdata, offset, rsize )( int deficit, report, note ); 
-				attach( *m, pdata, offset, rsize, deficit, 'r' );
+				latch_data( *m, pdata, offset, rsize, deficit, 'r' );
 			}
 			else
 				report:begin( 'good' ); -- nothing to do
@@ -401,7 +400,7 @@ type sync_channel_reader [incomplete]
 
 	abstract method
 	{
-		~read [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note );
+		~read [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note );
 	}
 	
 	instance
@@ -444,14 +443,14 @@ type sync_channel_writer [incomplete]
 			if ( "is_not_null?( wait )" ) io.wait:begin( wait );
 		}
 	
-		write [upd]( mediator m [upd], int seek [opt], etm wait [opt] )( channel_report report, text note ) 
+		write [upd]( mediator m [upd], int seek [opt], etm wait [opt] )( channel_report report, string note ) 
 		{
 			m:get_rp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if ( "rsize |>| zero" )
 			{
 				m:detach()( addr pdata );
 				io:~write( fix( wait, io.wait ), seek, pdata, offset, rsize )( int deficit, report, note ); 
-				attach( *m, pdata, offset, rsize, deficit, 'w' );
+				latch_data( *m, pdata, offset, rsize, deficit, 'w' );
 			}
 			else 
 				report:begin( 'good' ); -- nothing to do
@@ -461,7 +460,7 @@ type sync_channel_writer [incomplete]
 
 	abstract method
 	{
-		~write [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note );
+		~write [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note );
 	}
 	
 
@@ -481,14 +480,14 @@ type async_channel_reader [incomplete]
 		{
 		}
 	
-		read [upd]( int id, handle hq, mediator m [upd], int seek [opt] )( channel_report report, text note ) 
+		read [upd]( int id, handle hq, mediator m [upd], int seek [opt] )( channel_report report, string note ) 
 		{
 			m:get_wp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if (" rsize |>| zero ")
 			{
 				m:detach()( addr pdata );
 				io:~read( id, hq, seek, pdata, offset, rsize )( int deficit, report, note ); 
-				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) attach( *m, pdata, offset, rsize, deficit, 'r' );
+				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) latch_data( *m, pdata, offset, rsize, deficit, 'r' );
 			}
 			else
 				report:begin( 'good' ); -- nothing to do
@@ -498,7 +497,7 @@ type async_channel_reader [incomplete]
 
 	abstract method
 	{
-		~read [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note );
+		~read [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note );
 	}
 }
 
@@ -511,14 +510,14 @@ type async_channel_writer [incomplete]
 		{
 		}
 	
-		write [upd]( int id, handle hq, mediator m [upd], int seek [opt] )( channel_report report, text note ) 
+		write [upd]( int id, handle hq, mediator m [upd], int seek [opt] )( channel_report report, string note ) 
 		{
 			m:get_rp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if ( "rsize |>| zero" )
 			{
 				m:detach()( addr pdata );
 				io:~write( id, hq, seek, pdata, offset, rsize )( int deficit, report, note ); 
-				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) attach( *m, pdata, offset, rsize, deficit, 'w' );
+				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) latch_data( *m, pdata, offset, rsize, deficit, 'w' );
 			}
 			else
 				report:begin( 'good' ); -- nothing to do
@@ -528,7 +527,7 @@ type async_channel_writer [incomplete]
 
 	abstract method
 	{
-		~write [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note );
+		~write [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note );
 	}
 	
 }
@@ -549,7 +548,7 @@ type sync_read_only_channel from ( channel, sync_channel_reader )
 
 	abstract in sync_channel_reader
 	{
-		[final] ~read [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
+		[final] ~read [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note )
 		{
 			io:as_base<channel>:execute_sync( wait, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
@@ -571,7 +570,7 @@ type sync_write_only_channel from ( channel, sync_channel_writer )
 
 	abstract in sync_channel_writer
 	{
-		[final] ~write [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
+		[final] ~write [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note )
 		{
 			io:as_base<channel>:execute_sync( wait, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
@@ -593,7 +592,7 @@ type sync_read_write_channel from ( channel, sync_channel_reader, sync_channel_w
 
 	abstract in sync_channel_reader
 	{
-		[final] ~read [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
+		[final] ~read [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note )
 		{
 			io:as_base<channel>:execute_sync( wait, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
@@ -601,7 +600,7 @@ type sync_read_write_channel from ( channel, sync_channel_reader, sync_channel_w
 
 	abstract in sync_channel_writer
 	{
-		[final] ~write [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
+		[final] ~write [upd]( etm wait [opt], int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note )
 		{
 			io:as_base<channel>:execute_sync( wait, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
@@ -623,7 +622,7 @@ type async_read_only_channel from ( channel, async_channel_reader )
 
 	abstract in async_channel_reader
 	{
-		[final] ~read [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
+		[final] ~read [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note )
 		{
 			io:as_base<channel>:execute_async( id, hq, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
@@ -645,7 +644,7 @@ type async_write_only_channel from ( channel, async_channel_writer )
 
 	abstract in async_channel_writer
 	{
-		[final] ~write [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
+		[final] ~write [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note )
 		{
 			io:as_base<channel>:execute_async( id, hq, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
@@ -668,7 +667,7 @@ type async_read_write_channel from ( channel, async_channel_reader, async_channe
 
 	abstract in async_channel_reader
 	{
-		[final] ~read [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
+		[final] ~read [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note )
 		{
 			io:as_base<channel>:execute_async( id, hq, 'r', seek, pdata, offset, size )( deficit, report, note );
 		}
@@ -677,7 +676,7 @@ type async_read_write_channel from ( channel, async_channel_reader, async_channe
 
 	abstract in async_channel_writer
 	{
-		[final] ~write [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, text note )
+		[final] ~write [upd]( int id, handle hq, int seek [opt], addr pdata, int offset, int size )( int deficit, channel_report report, string note )
 		{
 			io:as_base<channel>:execute_async( id, hq, 'w', seek, pdata, offset, size )( deficit, report, note );
 		}
