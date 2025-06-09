@@ -82,9 +82,9 @@ type fp2 -- elementary, compatible, conventional
 		begin<#n> ( word<<#n>> w, expr fex );	-- word conversion
 
 
-		begin ( translator [upd], expr fex );	-- fread 
+		begin ( mediator [upd], expr fex );	-- fread 
 
-		fwrite ( translator [upd], expr fex );	
+		fwrite ( mediator [upd], expr fex );	
 
 
 		is_equal? ( fp2 x )( bool );

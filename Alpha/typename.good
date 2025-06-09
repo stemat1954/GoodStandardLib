@@ -43,9 +43,9 @@ type typename -- intrinsic
 	{
 		begin ( typename other );				-- copy
 
-		begin ( translator [upd], expr fex );		-- fread
+		begin ( mediator [upd], expr fex );		-- fread
 
-		fwrite ( translator [upd], expr fex );
+		fwrite ( mediator [upd], expr fex );
 
 		is<t>? ()( bool );		-- iff actual <t>
 

@@ -1,5 +1,5 @@
 
-page translator in AlphaByGood
+page mediator in AlphaByGood
 
 
 enum type endian ( 'little-endian', 'big-endian' );		
@@ -18,13 +18,14 @@ common
 
 
 
-type translator 
+type mediator 
 {{
-	A translator transforms and conveys object data.
+	A mediator translates and conveys object data from 
+	internal to external memory, and back.
 
-	A translator encapsulates a heap memory addr and
-	provides methods for formatting and parsing arbitrary
-	external data.  
+	A mediator encapsulates a heap memory addr and provides
+	methods for formatting and parsing arbitrary external
+	data.  
 	
 	Many Alpha types support precise external data formats.
 	Types that support external formats are "portable."
@@ -47,11 +48,11 @@ type translator
 
 	general method
 	{
-		begin ( translator [upd], expr fex );
-		begin ( translator [upd], expr fex )()( extra );
+		begin ( mediator [upd], expr fex );
+		begin ( mediator [upd], expr fex )()( extra );
 
-		fwrite ( translator [upd], expr fex );
-		fwrite ( translator [upd], expr fex )()( extra );
+		fwrite ( mediator [upd], expr fex );
+		fwrite ( mediator [upd], expr fex )()( extra );
 	}
 
 	A portable type needs at least one conventional :begin
@@ -59,8 +60,9 @@ type translator
 
 
 	"fex" is a type dependent format expression interpreted
-	by the object. Supported formats and the exprs that
-	describe them are documented in the Alpha Type Reference.
+	by the portability method. Supported formats and the 
+	exprs that describe them are documented in the Alpha 
+	Type Reference.
 
 	Note:  A particular type may support numerous external
 	formats and versions of those formats.	Format exprs
@@ -93,10 +95,10 @@ type translator
 	standing of usage to avoid creating a corrupt and
 	totally useless product.  So, programmer beware!
 
-	A translator has two modal formatting options that 
+	A mediator has two modal formatting options that 
 	supplement individual format specs:  endianess and
 	UTF (Unicode Transformational Format). Modal format
-	options are specified when a translator is initialized.
+	options are specified when a mediator is initialized.
 
 	Note:  Default modal format is controlled by two common
 	settings. Initial defaults are set at startup to plat-
@@ -106,10 +108,10 @@ type translator
 		
 	Endianess controls byte order.  For example, if an int
 	fex specifies an 8 byte, twos-complement binary value,
-	and a translator is initialized with 'little-endian', 
+	and a mediator is initialized with 'little-endian', 
 	the 8 int bytes are serially written least-significant 
 	to most-significant in memory.  Conversly,  if the 
-	translator is initialized with 'big-endian', the 8 bytes
+	mediator is initialized with 'big-endian', the 8 bytes
 	are serially written most-significant to least-signifi-
 	cant in memory.
 
@@ -123,32 +125,32 @@ type translator
 	Note: External memory can contain an arbitrary mix of 
 	object data stored using binary and text formats. 
 	
-	An output translator automatically allocates heap memory
+	An output mediator automatically allocates heap memory
 	to contain translated data. Translated data is naturally 
 	intended for external consumption, so at some point the
-	memory must be detached from the translator and	given to
+	memory must be detached from the mediator and given to
 	some compatible subroutine (e.g.kernel subroutine) for
 	final disposition.  
 	
-	Detaching memory creates an unattached translator and
-	an orphan memory block that must be reattached to some
-	translator or freed by some other procedure. Basically,
-	the translator disowns detached memory. Detaching memory
-	does not affect the translator's internal read/write
-	position cursors.
+	Detaching memory creates a detached mediator and an orphan
+	memory block that must be reattached to some mediator or
+	released by some other procedure. Basically, the mediator
+	disowns the detached memory. Detaching memory does not 
+	affect the mediator's internal read/write position 
+	cursors.
 
 	External heap memory can be attached (or reattached) to 
-	an unattached translator.  The memory usually originates 
-	from another translator or from a compatible subroutine.
-	The memory block may or may not contain	formatted data.
-	Once external memory is attached to a translator, the 
-	translator owns the memory and applications must not 
-	allow the given	addr to be used by any other procedure.
+	a detached mediator.  The memory usually originates from 
+	another mediator or from a compatible subroutine. The 
+	memory block may or may not contain	formatted data. Once 
+	external memory is attached to a mediator, the mediator
+	owns the memory and applications must not allow the given
+	addr to be used by any other procedure.
 	
 	When an application uses advanced methods to construct 
-	a data image, it generally needs to manipulate size and
-	two position cursors rp (read position or pointer) and
-	wp (write position or pointer).
+	an object image, it generally needs to manipulate size 
+	and	two position cursors rp (read position or pointer) 
+	and	wp (write position or pointer).
 	
 	Size measures the logical extent of	formatted data
 	in bytes, rp defines the current (next) read position
@@ -223,12 +225,12 @@ type translator
 	If the block is shifted up (positive) beyond size, 
 	size will be increased and wp will be at the end. Other-
 	wise, size is not changed. Shifting memory generally
-	leaves holes in the translator, so the application must
+	leaves holes in the mediator, so the application must
 	adjust size (truncate) and/or fill holes as needed.
 	 
-	:copy copies a q-byte block from a source translator 
+	:copy copies a q-byte block from a source mediator 
 	without changing source rp.  Thus, the given source 
-	translator does not need [upd] access permission.
+	mediator does not need [upd] access permission.
 	
 	(1) block read up to q bytes from source using given
 		rp or source rp
@@ -236,13 +238,13 @@ type translator
 	(3) set it rp = it wp
 	(4) block write q2 bytes from it wp
 
-	If rp *is* specified, it overrides the source translator 
+	If rp *is* specified, it overrides the source mediator 
 	rp.  If q is not specified (null), all data is copied 
 	from the source starting at the effective rp.  When the
 	method returns, (this) rp is at the start of copied 
 	data and (this) wp is at the end. Size is increased (or
 	not) as neccessary. Copying	memory may leave holes in
-	the translator, so the	application must adjust size 
+	the mediator, so the	application must adjust size 
 	(truncate) and/or fill holes as necessary.
 
 
@@ -283,24 +285,21 @@ type translator
 	written, and assigns 'true' to an output bool.  If the
 	next char is not 'NUL', rp is not moved and the output
 	is 'false'.
+			
+	Object pointer (op) service is optional and provided by
+	an internal array of mediators.  Each op mediator encap-
+	sulates an individual object image, and pointers in the
+	assembly of mediators index a mediator that represents
+	the encapsulates the pointer's object.	Shared refer-
+	ences are properly maintained.
 
-		
-	<t>pointer service is optional and provided thriugh an
-	internal array of translators, where each translator 
-	encapsulates an individual object referenced by an object
-	pointer. Shared references are properly maintained.
+	:open_op_service enables op<t> mediation.
 
-	:open_pointer_service enables <t>pointer translation.
-
-	:close_pointer_service disables <t> pointer translation
-	and assigns the translator array to an output.
+	:close_op_service disables op<t> mediation and assigns
+	the mediator array to an output.
 	
 	Pointer service is useful (necessary) for peristing a 
-	complex network of objects.  Generally, to persist a
-	network of objects, primary and auxiliary translator
-	memory is detached and written to persistent media in 
-	some order.  To restore the network, the process is
-	reversed. 
+	complex network of objects. 
 }}
 {
 
@@ -308,9 +307,9 @@ type translator
 	{
 		begin ( endian [opt], utf [opt] ); -- original
 
-		begin ( translator other [upd] );   -- take 
+		begin ( mediator other [upd] );   -- take 
 
-		begin ( translator other );		   -- copy
+		begin ( mediator other );		   -- copy
 
 
 		get_endian ()( endian );
@@ -318,16 +317,16 @@ type translator
 		get_utf ()( utf );
 
 
-		detach [upd]( bool checksum )( addr pmem, int size ); 
+		detach [upd]( bool checksum [opt] )( addr pmem, int size ); 
 
-		attach [upd]( bool checksum, addr pmem, int size [opt] );
+		attach [upd]( addr pmem, int size [opt], bool checksum [opt] );
 
 
-		open_pointer_service [upd];  -- original
+		open_op_service [upd];  -- original
 
-		open_pointer_service [upd]( <translator>array [upd] );  -- restore
+		open_op_service [upd]( <mediator>array [upd] );  -- restore
 
-		close_pointer_service [upd]()( <translator>array );
+		close_op_service [upd]()( <mediator>array );
 
 		
 		enable_auto_align [upd];		-- binary alignment
@@ -398,6 +397,6 @@ type translator
 
 		move [upd]( int q, int n );		-- see notes
 
-		copy [upd]( translator source, int q [opt], int rp [opt] )( int q2 );	-- see notes
+		copy [upd]( mediator source, int q [opt], int rp [opt] )( int q2 );	-- see notes
 	}
 }

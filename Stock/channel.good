@@ -8,7 +8,7 @@ page channel in StockByGood
 
 	begin
 	{
-		message:begin:fwrite<request>( request:begin, 'b' ):get_size()( sizeof_request );
+		mediator:begin:fwrite<request>( request:begin, 'b' ):get_size()( sizeof_request );
 	}
 }
 
@@ -54,12 +54,12 @@ page channel in StockByGood
 			io.pnote:begin;
 		}
 
-		begin ( message [upd], expr fex )	
+		begin ( mediator [upd], expr fex )	
 		{
 			%infer
 		}
 
-		fwrite ( message [upd], expr fex )	
+		fwrite ( mediator [upd], expr fex )	
 		{
 			%infer
 		}
@@ -137,15 +137,15 @@ page channel in StockByGood
 {
 	format_request ( request r )( addr pr )  -- orphan pr
 	{
-		message:begin:fwrite<request>( r, 'b' ):detach()( pr ); 
+		mediator:begin:fwrite<request>( r, 'b' ):detach()( pr ); 
 	}
 
 	restore_request ( addr pr )( request r )  -- final pr 
 	{
-		message:begin:attach( pr, sizeof_request ):fread<request>( 'b' )( r );
+		mediator:begin:attach( pr, sizeof_request ):fread<request>( 'b' )( r );
 	}
 
-	attach ( message m [upd], addr pdata, int offset, int size, int deficit, ascii action ) 
+	attach ( mediator m [upd], addr pdata, int offset, int size, int deficit, ascii action ) 
 	{
 		int msize:begin( "offset + size" );
 		m:attach( pdata, msize );
@@ -180,7 +180,7 @@ enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 
 	
 
 
-subroutine attach_async_message ( addr preq, message m [upd] )( int id, channel_report report, text note ) -- final preq
+subroutine attach_async_data ( addr preq, mediator m [upd] )( int id, channel_report report, text note ) -- final preq
 {
 	restore_request( preq )( request req );
 	req:get_group1()( ascii action, addr pdata, int offset, int size, int seek, id ); -- ignore seek
@@ -193,7 +193,7 @@ subroutine attach_async_message ( addr preq, message m [upd] )( int id, channel_
 type channel [incomplete]  
 {{
 	A channel is an object for communicating with external
-	processes and devices using messages.
+	processes and devices using mediators.
 
 	A channel handle is given at :begin time and respon-
 	sibility for the handle is assumed by the channel.  The 
@@ -355,24 +355,24 @@ type channel [incomplete]
 type sync_channel_reader [incomplete]
 {{
 	A sync_channel_reader is an adaptable channel reader.
-	Messages are transferred synchronously.
+	Data is transferred synchronously.
 	
-	:read transfers data from the channel to a given message
+	:read transfers data from the channel to a given mediator
 	via abstract :~read.
 
-	Data is placed at the current message wp. Request size
-	is calculated from message size and wp.
+	Data is placed at the current mediator wp. Request size
+	is calculated from current mediator size and wp.
 	
-	Message wp is updated to reflect the amount of data
+	Mediator wp is updated to reflect the amount of data
 	actually transferred.  The application can compare wp
-	to message size to calculate a deficit.
+	to size to calculate a deficit.
 
 	Output report is always well-defined.  If there is no
 	deficit, it will be 'good'.  Otherwise, report explains 
 	why	there is a deficit.  Output note is channel dependent
 	and	may or may not be well defined for any report.
 	
-	:read can be called in a loop until	message:wp_end? 
+	:read can be called in a loop until	mediator:wp_end? 
 	returns true, provided report doesn't imply that another
 	read is pointless.
 }}
@@ -385,7 +385,7 @@ type sync_channel_reader [incomplete]
 			if ( "is_not_null?( wait )" ) io.wait:begin( wait );
 		}
 	
-		read [upd]( message m [upd], int seek [opt], etm wait [opt] )( channel_report report, text note ) 
+		read [upd]( mediator m [upd], int seek [opt], etm wait [opt] )( channel_report report, text note ) 
 		{
 			m:get_wp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if ( "rsize |>| zero" )
@@ -414,17 +414,17 @@ type sync_channel_reader [incomplete]
 type sync_channel_writer [incomplete]
 {{
 	A sync_channel_writer is an adaptable channel writer.
-	Messages are transferred synchronously.
+	data is transferred synchronously.
 	
-	:write transfers data from a given message to the channel
+	:write transfers data from a given mediator to the channel
 	via :_write.
 
-	Data is copied from the current message rp. Request size
-	is calculated from message size and rp.
+	Data is copied from the current mediator rp. Request size
+	is calculated from mediator size and rp.
 	
-	Message wp is updated to reflect the amount of data
+	Mediator wp is updated to reflect the amount of data
 	actually transferred.  The application can compare wp
-	to message size to calculate a deficit.
+	to size to calculate a deficit.
 
 	Output report is always well-defined.  If there is no
 	deficit, it will be 'good'.  Otherwise, report 
@@ -432,7 +432,7 @@ type sync_channel_writer [incomplete]
 	dependent and may or may not be well defined for any
 	report.
 	
-	:write can be called in a loop until message:rp_end? 
+	:write can be called in a loop until mediator:rp_end? 
 	returns true, provided report doesn't imply that another
 	write is pointless.
 }}
@@ -444,7 +444,7 @@ type sync_channel_writer [incomplete]
 			if ( "is_not_null?( wait )" ) io.wait:begin( wait );
 		}
 	
-		write [upd]( message m [upd], int seek [opt], etm wait [opt] )( channel_report report, text note ) 
+		write [upd]( mediator m [upd], int seek [opt], etm wait [opt] )( channel_report report, text note ) 
 		{
 			m:get_rp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if ( "rsize |>| zero" )
@@ -481,7 +481,7 @@ type async_channel_reader [incomplete]
 		{
 		}
 	
-		read [upd]( int id, handle hq, message m [upd], int seek [opt] )( channel_report report, text note ) 
+		read [upd]( int id, handle hq, mediator m [upd], int seek [opt] )( channel_report report, text note ) 
 		{
 			m:get_wp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if (" rsize |>| zero ")
@@ -511,7 +511,7 @@ type async_channel_writer [incomplete]
 		{
 		}
 	
-		write [upd]( int id, handle hq, message m [upd], int seek [opt] )( channel_report report, text note ) 
+		write [upd]( int id, handle hq, mediator m [upd], int seek [opt] )( channel_report report, text note ) 
 		{
 			m:get_rp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if ( "rsize |>| zero" )

@@ -18,7 +18,7 @@ page list1 in StockByGood
 
 
 
-nom type link1 = hp<node1>;
+nom type link1 = op<node1>;
 
 
 type node1 [incomplete]

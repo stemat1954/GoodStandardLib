@@ -72,9 +72,9 @@ type word<#> -- elementary, compatible (up to word32), conventional
 		begin ( fp10 r, expr fex );					-- fp10 conversion, fp fex for encoding
 
 
-		begin ( translator [upd], expr fex );		-- fread
+		begin ( mediator [upd], expr fex );		-- fread
 
-		fwrite ( translator [upd], expr fex ) ;	
+		fwrite ( mediator [upd], expr fex ) ;	
 		
 
 		is_equal? ( word<<#>> w )( bool );
