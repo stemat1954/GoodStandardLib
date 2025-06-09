@@ -73,7 +73,7 @@ type list1_cursor
 		{
 			if ( "is_not_null?( io.link1 )" ) 
 			{
-				io.link1:use_object:get_link()( link1 next );
+				io.link1:deref:get_link()( link1 next );
 				io.link1:reuse;
 				if ( "is_not_null?( next )" ) io.link1:begin( next );
 			}
@@ -86,7 +86,7 @@ type list1_cursor
 
 		use_node = node1 proxy  ~n
 		{
-			if ( "is_not_null?( io.link1 )" ) ~n -> io.link1:use_object; 
+			if ( "is_not_null?( io.link1 )" ) ~n -> io.link1:deref; 
 		}
 	}
 
@@ -156,7 +156,7 @@ type list1 from serial<node1><list1_cursor>
 	:get methods copy a named link if it exists. Once a 
 	named link is copied, the list is traversed by calling 
 
-		:use_object:get_link()( link1 next )
+		:deref:get_link()( link1 next )
 
 	until next is null.
 
@@ -204,7 +204,7 @@ type list1 from serial<node1><list1_cursor>
 
 		get_next ()( link1 ) 
 		{
-			if ( "is_not_null?( io.current )" ) io.current:use_object:get_link()( given\link1 );
+			if ( "is_not_null?( io.current )" ) io.current:deref:get_link()( given\link1 );
 		}
 		
 
@@ -231,7 +231,7 @@ type list1 from serial<node1><list1_cursor>
 			}
 			else
 			{
-				io.current:use_object:get_link()( link1 nl ); 
+				io.current:deref:get_link()( link1 nl ); 
 				if ( "is_not_null?( nl )" ) io.current = nl;
 			}
 		}
@@ -243,20 +243,20 @@ type list1 from serial<node1><list1_cursor>
 				
 		insert [upd]( link1 )  -- after current  
 		{
-			given\link1:use_object[upd]:unlink;  -- just in case
+			given\link1:deref[upd]:unlink;  -- just in case
 			if ( "is_not_null?( io.current )" )  
 			{
 				-- after current
-				io.current:use_object[upd]:get_link()( link1 before ):set_link( given\link1 ); 
+				io.current:deref[upd]:get_link()( link1 before ):set_link( given\link1 ); 
 				if ( "is_null?( before )" )
 					io.last = given\link1 
 				else
-					given\link1:use_object[upd]:set_link( before );
+					given\link1:deref[upd]:set_link( before );
 			}
 			else if ( "is_not_null?( io.first )" )
 			{
 				-- front (before first)
-				given\link1:use_object[upd]:set_link( io.first );
+				given\link1:deref[upd]:set_link( io.first );
 				io.first = given\link1;
 			}
 			else 
@@ -272,20 +272,20 @@ type list1 from serial<node1><list1_cursor>
 			if ( "is_not_null?( io.current )" ) 
 			{
 				-- node after current
-				io.current:use_object:get_link()( link1 next );
+				io.current:deref:get_link()( link1 next );
 				if ( "is_not_null?( next )" ) 
 				{
-					next:use_object[upd]:get_link()( link1 next_next ):unlink;
+					next:deref[upd]:get_link()( link1 next_next ):unlink;
 					if ( "is_null?( next_next )" )
 						io.last = io.current -- new last
 					else 
-						io.current:use_object[upd]:set_link( next_next );
+						io.current:deref[upd]:set_link( next_next );
 				}
 			}
 			else if ( "is_not_null?( io.first )" ) 
 			{
 				-- first node
-				io.first:use_object[upd]:get_link()( link1 next_next ):unlink;
+				io.first:deref[upd]:get_link()( link1 next_next ):unlink;
 				if ( "is_null?( next_next )" )
 				{
 					-- list is empty now
@@ -398,25 +398,25 @@ type <t>list1 from list1
 		use_first = <t> proxy [eval,init] ~item  -- may be void
 		{
 			io:as_base<list1>:get_first()( link1 nl );
-			if ( "is_not_null?( nl )" ) ~item -> nl:use_object:as_actual<t_node>:use_item;
+			if ( "is_not_null?( nl )" ) ~item -> nl:deref:as_actual<t_node>:use_item;
 		}
 
 		use_last = <t> proxy [eval,init] ~item -- may be void
 		{
 			io:as_base<list1>:get_last()( link1 nl );
-			if ( "is_not_null?( nl )" ) ~item -> nl:use_object:as_actual<t_node>:use_item;
+			if ( "is_not_null?( nl )" ) ~item -> nl:deref:as_actual<t_node>:use_item;
 		}
 
 		use_current = <t> proxy [eval,init] ~item -- may be void
 		{
 			io:as_base<list1>:get_current()( link1 nl );
-			if ( "is_not_null?( nl )" ) ~item -> nl:use_object:as_actual<t_node>:use_item;
+			if ( "is_not_null?( nl )" ) ~item -> nl:deref:as_actual<t_node>:use_item;
 		}
 
 		use_next = <t> proxy [eval,init] ~item -- may be void
 		{
 			io:as_base<list1>:get_next()( link1 nl );
-			if ( "is_not_null?( nl )" ) ~item -> nl:use_object:as_actual<t_node>:use_item;
+			if ( "is_not_null?( nl )" ) ~item -> nl:deref:as_actual<t_node>:use_item;
 		}
 
 		remove_next [upd] ()( <t> item ) with copier ( <t> )( <t> )
@@ -424,7 +424,7 @@ type <t>list1 from list1
 			io:as_base<list1>:get_next()( link1 nl );
 			if ( "is_not_null?( nl )" ) 
 			{
-				copier( nl:use_object:as_actual<t_node>:use_item )( item );
+				copier( nl:deref:as_actual<t_node>:use_item )( item );
 				io:as_base<list1>:remove_next;
 			}
 		}
@@ -434,7 +434,7 @@ type <t>list1 from list1
 			io:as_base<list1>:get_next()( link1 nl );
 			if ( "is_not_null?( nl )" ) 
 			{
-				taker( *nl:use_object:as_actual<t_node>:use_item )( item );
+				taker( *nl:deref:as_actual<t_node>:use_item )( item );
 				io:as_base<list1>:remove_next;
 			}
 		}
