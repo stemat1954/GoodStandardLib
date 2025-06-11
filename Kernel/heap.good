@@ -24,12 +24,14 @@ subroutine
 
 	heap_realloc ( int s, addr bp [upd] );
 
+	heap_free ( addr bp [upd] );
+
+
 	heap_size ( addr bp, int s [upd] );    
 
 	heap_copy ( addr bp, int i, int s, int j );				-- intra-block
 
 	heap_copy ( addr bp, int i, int s, addr bp2, int j );	-- inter-block
 
-	heap_free ( addr bp );
 }
 

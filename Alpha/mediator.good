@@ -20,8 +20,10 @@ common
 
 type mediator 
 {{
-	A mediator translates and conveys object data from 
-	internal to external memory, and back.
+	A mediator facilitates transfer of object data from 
+	object to external memory and back. Generally, data	is
+	transformed between internal and external formats during
+	the transfer.
 
 	A mediator encapsulates a heap memory addr and provides
 	methods for formatting and parsing arbitrary external
@@ -376,13 +378,13 @@ type mediator
 		get_indent ()( int );			-- out = indent
 
 
-		write_new_line [upd]( expr label );	
+		write_new_line [upd]( expr label );	-- ascii (CR) LF label (platform dependent)
 
-		read_new_line [upd]()( expr label );
+		read_new_line [upd]()( expr label ); -- ditto
 		
-		write_nul [upd];
+		write_nul [upd];				-- ascii NUL
 
-		read_nul [upd]()( bool );
+		read_nul [upd]()( bool );		-- ditto
 				
 
 		fread<t> [upd]( expr fex )( <t> obj );			-- read object, one fex

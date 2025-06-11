@@ -1,0 +1,86 @@
+
+page string in AlphaByGood
+
+type string
+{{
+	A string is a static unicode character sequence.
+	
+	strings have [eval] methods that mimic expr methods.
+	They can be copied and evaluated, but not modified.
+
+	There are 5 ways to create a string:
+	
+	(1) using a heap addr:
+
+		string assumes ownership of addr.  If len is not
+		specified, sequence must be delimited by a zero 
+		char (aka "null-terminated").  Encoding	must be 
+		specified.  Note: a mediator or compatible sub-
+		routine is usually the source for this initial-
+		izer.
+	
+	(2) from array of characters:
+
+		encoding must be specified
+
+	(3) from ascii expr (literal):
+
+		If encoding is not specified, default encoding is
+		used (see alpha\mediator).
+
+	(4) from mediator
+
+		fex specifies which encoding and delimitation.
+		Binary formats usually use intrinsic string encoding
+		and length or null delimitation. Text formats use 
+		mediator encoding and some kind	of quotation or eol 
+		delimitation.
+
+		Note: generic binary 'b' uses platform encoding and
+		and null-delimitation, making it a platform compat-
+		ible c string.
+
+	(5) copy another
+	
+
+	Since strings can't be modified, internal representation 
+	is undefined.
+
+}}
+{
+	general method
+	{
+		begin ( addr, utf, endian, int len [opt] );  -- encoded sequence
+
+		begin ( <unicode>array, utf, endian );  -- encoded array
+
+		begin ( expr, utf [opt], endian [opt] );  -- expr/literal conversion
+
+		begin ( string other );  -- copy 
+
+		begin ( mediator [upd], expr fex );	-- fread
+
+		fwrite ( mediator [upd], expr fex );
+		
+
+		get_encoding ()( utf, endian );
+		
+		get_length ()( int );
+
+
+		is_equal? ( string other, int q [opt] )( bool ); 
+
+		is_before? ( string other )( bool );
+
+
+		extract ( int i, int q )( string );	-- sub-expression
+
+		extract ( int i )( unicode );	 -- one char 
+
+		extract ( int i [opt], int q [opt] )( <unicode>array );  -- multiple chars
+
+		find ( string other, int i [upd] )( bool );
+
+		scan ( int i [upd] ) with stop? ( string, int i )( bool );
+	}
+}

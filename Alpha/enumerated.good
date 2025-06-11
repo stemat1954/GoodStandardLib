@@ -28,7 +28,7 @@ type enumerated  -- intrinsic
 	{
 		begin ( int );
 
-		use_int = int proxy [eval];
+		use_int_value = int proxy [eval];
 	}
 
 }

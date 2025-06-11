@@ -65,34 +65,17 @@ type expr -- intrinsic, conventional
 	All expr methods have [eval] intent. Once an expr has
 	been initialized, it cannot be changed.
 
-	Note:  An expr is not suitable for general purpose
-	text.  See stock\text for a general solution.
-
 	Several methods are provided for expr analysis: 
-	:count, :is_equal? and :is_before?, :extract, :find,
-	and :scan.
+	:get_length(), :is_equal? and :is_before?, :extract, 
+	:find, and :scan.
 	
 	:extract methods extract ascii character objects. See
 	alpha\ascii for details.
 	
-	Expressions are portable.
-
-	Binary formats incorporate a length or delimiter,
-	and characters are represented by one byte decimal
-	values between 0 and 255.
-
-	Text formats support conversion between external 
-	unicode and internal extended ascii. Since unicode 
-	is compatible with standard (7 bit)	ascii, conversion
-	is well defined and nominal for	characters between 0
-	and 127.  However, characters between 128 and 255 can
-	have various interpretations depending on which version
-	of extended ascii an application is using. Several 
-	common extensions are supported, but in general, using
-	characters between 128 and 255 introduces platform
-	dependencies that should be avoided.
-
-	See documentation for supported formats.
+	Expressions are portable. The format expr (fex) specifies
+	both encoding and delimitation.  Encoding can be either
+	8-bit ascii (ignore mediator utf) or mediator utf. 
+	Several forms pf delimitiation are supported.
 }}
 {
 	general 	
@@ -109,7 +92,7 @@ type expr -- intrinsic, conventional
 
 		is_before? ( expr other )( bool );
 
-		measure ()( int );
+		get_length ()( int );
 
 		extract ( int i, int q )( expr );	-- sub-expression
 

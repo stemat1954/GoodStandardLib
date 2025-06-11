@@ -139,6 +139,27 @@ subroutine -- selectors
 }
 
 
+subroutine	-- string conversion
+{{
+	These subroutines convert between alpha strings and 
+	c-compatible strings.
+	
+	c-compatible strings are null-terminated, use platform 
+	encoding, and are referenced by heap addr. 
+}}
+{
+	alpha_to_cstr ( string )( addr )  -- orphan addr
+	{
+		text_editor:begin( platform_utf, platform_endian ):write( given\string ):add_zero():detach()( given\addr );
+	}
+
+	cstr_to_alpha ( addr )( string ) -- string owns addr
+	{
+		given\string:begin( given\addr, platform_utf, platform_endian );
+	}
+}
+
+
 subroutine  --  coroutines
 {
 	std_copy<t> ( <t> a )( <t> b )

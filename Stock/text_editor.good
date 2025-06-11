@@ -1,0 +1,748 @@
+
+page text_editor in StockByGood
+
+
+
+enum type match_mode ( 'exact', 'similar', 'regex' );
+
+subroutine
+{
+	exact_match? ( text_editor ped [upd], unicode c, sign d, expr fex )( bool yes )
+	{{
+		This coroutine works for all character sets. Characters
+		in the pattern editor and input characters are matched 
+		one-for-one	exactly by code-point value.
+
+		If output is null, the match is pending.
+	}}
+	{
+		int code;
+		if ( "d |=| 'positive'" )
+			ped:fread( fex )( code )
+		else -- 'negative'
+			ped:get_rp()( int mark ):fread( fex )( code ):set_rp( mark ):dec_rp;
+			
+		if ( "code as unicode |not=| c" ) yes:begin( false )
+		else if ( "rp_end?( pattern )" ) yes:begin( true );
+	}
+
+
+	similar_match? ( text_editor ped [upd], unicode c, sign d, expr fex )( bool yes )
+	{{
+		This coroutine matches consecutive white-space in the 
+		pattern editor to consecutive input white-space, and 
+		matches pattern letters	to input letters regardless	of
+		case.
+	}}
+	{
+	}
+
+
+	regex_match? ( text_editor ped [upd], unicode c, sign d, expr fex )( bool yes )
+	{
+	}
+
+}
+
+
+
+type text_editor 
+{{
+	A text_editor is a specialized unicode text mediator.
+	It formats and parses external unicode images.  
+
+	A text_editor doesn't derive from mediator.  Rather, it
+	encapsulates one. 
+	
+	Most applications can use editor methods alone to
+	accomplish common serial formatting and parsing tasks.
+	However, more advanced applications will need access to
+	the	encapsulated mediator to manipulate the read/write 
+	cursors, and to send/receive unicode images over a 
+	channel.  Use :as_mediator for this purpose.
+	
+	Encoding of the unicode image is specified when the 
+	editor is initialized.
+
+	Note:  Generally, stock methods and subroutines use 
+	default encoding to edit unicode text.  Default encod-
+	ing is defined by well-known alpha\default_utf and 
+	alpha\default_endian.
+	
+	The external unicode image is stored as a sequence of
+	integer codepoints that represent characters. utf 
+	encoding specified at initialization is mapped into 
+	two values that define the codepoint representation 
+	in memory:
+
+	utf token		int fex			code unit (bytes)
+
+	'UTF-8'			'b:utf8'		1
+	'UTF-16'		'b:utf16'		2
+	'UTF-32'		'b:utf32'		4
+
+	Note: the actual reading and writing of a codepoint	is
+	handled by alpha\int portability methods.
+
+	Object values can be mediated to and from the unicode
+	image using generic formatted read and write methods.
+	Only text format expressions will yield sensible results
+	of course.
+	
+	Textual objects like expr, string, ascii, and unicode 
+	can be read and written using formatted fread and fwrite
+	like any other object. However, unformatted read and
+	write methods are also provided to allow applications to
+	explicitly control formatting.
+
+	Unformatted transfers copy codepoints as integer values 
+	and apply encoding conversions as necessary.  In par-
+	ticular, exprs generally need ascii <-> editor conver-
+	sion, and strings may need string <-> editor conversion.
+
+	Unformatted reads of more than one char require a delim-
+	iter char spec. The delimiter is not transferred and
+	presumably it's known to be in the external image. If 
+	not, all remaining chars are read.
+	
+
+	Editor :detach transfers editor memory to an output string.
+	Once detached, the editor is logically empty.
+
+}}
+{
+	general method
+	{
+		begin ( utf f [opt], endian e [opt] )  -- original, empty
+		{
+			io.mediator:begin( e, f );
+			describe_utf( f )( io.codepoint_unit, io.codepoint_fex );
+		}
+
+		begin ( string )  -- string copy conversion
+		{
+			given\string:get_encoding( utf f, endian e );
+			io.mediator:begin( e, f );
+			io:write( given\string );
+		}
+
+		begin ( expr ) -- expr copy conversion 
+		{
+			io.mediator:begin;  -- default encoding
+			io:write( given\expr );
+		}
+
+		detach [upd]()( string )
+		{
+			io.mediator:get_utf()( utf f ):get_endian()( endian e );
+			io.mediator:detach()( addr a, int n );  -- no checksum
+			given\string:begin( a, f, e, n );
+			io.mediator:set_size( zero );
+		}
+
+		
+		-- mediation
+
+		as_mediator = mediator proxy [eval,upd] ~m
+		{
+			~m -> io.mediator;
+		}
+				
+		reserve	[upd] -- first
+		{{
+			Call this method to reserve space at the end of a sequence
+			for the first code unit of a char.  Immediately after reading
+			the	first code unit, call the other reserve method to reserve 
+			additional space for characters that are longer than one unit.
+		}}
+		{
+			io.mediator:get_size()( int size ):set_size( "size + io.codepoint_unit" );
+		}
+
+		reserve [upd]()( bool ok ) 
+		{{
+			Call this method immediately after reading the first code
+			unit.  The first unit is assumed to be stored at the end of 
+			the sequence.
+
+			This method sets rp to read the presumed first unit, then
+			calls a method to predict the new size based on the first 
+			unit. If the character is more than one unit in length, 
+			the new	size is set and ok will be true.  Otherwise, the 
+			character is only one code unit long, and another read is 
+			not necessary.
+		}}
+		{
+			io.mediator:get_size()( int size ):set_rp( "size - io.codepoint_unit" ):predict_next_rp()( int new_size ):set_rp( size ); 
+			ok:begin( "new_size |>| size" );
+			if ( ok ) io.mediator:set_size( new_size );
+		}
+
+
+		-- cross compatability
+
+		compare ( text_editor other [opt] )( bool compatible ) -- compare to platform if other null
+		{
+			endian e; utf f;
+			if ( "is_null?( other )" )
+			{
+				e:begin( platform_endian );
+				f:begin( platform_utf );
+			}
+			else
+			{
+				other:get_encoding()( e, f );
+			}
+			compatible:begin( "get_utf( io.mediator ) |=| f" );
+			if ( "not( compatible )" ) return; 
+			compatible:and( "get_endian( io.mediator ) |=| e" );
+		}
+
+		spawn ()( text_editor other )
+		{
+			io.mediator:get_endian()( endian e ):get_utf()( utf f );
+			other:begin( e, f );
+		}
+		
+
+		-- cross copy with conversion (using current pointers)
+
+		import [upd]( text_editor other [upd], int q [opt] ) 
+		{
+			fix( q, max_int ) ~q;
+			q2:begin;
+			loop ( "( q2 |<| ~q ) |and| not( rp_end?( other.mediator ) )" )
+			{
+				other.mediator:fread<int>( other.codepoint_fex )( int n );
+				io.mediator:fwrite<int>( n, io.codepoint_fex );
+				q2:inc;
+			}
+		}
+
+		export [upd]( text_editor other [upd], int q [opt] )
+		{
+			fix( q, max_int ) ~q;
+			q2:begin;
+			loop ( "( q2 |<| ~q ) |and| not( rp_end?( io.mediator ) )" )
+			{
+				io.mediator:fread<int>( n, io.codepoint_fex );
+				other.mediator:fwrite<int>( other.codepoint_fex )( int n );
+				q2:inc;
+			}
+		}
+
+		
+		-- c str conversion
+		 
+		add_zero [upd] 
+		{
+			zero:fwrite( io.mediator, io.codepoint_fex );
+		}
+
+		
+		trim_zero [upd]
+		{
+			io.mediator:set_rp( zero ):seek_chr( zero, 'positive' )():set_size_rp;
+		}
+		
+			
+		-- synthesis (serial write)
+
+		write [upd]( unicode c )
+		{
+			io:write_one( c );
+		}
+		
+		write [upd]( ascii c )
+		{
+			io:write_one( c );
+		}
+				
+		write [upd]( <unicode>array arr )
+		{
+			io:write_all( arr );
+		}
+
+		write [upd]( <ascii>array arr )
+		{
+			io:write_all( arr );
+		}
+
+		write [upd]( string s ) 
+		{
+			io:write_all( s:extract()( =<unicode>array ) );
+		}
+
+		write [upd]( expr e ) 
+		{
+			io:write_all( e:extract()( =<ascii>array ) );
+		}
+			
+			
+		fwrite<t> [upd]( <t> obj, expr fex [opt] )		-- single fex
+		{
+			fix( fex, 't' ) ~fex;	
+			io.mediator:fwrite<<t>>( obj, ~fex );
+		}
+
+		fwrite<t> [upd]( <t> obj, expr fex [opt] )()( extra etc )  -- multiple fex
+		{
+			fix( fex, 't' ) ~fex;
+			io:mediator:fwrite<<t>>( obj, ~fex )()( etc );
+		}
+							
+			
+		-- parse (serial read, skip, and seek)
+
+		read [upd]()( unicode c )  
+		{
+			io:read_one()( c );
+		}
+
+		read [upd]()( ascii c )  
+		{
+			io:read_one()( c );
+		}
+
+		read [upd]( unicode delim )( <unicode>array arr )
+		{
+			io:read_array( delim )( arr );
+		}
+
+		read [upd]( ascii delim )( <ascii>array arr )  
+		{
+			io:read_array( delim )( arr );
+		}
+
+		read [upd]( unicode delim )( string )
+		{
+			io:read_array( delim )( <unicode>array arr );
+			given\string:begin( arr );
+		}
+				
+		read [upd]( ascii delim )( expr )
+		{
+			io:read_array( delim )( <ascii>array arr );
+			given\expr:begin( arr );
+		}
+
+		read [upd]( int q [opt] )( <unicode>array arr ) -- null q -> all
+		{
+			io:read_array( q )( arr );
+		}
+
+		read [upd]( int q [opt] )( <ascii>array arr )  
+		{
+			io:read_array( q )( arr );
+		}
+
+		read [upd]( int q [opt] )( string )
+		{
+			io:read_array( q )( <unicode>array arr );
+			given\string:begin( arr );
+		}
+
+		read [upd]( int q [opt] )( expr )
+		{
+			io:read_array( q )( <unicode>array arr );
+			given\expr:begin( arr );
+		}
+
+
+		fread<t> [upd]( expr fex [opt] )( <t> x )	-- single fex
+		{
+			fix( fex, 't' ) ~fex;
+			io.mediator:fread<<t>>( ~fex )( x );
+		}
+
+		fread<t> [upd]( expr fex [opt] )( <t> x )( extra etc ) -- multiple fex
+		{
+			fix( fex, 't' ) ~fex;
+			io.mediator:fread<<t>>( ~fex )( x )( etc );
+		}
+
+
+				
+		skip [upd]( expr pattern, match_mode [opt] )  -- strict (exact) by expr pattern
+		{
+			io:copy_pattern( pattern )( text_editor ped );
+			io:skip( *ped, given\match_mode );
+		}
+
+		skip [upd]( string pattern, match_mode [opt] )  -- strict (exact) by string pattern
+		{
+			io:copy_pattern( pattern )( text_editor ped );
+			io:skip( *ped, given\match_mode );
+		}
+		
+		skip [upd]( text_editor ped [upd], match_mode [opt] ) -- strict (exact) by compatible pattern
+		{
+			fix( given\match_mode, 'similar' as match_mode ) ~mode;
+
+			bool ok; int rp;
+			select ( ~mode )
+			{
+				value ( 'exact' )   io:skip( *ped )( ok, null, rp ) with exact_match?;
+				value ( 'similar' ) io:skip( *ped )( ok, null, rp ) with similar_match?;
+				value ( 'regex' )   io:skip( *ped )( ok, null, rp ) with regex_match?;
+			}
+			if ( ok:not ) quit with fault:begin( 'format', 'skip pattern mismatch' );
+			io:set_rp( rp );
+		}
+
+		skip [upd]( text_editor ped [upd] )( bool ok, int q, int rp )  -- general: by compatible pattern and coroutine
+		 with match? ( text_editor ped [upd], unicode, sign, expr fex )( bool )
+		{
+			if ( "not( compare( io, ped ) )" ) quit with fault:begin( 'bug', 'incompatible pattern text_editor' );
+			io:match( *ped, 'positive' )( ok, q, rp ) with match?;  
+			if ( ok ) io.mediator:set_rp( rp );
+		}
+
+
+		
+		seek [upd]( int n )( int n2 )  -- number of chars, signed
+		{
+			n2:begin;
+
+			if ( "n |>| zero" )
+			{
+				loop ( "( n2 |<| n ) |and| not( rp_end?( io.mediator ) )" )
+				{	
+					n2:inc;
+					io.mediator:inc_rp;
+				}
+			}
+			else if ( "n |<| zero" )
+			{
+				loop ( "( n2 |>| n ) |and| not( rp_end?( io.mediator ) )" )
+				{	
+					n2:dec;
+					io.mediator:dec_rp;
+				}
+			}
+		}
+		
+		seek [upd]( ascii c, sign d [opt] )( bool ok ) -- to char
+		{
+			io:seek_char( c:use_int_value, d )( ok );
+		}
+
+		seek [upd]( unicode c, sign d [opt] )( bool ok ) -- to char
+		{
+			io:seek_char( c:use_int_value, d )( ok );
+		}
+
+		seek [upd]( expr pattern, sign d [opt], match_mode [opt] )( int q ) -- by expr pattern and mode, q = chars matched (zero = no match)
+		{
+			io:copy_pattern( pattern )( text_editor ped );
+			io:seek( *ped, d, given\match_mode )( q );
+		}
+
+		seek [upd]( string pattern, sign d [opt], match_mode [opt] )( int q ) -- by string pattern and mode, q = chars matched (zero = no match)
+		{
+			io:copy_pattern( pattern )( text_editor ped );
+			io:seek( *ped, d, given\match_mode )( q );
+		}
+
+		seek [upd]( text_editor ped [upd], sign d [opt], match_mode [opt] )( int q ) -- by compatible pattern and mode, q = chars matched (zero = no match)
+		{
+			fix( given\match_mode, 'exact' as match_mode ) ~mode;
+			select ( ~mode  )
+			{
+				value ( 'exact' )   io:seek( *pattern, d )( q ) with exact_match?;
+				value ( 'similar' ) io:seek( *pattern, d )( q ) with similar_match?;
+				value ( 'regex' )   io:seek( *pattern, d )( q ) with regex_match?;
+			}
+		}
+			
+		seek [upd]( text_editor ped [upd], sign d [opt] )( int q ) -- general: by compatible pattern and coroutine, q = chars matched (zero = no match)
+		 with match? ( text_editor ped [upd], unicode c, sign d, expr fex )( bool )
+		{
+			if ( "not( compare( io, ped ) )" ) quit with fault:begin( 'bug', 'incompatible pattern text_editor' );
+			fix<sign>( d, 'positive' ) ~d;
+			loop 
+			{
+				io:match( *ped, ~d )( bool ok, q:reuse, int rp ) with match?;
+
+				if ( ok ) return;
+				if ( "is_null?( rp )" ) return after q:begin( zero );
+
+				io.mediator:set_rp( rp );  -- next unmatched char
+			}
+		}
+
+
+		-- cut & paste using compatible editor (to-do)
+
+		copy [upd]( int q )( text_editor );
+
+		delete [upd]( int q );
+				
+		insert [upd]( text_editor [upd] ); 
+
+		insert [upd]( unicode c );
+
+		replace [upd]( int q, text_editor [upd] );  -- more efficient than :delete(q):insert(t)
+
+		replace [upd]( unicode c );
+	
+	}
+
+
+	common 
+	{
+		word16 xD800:begin( 'x:D800' ) [const];
+		word16 xDC00:begin( 'x:D800' ) [const];
+		word16 xDFFF:begin( 'x:DFFF' ) [const];
+
+		word8 x80:begin( 'x:80' ) [const];
+		word8 x20:begin( 'x:20' ) [const];
+		word8 x10:begin( 'x:10' ) [const];
+		word8 xC0:begin( 'x:C0' ) [const];
+
+		int	two:begin( '2' )   [const];
+		int three:begin( '3' ) [const];
+		int four:begin( '4' )  [const];
+	}
+
+
+	misc method
+	{
+		write_one<t> [upd]( <t> c ) -- <t> ascii or unicode
+		{
+			c:use_int_value:fwrite( io.mediator, io.codepoint_fex );
+		}
+
+		write_all<t> [upd]( <<t>>array arr ) -- <t> ascii or unicode
+		{
+			for each ( ~c in arr ) ~c:use_int_value:fwrite( io.mediator, io.codepoint_fex );
+		}
+
+		read_one<t> [upd]()( <t> c ) -- <t> ascii or unicode
+		{
+			c:begin( int:begin( io.mediator, io.codepoint_fex ) ); -- int:fread
+		}
+
+		read_array<t> [upd]( <t> delim )( <<t>>array arr ) -- <t> ascii or unicode
+		{
+			arr:begin;
+			if ( "rp_end?( io.mediator )" ) return;
+			int dn:begin( delim:use_int_value );
+			loop
+			{
+				int xn:begin( io.mediator, io.codepoint_fex ) );  -- int:fread
+				if ( "xn |=| dn" ) return;
+				arr:insert:begin( xn );
+				if ( "rp_end?( io.mediator )" ) return;
+			}
+		}
+
+		read_array<t> [upd]( int q [opt] )( <<t>>array arr ) -- <t> ascii or unicode
+		{
+			arr:begin;
+			if ( "rp_end?( io.mediator )" ) return;
+			fix( q, max_int ) ~q;
+			int n:begin;
+			loop ( "n |<| ~q" )
+			{
+				int xn:begin( io.mediator, io.codepoint_fex ) );  -- int:fread
+				arr:insert:begin( xn );
+				if ( "rp_end?( io.mediator )" ) return;
+				n:inc;
+			}
+		}
+
+
+
+		seek_chr [upd]( int cn, sign d [opt] )( bool ok ) 
+		{
+			if ( "rp_end?( io.mediator )" ) return after ok:begin( false );
+			fix( d, 'positive' as sign ) ~d;
+			if ( "~d |=| 'positive'" )
+			{
+				loop
+				{
+					int xn:begin( io.mediator, io.codepoint_fex ) );  -- int:fread
+					if ( "xn |=| cn" ) return after ok:begin( 'true' );
+					if ( "rp_end?( io.mediator )" ) return after ok:begin( 'false' );
+				}
+			}
+			else
+			{
+				loop
+				{
+					io.mediator:get_rp()( int mark );
+					int xn:begin( io.mediator, io.codepoint_fex ) );  -- int:fread
+					if ( "xn |=| cn" ) return after ok:begin( 'true' );
+					if ( "rp_end?( io.mediator )" ) return after ok:begin( 'false' );
+					io.mediator:set_rp( mark ):dec_rp;
+				}
+			}
+		}
+			
+
+		copy_pattern<t> [upd]( <t> pattern )( text_editor ped ) -- <t> string or expr
+		{
+			if ( "get_length( pattern ) |=| zero" ) quit with fault:begin( 'bug', 'no pattern' );  
+			io:spawn()( ped ); -- compatible ped
+			ped:write( pattern );
+		}
+
+
+		match [upd]( text_editor ped [upd], sign d )( bool ok, int q, int rp ) 
+		 with match? ( text_editor ped [upd], unicode c, sign d, expr fex )( bool ) 
+		{{
+			If sign is 'negative', ped rp and io.mediator rp decrement. 
+			Otherwise, sign is 'positive' and ped rp and io.mediator rp 
+			increment.
+
+			Output ok is true if entire pattern is matched, otherwise false.
+
+			Output q is number of matching chars, even when ok is false.
+
+			Output rp points to "next" char before/after last matching 
+			char, unless it's null. Null means scan reached the end.
+			
+			io.mediator rp is retored to it's original position.  
+		}}
+		{
+			if ( "d |=| 'positive'" ) ped:set_rp( zero ) else ped:set_rp_last;
+
+			io.meditor:get_rp()( int mark );
+			q:begin;
+
+			loop ( "not( rp_end?( io.mediator ) )" )
+			{
+				unicode c;
+				if ( "d |=| 'positive'" )
+					io:read_chr()( c )
+				else
+					io.mediator:get_rp()( int mark2 ):read_chr()( c ):set_rp( mark2 ):dec_rp;
+
+				match?( *ped, c, d, io.codepoint_fex )( ok ); 
+				if ( "is_not_null?( ok )" ) escape;
+
+				q:inc; -- result pending
+			}
+
+			if ( "is_null?( ok )" ) ok:begin( false )
+			else if ( ok ) q:inc; -- account for final match
+
+			io.mediator:get_rp()( rp ):set_rp( mark );
+		}
+		
+
+		inc_rp [upd] -- next code point
+		{
+			io.mediator:set_rp( io:predict_next_rp()( =int ) );
+		}
+
+
+		dec_rp [upd] -- prev code point
+		{{
+			This method moves mediator rp one code point backward.  It 
+			assumes rp is currently aligned on a code point.  If rp is
+			initially zero, it "wraps" to the end.  This means that 
+			rp_end? can be used to test limit in either direction.
+		}}
+		{
+			io.mediator:get_rp()( int rp ); 
+			if ( "rp |=| zero" )
+			{
+				io.mediator:set_rp_end;
+			}
+			else if ( "io.codepoint_unit |=| two" )
+			{
+				rp:sub( two );  -- prev code point
+				io.mediator:set_rp( rp ):fread( 'b' )( word16 w );  
+				if ( "(w |>=| xDC00 ) |and| ( w |<=| xDFFF )" ) rp:sub( two );  -- sub 2 more if surrogate
+				io.mediator:set_rp( rp ); 
+			}
+			else if ( "io.codepoint_unit |=| one" )
+			{
+				loop
+				{
+					rp:dec;
+					io.mediator:set_rp( rp ):fread( 'b' )( word8 w ):set_rp( rp );
+					if ( "( w |and| xC0 ) |not=| x80" ) escape;		-- if not 10xx xxxx
+				}
+			}
+			else -- "io.codepoint_unit |=| four"
+			{
+				io.mediator:set_rp( rp:sub( four ) ); 
+			}
+		}
+
+
+		predict_next_rp [upd]()( int rp ) 
+		{{
+			This method predicts next properly aligned rp. It assumes 
+			io.mediator rp is currently aligned and rp may be moved one
+			code unit to evaulate next position.  Thus, io.mediator rp
+			SHOULD ALWAYS BE REALIGNED after calling this method (using 
+			predicted output rp or original mediator rp).
+		}}
+		{
+			io.mediator:get_rp()( rp ); 
+			if ( "io.codepoint_unit |=| two" )
+			{
+				io.mediator:fread<word16>( 'b' )( word16 w );
+				if ( "(w |<| xD800 ) |or| ( w |>| xDFFF )" )
+					rp:add( two )
+				else
+					rp:add( four );
+			}
+			else if ( "io.codepoint_unit |=| one" )
+			{
+				io.mediator:fread<word8>( 'b' )( word8 w );
+				if ( "w |<| x80" )					-- 0xxx xxxx
+					rp:inc
+				else if ( "is_zero?( w |and| x20 )" )	-- 110x xxxx
+					rp:add( two )
+				else if ( "is_zero?( w |and| x10 )" )	-- 1110 xxxx
+					rp:add( three )
+				else								-- 1111 0xxx
+					rp:add( four );
+			}
+			else -- "io.codepoint_unit |=| four"
+			{
+				rp:add( four );
+			}
+		}
+	}
+
+
+	subroutine describe_utf ( utf )( int unit, expr fex )
+	{
+		select ( given\utf )
+		{	
+			value ( 'UTF-8' ) 
+			{
+				unit:begin( one );
+				fex:begin( 'b:utf8' );
+			}
+
+			value ( 'UTF-16' )
+			{
+				unit:begin( two );
+				fex:begin( 'b:utf16' );  
+			}
+
+			value ( 'UTF-32' )
+			{
+				unit:begin( four );
+				fex:begin( 'b:utf32' );	
+			}
+		}
+	}
+
+
+	instance
+	{
+		mediator;
+		expr codepoint_fex;		-- int fex
+		int	 codepoint_unit;	-- bytes: 1,2,4
+	}
+				
+}
+

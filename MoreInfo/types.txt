@@ -93,7 +93,7 @@ type foo from enumerated
 			io.expr:begin( given\foo.expr );
 		}
 
-		use_expr = expr proxy [eval] ~x
+		use_token = expr proxy [eval] ~x
 		{
 			~x -> io.expr;
 		}

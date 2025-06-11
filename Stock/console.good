@@ -5,18 +5,14 @@ page console in StockByGood
 type console 
 {{
 	A console is an interactive peripheral that displays 
-	text output and accepts text input from a user. 
+	ouput strings and accepts input strings from a user. 
 
-	Console text format is device specific. Applications
-	must call :prep_text to initialize a device compatible 
-	output string.  Input strings are naturally device
-	compatible.
+	Unicode character encoding is device specific. Call
+	:get_encoding to get encoding specs for output strings.
 
-	Note: In general, console text format is different
-	from platform text format. However, they're one and the
-	same for system consoles.  Thus, the system console can
-	always dispay text that is known to be platform compat-
-	ible.
+	Note: In general, console encoding is different	from
+	platform encoding. However, system consoles always use
+	platform encoding.
 }}
 {
 	general method
@@ -25,68 +21,88 @@ type console
 		{
 			kernel\console_identify( no_addr, *handle hcon:begin );
 			if ( "hcon |=| no_handle" ) quit with fault:begin( 'platform', 'no system console' );
-			io:configure( hcon )( text err );
+			io:configure( hcon )( string err );
 			if ( "is_not_null?( err )" ) quit with fault:begin( 'platform', 'system console broken' );
-			io.ready:begin( true );
 		}
 
-		begin ( text name )( text error )  -- named console
+		begin ( string name )( string error )  -- named console
 		{
-			text:begin( name ):add_zero:detach()( addr pname );
+			alpha_to_cstr( name )( addr pname ); 
 			kernel\console_identify( pname, *handle hcon:begin );
-			kernel\heap_free( pname );
+			kernel\heap_free( *pname );
 
 			if ( "hcon |=| no_handle" )
 			{
-				error:begin:write( 'unknown console: ' ):write( name );
+				text_editor:begin( 'unknown console: ' ):write( name ):detach()( error );
 				io.ready:begin( false );
 			}
 			else
-			{
 				io:configure( hcon )( error );
-				io.ready:begin( "is_null?( error )" );
-			}
 		}
 
 
-		prep_text ()( text )  -- compatible
+		get_encoding ()( utf f, endian e )
 		{
-			if ( io.ready ) given\text:begin( io.utf, io.endian );
+			f:begin( io.utf );
+			e:begin( io.endian );
 		}
-	
+		
 				
-		read [upd]( text input [upd], int q )( text error ) -- q chars
-		{
-			if ( io.ready )
-				io.channel:read( *input, q )( error )
-			else
-				error:begin( not_ready );
-		}
-
-		read [upd]( text input [upd], unicode c )( text error ) -- delimiter c
-		{
-			if ( io.ready )
-				io.channel:read( *input, c )( error )
-			else
-				error:begin( not_ready );
-		}
-
-		read_line [upd]()( text input, text error )
+		read [upd]( int q )( string input, string error ) -- q chars
 		{
 			if ( io.ready )
 			{
-				io:prep_text()( input );
-				io.channel:read( *input, io.eol )( error );
+				text_editor ed:begin( io.utf, io.endian );
+				io.channel:read( *ed, q )( error );
+				if ( "is_null?( error ) ) ed:read()( input ); -- all
+			}
+			else
+				error:begin( not_ready );
+		}
+
+		read [upd]( unicode c )( string input, string error ) -- delimiter c
+		{
+			if ( io.ready )
+			{
+				text_editor ed:begin( io.utf, io.endian );
+				io.channel:read( *ed, c )( error );
+				if ( "is_null?( error ) ) ed:read()( input ); -- all
+			}
+			else
+				error:begin( not_ready );
+		}
+
+		read_line [upd]()( string input, string error )
+		{
+			if ( io.ready )
+			{
+				text_editor ed:begin( io.utf, io.endian );
+				io.channel:read( *ed, io.eol )( error );
+				if ( "is_null?( error ) ) ed:read()( input ); -- all
 			}
 			else
 				error:begin( not_ready );
 
 		}
 
-		write [upd]( text output [upd] )( text error )  
+		write [upd]( string )( string error )  
 		{
 			if ( io.ready )
-				io.channel:write( *output )( error )
+			{
+				text_editor ed:begin( given\string );
+				io.channel:write( *ed )( error )
+			}
+			else
+				error:begin( not_ready );
+		}
+
+		write [upd]( expr )( string error )
+		{
+			if ( io.ready )
+			{
+				text_editor ed:begin( given\expr );
+				io.channel:write( *ed )( error )
+			}
 			else
 				error:begin( not_ready );
 		}
@@ -96,7 +112,7 @@ type console
 
 	misc method
 	{
-		configure [upd]( handle hcon )( text err )
+		configure [upd]( handle hcon )( string err )
 		{
 			kernel\console_open_channel( hcon, *handle hch:begin, *addr pnote:begin );
 			
@@ -105,6 +121,8 @@ type console
 				io.channel:begin( hch ); 
 
 				kernel\console_get_protocol( hcon, *int unit:begin, *word16 bom:begin, *int eol:begin );
+
+				io.eol:begin( eol );
 
 				select ( unit )
 				{
@@ -118,28 +136,32 @@ type console
 				else if ( "bom |=| unicode_bom_FFFE" ) io.endian:begin ( 'little_endian' )
 				else if ( "not( is_zero?( bom ) )" ) quit with fault:begin( 'bug', 'invalid byte order mark' );
 
-				io.eol:begin( eol );
+				io.ready:begin( true );
 			}
 			else 
 			{
-				err:begin:write( 'could not open console channel [' );
-				if ( "pnote |not=| no_addr" ) err:write( text begin:attach( pnote ):trim_zero );
-				err:write( ']' );
+				text_editor ed:begin( 'could not open console channel [' );
+				if ( "pnote |not=| no_addr" ) ed:write( cstr_to_alpha( pnote )( =string ) );  -- zero terminated
+				ed:write( ']' ):detach()( err );
+
+				io.ready:begin( false );
 			}
+
+			kernel\heap_free( *pnote );
 		}
 	}
 
-	nom type nom_channel = read_write_text_channel;
 
-	common text not_ready:begin( 'not ready' ) [const];
+	common string not_ready:begin( 'not ready' ) [const];
 
 	instance
 	{
-		nom_channel	channel	[opt];
-		utf					[opt];
-		endian				[opt];  -- n/a for UTF-8
-		unicode		eol		[opt];
-		bool		ready;
+		bool					ready; 
+
+		read_write_text_channel channel	[opt];
+		utf								[opt];
+		endian							[opt];
+		unicode					eol		[opt];
 	}
 
 }

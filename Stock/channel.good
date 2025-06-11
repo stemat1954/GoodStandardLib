@@ -90,8 +90,8 @@ page channel in StockByGood
 			}
 			if ( "io.pnote |not=| no_addr" )
 			{
-				note:begin( io.pnote, platform_utf, platform_endian );
-				io.pnote = no_addr;  -- prevent another attachment
+				cstr_to_alpha( io.pnote )( note );
+				io.pnote = no_addr;  -- disown
 			}
 		}
 	}
@@ -106,7 +106,7 @@ page channel in StockByGood
 
 		ascii_to_word ( ascii a )( word8 w )
 		{
-			w:begin( a:use_int, 'b:ascii' );
+			w:begin( a:use_int_value, 'b:ascii' );
 		}
 	}
 	
@@ -121,7 +121,7 @@ page channel in StockByGood
 		int		seek;		-- external origin
 		int		deficit;	-- size	deficit, bytes
 		word8	report;		-- ascii NUL, p, b, t, c, x
-		addr	pnote;		-- zero terminated unicode string
+		addr	pnote;		-- platform encoded unicode string, zero-terminated (cstr)
 	}
 
 
@@ -139,17 +139,18 @@ page channel in StockByGood
 		mediator:begin:fwrite<request>( r, 'b' ):detach()( pr ); 
 	}
 
-	restore_request ( addr pr )( request r )  -- final pr 
+	restore_request ( addr pr )( request r )  -- adopt pr 
 	{
-		mediator:begin:attach( pr, sizeof_request ):fread<request>( 'b' )( r );
+		mediator m:begin:attach( pr, sizeof_request ); -- adopt pr (final)
+		r:begin( *m, 'b' );
 	}
 
-	latch_data ( mediator m [upd], addr pdata, int offset, int size, int deficit, ascii action ) 
+	update_mediator ( mediator m [upd], addr pdata, int offset, int size, int deficit, ascii action ) 
 	{
 		int msize:begin( "offset + size" );
 		m:attach( pdata, msize );
 		int cp:begin( msize ):sub( deficit );
-		if ( "action |=| 'w'" ) m:set_rp( cp ) else m:set_wp( cp );   
+		if ( "action |=| 'w'" ) m:set_rp( cp ) else m:set_wp( cp );   -- yes: 'w' moves rp and 'r' moves wp
 	}
 }
 
@@ -179,12 +180,12 @@ enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 
 	
 
 
-subroutine latch_async_data ( addr preq, mediator m [upd] )( int id, channel_report report, string note ) -- final preq
+subroutine update_mediator_async ( addr preq, mediator m [upd] )( int id, channel_report report, string note ) -- adopt preq
 {
-	restore_request( preq )( request req );
+	restore_request( preq )( request req ); -- adopt preq
 	req:get_group1()( ascii action, addr pdata, int offset, int size, int seek, id ); -- ignore seek
 	req:get_group2()( int deficit, report, note );
-	latch_data( *m, pdata, offset, size, deficit, action );
+	update_mediator( *m, pdata, offset, size, deficit, action );
 }
 
  
@@ -192,7 +193,22 @@ subroutine latch_async_data ( addr preq, mediator m [upd] )( int id, channel_rep
 type channel [incomplete]  
 {{
 	A channel is an object for communicating with external
-	processes and devices using mediators.
+	processes and devices via mediator.
+
+	This is a base type for all channel subtypes. 
+
+	Write methods transfer data from mediator to channel, 
+	and read methods transfer data from channel to mediator. 
+	
+	Transfers can be synchronous or asynchronous. A synchro-
+	nous transfer waits for the transfer to complete before
+	returning to the caller. Asynchronous transfers return
+	immediately to the caller and use a queue to communicate
+	results back to the app when the transfer completes.
+	
+	Read and write channels are combined with synchronous 
+	and asynchronous channels to get six complete channel 
+	subtypes.
 
 	A channel handle is given at :begin time and respon-
 	sibility for the handle is assumed by the channel.  The 
@@ -205,7 +221,7 @@ type channel [incomplete]
 	closing note is	copied to an output.
 
 	A channel is automatically closed in response to any
-	error. In this value, the closing note is copied from
+	error. In this case, the closing note is copied from
 	the i/o request record, if any.  If not provided, the
 	closing note is "unspecified channel error."
 	
@@ -236,6 +252,8 @@ type channel [incomplete]
 	millisecs, which means "wait forever".  Any etm wait
 	time greater than max_int will not properly convert to
 	int and the app will be disrupted.
+
+
 }}
 {
 	general method
@@ -360,7 +378,9 @@ type sync_channel_reader [incomplete]
 	via abstract :~read.
 
 	Data is placed at the current mediator wp. Request size
-	is calculated from current mediator size and wp.
+	is calculated from current mediator size and wp. 
+
+	Note: request size = mediator size - wp
 	
 	Mediator wp is updated to reflect the amount of data
 	actually transferred.  The application can compare wp
@@ -391,7 +411,7 @@ type sync_channel_reader [incomplete]
 			{
 				m:detach()( addr pdata );
 				io:~read( fix( wait, io.wait ), seek, pdata, offset, rsize )( int deficit, report, note ); 
-				latch_data( *m, pdata, offset, rsize, deficit, 'r' );
+				update_mediator( *m, pdata, offset, rsize, deficit, 'r' );
 			}
 			else
 				report:begin( 'good' ); -- nothing to do
@@ -416,10 +436,12 @@ type sync_channel_writer [incomplete]
 	data is transferred synchronously.
 	
 	:write transfers data from a given mediator to the channel
-	via :_write.
+	via :write.
 
 	Data is copied from the current mediator rp. Request size
 	is calculated from mediator size and rp.
+
+	Note: request size = mediator size - rp
 	
 	Mediator wp is updated to reflect the amount of data
 	actually transferred.  The application can compare wp
@@ -450,7 +472,7 @@ type sync_channel_writer [incomplete]
 			{
 				m:detach()( addr pdata );
 				io:~write( fix( wait, io.wait ), seek, pdata, offset, rsize )( int deficit, report, note ); 
-				latch_data( *m, pdata, offset, rsize, deficit, 'w' );
+				update_mediator( *m, pdata, offset, rsize, deficit, 'w' );
 			}
 			else 
 				report:begin( 'good' ); -- nothing to do
@@ -487,7 +509,7 @@ type async_channel_reader [incomplete]
 			{
 				m:detach()( addr pdata );
 				io:~read( id, hq, seek, pdata, offset, rsize )( int deficit, report, note ); 
-				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) latch_data( *m, pdata, offset, rsize, deficit, 'r' );
+				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) update_mediator( *m, pdata, offset, rsize, deficit, 'r' );
 			}
 			else
 				report:begin( 'good' ); -- nothing to do
@@ -517,7 +539,7 @@ type async_channel_writer [incomplete]
 			{
 				m:detach()( addr pdata );
 				io:~write( id, hq, seek, pdata, offset, rsize )( int deficit, report, note ); 
-				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) latch_data( *m, pdata, offset, rsize, deficit, 'w' );
+				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) update_mediator( *m, pdata, offset, rsize, deficit, 'w' );
 			}
 			else
 				report:begin( 'good' ); -- nothing to do

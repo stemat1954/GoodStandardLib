@@ -31,18 +31,18 @@ type main_thread from entry
 		~run [upd]( signal active [upd], signal stop, hp<object> pobj [opt] )
 		{
 			active:indicate;
-			text report:begin;
+			string report;
 			isolate
 			{
-				hello;  -- minimal 
-				main( *active, stop );  -- general (sans extra)
-				report:write( 'normal exit' );
+				hello;  -- minimal call
+				main( *active, stop );  -- general call (sans extra)
+				report:begin( 'normal exit' );
 			}
 			trap
 			{
-				report:write( 'abnormal exit, quit location = ' ):write( ~disruption:use_object( zero ):use_location );
+				text_editor:begin( 'abnormal exit, quit location = ' ):write( ~disruption:use_object( zero ):use_location ):detach()( report );
 			}
-			sys:use_console:write( *report ); -- ignore errors
+			sys:use_console:write( report ); 
 		}
 	}
 }
@@ -83,8 +83,8 @@ subroutine main ( signal active [upd], signal stop )()( extra )
 
 		-- timer tick
 
-		text greeting:begin:fwrite( tick:inc ):write( ' - Hello World!' );
-		sys:use_console:write( *greeting );  -- ignore errors
+		text_editor:begin:fwrite( tick:inc ):write( ' - Hello World!' ):detach()( string greeting );
+		sys:use_console:write( greeting );  
 	}
 }
 
@@ -95,5 +95,5 @@ subroutine hello
 	It displays 'Hello World!" on the system console and returns.
 }}
 {
-	sys:use_console:write( *'Hello World!' as text );
+	sys:use_console:write( 'Hello World!' );
 }
