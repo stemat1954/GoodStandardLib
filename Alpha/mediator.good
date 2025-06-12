@@ -21,10 +21,8 @@ common
 type mediator 
 {{
 	A mediator facilitates transfer of object data from 
-	object to external memory and back. Generally, data	is
-	transformed between internal and external formats during
-	the transfer.
-
+	object to external memory and back. 
+	
 	A mediator encapsulates a heap memory addr and provides
 	methods for formatting and parsing arbitrary external
 	data.  
@@ -135,7 +133,7 @@ type mediator
 	final disposition.  
 	
 	Detaching memory creates a detached mediator and an orphan
-	memory block that must be reattached to some mediator or
+	heap pointer that must be reattached to some mediator or
 	released by some other procedure. Basically, the mediator
 	disowns the detached memory. Detaching memory does not 
 	affect the mediator's internal read/write position 
@@ -289,11 +287,11 @@ type mediator
 	is 'false'.
 			
 	Object pointer (op) service is optional and provided by
-	an internal array of mediators.  Each op mediator encap-
-	sulates an individual object image, and pointers in the
-	assembly of mediators index a mediator that represents
-	the encapsulates the pointer's object.	Shared refer-
-	ences are properly maintained.
+	an internal array of mediators. An array of mediators is
+	a logical heap whereby each mediator encapsulates an 
+	individual object image.  Serialized object pointers 
+	index the mediator that encapsulates the pointer's 
+	object.	Shared references are properly maintained.
 
 	:open_op_service enables op<t> mediation.
 
@@ -302,6 +300,22 @@ type mediator
 	
 	Pointer service is useful (necessary) for peristing a 
 	complex network of objects. 
+
+	:write_checksum writes a 4 byte checksum at the 
+	current wp. The sum is calculated from all bytes
+	preceding wp.  
+
+	:read_checksum reads a 4 byte checksum at the 
+	current rp. The sum read is compared to the
+	actual sum calculated from all bytes preceding
+	rp (before reading the checksum).  If the two
+	sums agree, output is 'true'.  Otherwise, it's
+	'false'.
+
+	med:set_wp_end:write_checksum;  -- write 4 byte sum at end
+	
+	med:get_size()( =int where ):sub( '4' );
+	med:set_rp( where ) ):read_checksum()( bool ok );  -- verify
 }}
 {
 
@@ -319,9 +333,9 @@ type mediator
 		get_utf ()( utf );
 
 
-		detach [upd]( bool checksum [opt] )( addr pmem, int size ); 
+		detach [upd]()( addr pmem, int size ); -- orphan pmem
 
-		attach [upd]( addr pmem, int size [opt], bool checksum [opt] );
+		attach [upd]( addr pmem, int size [opt] );  -- adopt pmem
 
 
 		open_op_service [upd];  -- original
@@ -385,6 +399,11 @@ type mediator
 		write_nul [upd];				-- ascii NUL
 
 		read_nul [upd]()( bool );		-- ditto
+
+		
+		write_checksum [upd];
+
+		read_checksum [upd]()( bool ok );
 				
 
 		fread<t> [upd]( expr fex )( <t> obj );			-- read object, one fex

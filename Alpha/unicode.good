@@ -20,8 +20,8 @@ type unicode from enumerated
 	https://en.wikipedia.org/wiki/Unicode_character_property
 
 	A unicode object is portable but applications are
-	limited.  The primary fex is either 'label' or 'code'.
-	An extra fex specifies how to format the char label
+	limited.  The primary fex is either 'notation' or 'code'.
+	An extra fex specifies how to format the char notation
 	as an expr, or the char code as an int.
 }}
 {

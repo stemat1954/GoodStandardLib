@@ -74,7 +74,7 @@ page channel in StockByGood
 		}
 
 
-		get_group2 [upd] ()( int deficit, channel_report cr, string note ) -- invalidates io.pnote
+		get_group2 [upd] ()( int deficit, channel_report cr, string note ) 
 		{
 			deficit:begin( io.deficit );
 			select ( word_to_ascii( io.report )( =ascii ) )
@@ -106,7 +106,7 @@ page channel in StockByGood
 
 		ascii_to_word ( ascii a )( word8 w )
 		{
-			w:begin( a:use_int_value, 'b:ascii' );
+			w:begin( a:as_int, 'b:ascii' );
 		}
 	}
 	
@@ -141,16 +141,16 @@ page channel in StockByGood
 
 	restore_request ( addr pr )( request r )  -- adopt pr 
 	{
-		mediator m:begin:attach( pr, sizeof_request ); -- adopt pr (final)
+		mediator m:begin:attach( pr, sizeof_request ); 
 		r:begin( *m, 'b' );
 	}
 
-	update_mediator ( mediator m [upd], addr pdata, int offset, int size, int deficit, ascii action ) 
+	update_mediator ( mediator med [upd], addr pdata, int offset, int size, int deficit, ascii action ) 
 	{
-		int msize:begin( "offset + size" );
-		m:attach( pdata, msize );
-		int cp:begin( msize ):sub( deficit );
-		if ( "action |=| 'w'" ) m:set_rp( cp ) else m:set_wp( cp );   -- yes: 'w' moves rp and 'r' moves wp
+		int dsize:begin( "offset + size" );  -- data size
+		med:attach( pdata, dsize );
+		int cp:begin( dsize ):sub( deficit );
+		if ( "action |=| 'w'" ) med:set_rp( cp ) else med:set_wp( cp );   -- correct: 'w' moves rp and 'r' moves wp
 	}
 }
 
@@ -180,12 +180,12 @@ enum type channel_report ( 'good', 'pending', 'busy', 'closed', 'retry', 'end', 
 	
 
 
-subroutine update_mediator_async ( addr preq, mediator m [upd] )( int id, channel_report report, string note ) -- adopt preq
+subroutine update_mediator_async ( addr preq, mediator med [upd] )( int id, channel_report report, string note ) -- adopt preq
 {
 	restore_request( preq )( request req ); -- adopt preq
 	req:get_group1()( ascii action, addr pdata, int offset, int size, int seek, id ); -- ignore seek
 	req:get_group2()( int deficit, report, note );
-	update_mediator( *m, pdata, offset, size, deficit, action );
+	update_mediator( *med, pdata, offset, size, deficit, action );
 }
 
  
@@ -404,14 +404,14 @@ type sync_channel_reader [incomplete]
 			if ( "is_not_null?( wait )" ) io.wait:begin( wait );
 		}
 	
-		read [upd]( mediator m [upd], int seek [opt], etm wait [opt] )( channel_report report, string note ) 
+		read [upd]( mediator med [upd], int seek [opt], etm wait [opt] )( channel_report report, string note ) 
 		{
-			m:get_wp()( int offset ):get_size()( =int rsize ):sub( offset );
+			med:get_wp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if ( "rsize |>| zero" )
 			{
-				m:detach()( addr pdata );
+				med:detach()( addr pdata );
 				io:~read( fix( wait, io.wait ), seek, pdata, offset, rsize )( int deficit, report, note ); 
-				update_mediator( *m, pdata, offset, rsize, deficit, 'r' );
+				update_mediator( *med, pdata, offset, rsize, deficit, 'r' );
 			}
 			else
 				report:begin( 'good' ); -- nothing to do
@@ -465,14 +465,14 @@ type sync_channel_writer [incomplete]
 			if ( "is_not_null?( wait )" ) io.wait:begin( wait );
 		}
 	
-		write [upd]( mediator m [upd], int seek [opt], etm wait [opt] )( channel_report report, string note ) 
+		write [upd]( mediator med [upd], int seek [opt], etm wait [opt] )( channel_report report, string note ) 
 		{
-			m:get_rp()( int offset ):get_size()( =int rsize ):sub( offset );
+			med:get_rp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if ( "rsize |>| zero" )
 			{
-				m:detach()( addr pdata );
+				med:detach()( addr pdata );
 				io:~write( fix( wait, io.wait ), seek, pdata, offset, rsize )( int deficit, report, note ); 
-				update_mediator( *m, pdata, offset, rsize, deficit, 'w' );
+				update_mediator( *med, pdata, offset, rsize, deficit, 'w' );
 			}
 			else 
 				report:begin( 'good' ); -- nothing to do
@@ -502,14 +502,14 @@ type async_channel_reader [incomplete]
 		{
 		}
 	
-		read [upd]( int id, handle hq, mediator m [upd], int seek [opt] )( channel_report report, string note ) 
+		read [upd]( int id, handle hq, mediator med [upd], int seek [opt] )( channel_report report, string note ) 
 		{
-			m:get_wp()( int offset ):get_size()( =int rsize ):sub( offset );
+			med:get_wp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if (" rsize |>| zero ")
 			{
-				m:detach()( addr pdata );
+				med:detach()( addr pdata );
 				io:~read( id, hq, seek, pdata, offset, rsize )( int deficit, report, note ); 
-				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) update_mediator( *m, pdata, offset, rsize, deficit, 'r' );
+				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) update_mediator( *med, pdata, offset, rsize, deficit, 'r' );
 			}
 			else
 				report:begin( 'good' ); -- nothing to do
@@ -532,14 +532,14 @@ type async_channel_writer [incomplete]
 		{
 		}
 	
-		write [upd]( int id, handle hq, mediator m [upd], int seek [opt] )( channel_report report, string note ) 
+		write [upd]( int id, handle hq, mediator med [upd], int seek [opt] )( channel_report report, string note ) 
 		{
-			m:get_rp()( int offset ):get_size()( =int rsize ):sub( offset );
+			med:get_rp()( int offset ):get_size()( =int rsize ):sub( offset );
 			if ( "rsize |>| zero" )
 			{
-				m:detach()( addr pdata );
+				med:detach()( addr pdata );
 				io:~write( id, hq, seek, pdata, offset, rsize )( int deficit, report, note ); 
-				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) update_mediator( *m, pdata, offset, rsize, deficit, 'w' );
+				if ( "( deficit |not=| rsize ) |or| ( report |not=| 'pending' )" ) update_mediator( *med, pdata, offset, rsize, deficit, 'w' );
 			}
 			else
 				report:begin( 'good' ); -- nothing to do

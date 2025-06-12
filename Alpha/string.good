@@ -43,16 +43,13 @@ type string
 	(5) copy another
 	
 
-	Since strings can't be modified, internal representation 
-	is undefined.
-
 }}
 {
 	general method
 	{
-		begin ( addr, utf, endian, int len [opt] );  -- encoded sequence
+		begin ( addr, utf, endian, int len [opt] );  -- sequence
 
-		begin ( <unicode>array, utf, endian );  -- encoded array
+		begin ( <unicode>array, utf, endian );  -- array
 
 		begin ( expr, utf [opt], endian [opt] );  -- expr/literal conversion
 

@@ -28,7 +28,7 @@ type main_thread from entry
 
 	abstract method in entry
 	{
-		~run [upd]( signal active [upd], signal stop, hp<object> pobj [opt] )
+		~run [upd]( signal active [upd], signal stop, op<object> pobj [opt] )
 		{
 			active:indicate;
 			string report;

@@ -6,7 +6,9 @@ page demo1 in ExamplesByGood
 
 	<int>queue my_queue:begin;
 	my_queue:push:begin( zero );
-	my_queue:pull()( n ) with std_copy<int>;
+	my_queue:push:begin( one );
+	my_queue:copy_pull()( n ) with std_copy<int>;
+	my_queue:copy_pull()( n:reuse );
 
 	<int>stack my_stack:begin;
 	my_stack:push:begin( zero );

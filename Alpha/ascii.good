@@ -98,8 +98,8 @@ type ascii from enumerated
 	ascii c:begin( '^065' );  -- ok, but cryptic, use 'A' instead
 
 	An ascii object is portable but applications are
-	limited.  The primary fex is either 'note' or 'code' and an 
-	extra fex specifies how to format the expr or int
+	limited.  The primary fex is either 'notation' or 'code' and 
+	an extra fex specifies how to format the expr or int
 }}
 {
 
