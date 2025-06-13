@@ -379,18 +379,13 @@ type <t>list1 from list1
 			io:as_base<list1>:begin( *other:as_base<list1> );
 		}
 
-{{
-CONSIDER THIS NEW SYNTAX FOR PROXY NAME IN CALL...
-link1 nl:begin<t_node>:begin is ~new_item;  
-}}
-
 
 		begin ( t_list other )  -- with <t> copy
 		{
-			for each ( ~node in other ) -- node1 proxy [eval] 
+			for each ( ~node in other )  
 			{
-				link1 nl:begin<t_node>:begin ~new_item;  
-				~node:as<t_node>:use_item ~other_item;
+				link1 nl:begin<t_node>:begin is ~new_item;  
+				~node:as<t_node>:use_item is ~other_item;
 				~new_item:begin( ~other_item );
 				io:as_base<list1>:insert( nl ):go_next;
 			}
@@ -400,8 +395,8 @@ link1 nl:begin<t_node>:begin is ~new_item;
 		{
 			for each ( ~node in other ) -- node1 proxy [eval] 
 			{
-				link1 nl:begin<t_node>:begin ~new_item;  
-				~node:as<t_node>:use_item ~other_item;
+				link1 nl:begin<t_node>:begin is ~new_item;  
+				~node:as<t_node>:use_item is ~other_item;
 				copier( ~other_item )( ~new_item );
 				io:as_base<list1>:insert( nl ):go_next;
 			}

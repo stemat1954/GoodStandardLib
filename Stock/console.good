@@ -70,7 +70,7 @@ type console
 		
 		read [upd]( text_editor ed [upd], unicode c [opt] )( string error ) -- delimited by c (eol) into editor @wp
 		{
-			fix( c, io.eol ) ~c;
+			fix( c, io.eol ) is ~c;
 			if ( io.ready )
 				io.channel:read( *ed, ~c )( error )
 			else
@@ -80,7 +80,7 @@ type console
 		
 		read [upd]( unicode c [opt] )( string input, string error ) -- delimited by c (eol) into string
 		{
-			fix( c, io.eol ) ~c;
+			fix( c, io.eol ) is ~c;
 			if ( io.ready )
 			{
 				text_editor ed:begin( io.utf, io.endian );

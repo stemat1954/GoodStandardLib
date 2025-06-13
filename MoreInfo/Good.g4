@@ -33,6 +33,7 @@ IN_					:	'in'			;
 INCOMPLETE			:	'incomplete'	;
 INIT				:	'init'			;		// initiate
 INSTANCE			:	'instance'		;
+IS					:	'is'			;
 ISOLATE				:	'isolate'		;
 LOOP				:	'loop'			;
 METHOD				:	'method'		;
@@ -86,7 +87,7 @@ DOUBLE_QUOTE		:	'"'				;
 EQUAL				:	'='				;
 COLON				:	':'				;
 ASTERISK			:	'*'				;
-BIND				:	'->'			;
+JOIN				:	'->'			;
 
 
 // literal 
@@ -277,7 +278,7 @@ SPACE				: [ \t\r\n]+			-> skip
 
 
 
-binding_obj				: LITERAL
+join_obj				: LITERAL
 						| VOID_
 						| SID
 						| formula
@@ -287,21 +288,15 @@ binding_obj				: LITERAL
 						| conversion
 						;	
 
-binding					: BIND binding_obj
+join					: JOIN join_obj
 						;
 
-
-proxy_binding_ref		: SID	
-						;
-
-proxy_binding			: proxy_binding_ref binding
-						;
 
 
 new_proxy_name			: SID
 						;
 
-new_proxy				: proxy_spec new_proxy_name binding?
+new_proxy				: proxy_header proxy_attribution? new_proxy_name join?
 						;
 
 
@@ -356,6 +351,13 @@ assignment_obj_right	: NULL_
 assignment				: assignment_obj_left EQUAL ASTERISK? assignment_obj_right conversion_chain?
 						;
 
+
+
+association_ref			: SID	
+						;
+
+association				: association_ref join
+						;
 
 
 operator_				:  OPERATOR
@@ -468,13 +470,17 @@ call_coroutine_ref		: SID
 call_coroutine			: WITH call_coroutine_ref aux_given_obj_list?	
 						;
 
-call_proxy_attribution	: LEFT_SQUARE ( EVAL | UPD | INIT ) RIGHT_SQUARE
+
+call_proxy_tag_name		: SID	
 						;
 
-call_proxy_name			: SID	
+call_proxy_tag			: proxy_attribution
+						| IS proxy_header proxy_attribution? call_proxy_tag_name? 
+						| IS proxy_attribution? call_proxy_tag_name
 						;
 
-call_provision			: reg_given_obj_list? call_coroutine? call_proxy_attribution? call_proxy_name?
+
+call_provision			: reg_given_obj_list? call_coroutine? call_proxy_tag?
 						;
 
 
@@ -516,7 +522,7 @@ quit					: QUIT ( WITH quit_obj )?
 
 
 
-after					: AFTER ( subroutine_call | method_call_sequence | proxy_binding | assignment )
+after					: AFTER ( subroutine_call | method_call_sequence | association | assignment )
 						;
 
 
@@ -569,19 +575,19 @@ for_each_index_obj		: SID
 						| new_obj	
 						;
 
-for_each_proxy_attrib	: LEFT_SQUARE ( EVAL | UPD | INIT ) RIGHT_SQUARE
+for_each_item_spec		: proxy_header? proxy_attribution?
 						;
 
-for_each_proxy_name		: SID  
+for_each_item_name		: SID  // proxy 
 						;
 
-for_each_spec			: LEFT_PAREN for_each_proxy_attrib? for_each_proxy_name IN_ for_each_collection_obj ( COMMA for_each_index_obj )? RIGHT_PAREN
+for_each_list			: LEFT_PAREN for_each_item_spec for_each_item_name IN_ for_each_collection_obj ( COMMA for_each_index_obj )? RIGHT_PAREN
 						;
 
-for_each				: FOR EACH for_each_spec exec_element
+for_each				: FOR EACH for_each_list exec_element
 						;
 
-for_each_block			: FOR EACH for_each_spec exec_block
+for_each_block			: FOR EACH for_each_list exec_block
 						;
 
 
@@ -636,7 +642,7 @@ plain_block				: LEFT_CURLY exec_item* RIGHT_CURLY
 
 exec_element			: new_obj	
 						| new_proxy
-						| proxy_binding
+						| association
 						| assignment
 						| method_call_sequence	
 						| subroutine_call
@@ -680,22 +686,20 @@ infer_block				: LEFT_CURLY INFER RIGHT_CURLY
 
 
 
-
-
-proxy_spec_attribute	: EVAL ( COMMA ( UPD | INIT ) )?
+proxy_attribute			: EVAL ( COMMA ( UPD | INIT ) )?
 						| UPD
 						| INIT
 						;
 
-proxy_spec_attribution	: LEFT_SQUARE proxy_spec_attribute RIGHT_SQUARE
+proxy_attribution		: LEFT_SQUARE proxy_attribute RIGHT_SQUARE
 						;
 
-proxy_spec_type_ref		: SID
+
+proxy_header_type_ref	: SID
 						;
 
-proxy_spec				: proxy_spec_type_ref PROXY proxy_spec_attribution?   
+proxy_header			: proxy_header_type_ref PROXY
 						;
-
 
 
 input_spec_type_ref		: SID
@@ -770,7 +774,7 @@ coroutine_spec			: WITH coroutine_name reg_obj_spec_list?
 proxy_result_name		: SID
 						;
 
-proxy_result			: EQUAL proxy_spec proxy_result_name?
+proxy_result			: EQUAL proxy_header proxy_attribution? proxy_result_name?
 						;
 
 

@@ -267,7 +267,7 @@ type channel [incomplete]
 		
 		close [upd]( string note [opt] )( string other )
 		{
-			fix( note, normal_close ) ~note;
+			fix( note, normal_close ) is ~note;
 			:internal_close( ~note )( other );
 		}
 
@@ -287,7 +287,7 @@ type channel [incomplete]
 			io:check()( note );
 			if ( "is_null?( note )" ) -- if not closed
 			{
-				fix( wait, max_int as etm ) ~wait;
+				fix( wait, max_int as etm ) is ~wait;
 				format_request( request:begin( action, pdata, offset, size, seek, null ) )( addr pr );
 				kernel\channel_sync_io( io.hch, pr, ~wait:as_int );
 				io:finish( pr )( deficit, report, note );
@@ -345,7 +345,7 @@ type channel [incomplete]
 			restore_request( pr )( =request ):get_group2()( deficit, report, note );
 			if ( "report |=| 'error' " )
 			{
-				fix( note, unspecified_error ) ~note;
+				fix( note, unspecified_error ) is ~note;
 				io:internal_close( ~note )( string og_note );
 				if ( "is_not_null?( og_note )" ) note = og_note;
 			}

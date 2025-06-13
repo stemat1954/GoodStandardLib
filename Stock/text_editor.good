@@ -207,7 +207,7 @@ type text_editor
 
 		import [upd]( text_editor other [upd], int q [opt] ) 
 		{
-			fix( q, max_int ) ~q;
+			fix( q, max_int ) is ~q;
 			int q2:begin;
 			loop ( "( q2 |<| ~q ) |and| not( rp_end?( other.mediator ) )" )
 			{
@@ -219,7 +219,7 @@ type text_editor
 
 		export [upd]( text_editor other [upd], int q [opt] )
 		{
-			fix( q, max_int ) ~q;
+			fix( q, max_int ) is ~q;
 			int q2:begin;
 			loop ( "( q2 |<| ~q ) |and| not( rp_end?( io.mediator ) )" )
 			{
@@ -280,13 +280,13 @@ type text_editor
 			
 		fwrite<t> [upd]( <t> obj, expr fex [opt] )		-- single fex
 		{
-			fix( fex, 't' ) ~fex;	
+			fix( fex, 't' ) is ~fex;	
 			io.mediator:fwrite<<t>>( obj, ~fex );
 		}
 
 		fwrite<t> [upd]( <t> obj, expr fex [opt] )()( extra etc )  -- multiple fex
 		{
-			fix( fex, 't' ) ~fex;
+			fix( fex, 't' ) is ~fex;
 			io.mediator:fwrite<<t>>( obj, ~fex )()( etc );
 		}
 							
@@ -352,13 +352,13 @@ type text_editor
 
 		fread<t> [upd]( expr fex [opt] )( <t> x )	-- single fex
 		{
-			fix( fex, 't' ) ~fex;
+			fix( fex, 't' ) is ~fex;
 			io.mediator:fread<<t>>( ~fex )( x );
 		}
 
 		fread<t> [upd]( expr fex [opt] )( <t> x )( extra etc ) -- multiple fex
 		{
-			fix( fex, 't' ) ~fex;
+			fix( fex, 't' ) is ~fex;
 			io.mediator:fread<<t>>( ~fex )( x )( etc );
 		}
 	
@@ -409,7 +409,7 @@ type text_editor
 
 		seek [upd]( text_editor ped [upd], sign d [opt], match_mode [opt] )( int q ) -- compatible pattern per mode, q = chars matched (zero = no match)
 		{
-			fix( given\match_mode, 'exact' as match_mode ) ~mode;
+			fix( given\match_mode, 'exact' as match_mode ) is ~mode;
 			select ( ~mode  )
 			{
 				value ( 'exact' )   io:seek( *ped, d )( q ) with exact_match?;
@@ -422,7 +422,7 @@ type text_editor
 		 with helper ( text_editor ped [upd], unicode c, sign d, expr fex )( bool )
 		{
 			if ( "not( compare( io, ped ) )" ) quit with fault:begin( 'bug', 'incompatible pattern text editor' );
-			fix<sign>( d, 'positive' ) ~d;
+			fix<sign>( d, 'positive' ) is ~d;
 
 			loop 
 			{
@@ -514,7 +514,7 @@ type text_editor
 		{
 			arr:begin;
 			if ( "rp_end?( io.mediator )" ) return;
-			fix( q, max_int ) ~q;
+			fix( q, max_int ) is ~q;
 			int n:begin;
 			loop ( "n |<| ~q" )
 			{
@@ -530,7 +530,7 @@ type text_editor
 		seek_chr [upd]( int cn, sign d [opt] )( bool ok ) 
 		{
 			if ( "rp_end?( io.mediator )" ) return after ok:begin( false );
-			fix( d, 'positive' as sign ) ~d;
+			fix( d, 'positive' as sign ) is ~d;
 			if ( "~d |=| 'positive'" )
 			{
 				loop
