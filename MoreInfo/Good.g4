@@ -471,16 +471,16 @@ call_coroutine			: WITH call_coroutine_ref aux_given_obj_list?
 						;
 
 
-call_proxy_tag_name		: SID	
+call_overt_proxy_name	: SID	
 						;
 
-call_proxy_tag			: proxy_attribution
-						| IS proxy_header proxy_attribution? call_proxy_tag_name? 
-						| IS proxy_attribution? call_proxy_tag_name
+call_overt_proxy		: proxy_attribution
+						| IS proxy_header proxy_attribution? call_overt_proxy_name? 
+						| IS proxy_attribution? call_overt_proxy_name
 						;
 
 
-call_provision			: reg_given_obj_list? call_coroutine? call_proxy_tag?
+call_provision			: reg_given_obj_list? call_coroutine? call_overt_proxy?
 						;
 
 

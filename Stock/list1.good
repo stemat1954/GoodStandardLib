@@ -382,10 +382,10 @@ type <t>list1 from list1
 
 		begin ( t_list other )  -- with <t> copy
 		{
-			for each ( ~node in other )  
+			for each ( node1 proxy ~node in other )  
 			{
-				link1 nl:begin<t_node>:begin is ~new_item;  
-				~node:as<t_node>:use_item is ~other_item;
+				link1 nl:begin<t_node> is t_node proxy:begin is <t> proxy ~new_item;  
+				~node:as<t_node>:use_item is <t> proxy ~other_item;
 				~new_item:begin( ~other_item );
 				io:as_base<list1>:insert( nl ):go_next;
 			}
@@ -393,10 +393,10 @@ type <t>list1 from list1
 
 		begin ( t_list other ) with copier ( <t> )( <t> ) -- with copier
 		{
-			for each ( ~node in other ) -- node1 proxy [eval] 
+			for each ( node1 proxy ~node in other ) 
 			{
-				link1 nl:begin<t_node>:begin is ~new_item;  
-				~node:as<t_node>:use_item is ~other_item;
+				link1 nl:begin<t_node> is t_node proxy:begin is <t> proxy ~new_item;  
+				~node:as<t_node>:use_item is <t> proxy ~other_item;
 				copier( ~other_item )( ~new_item );
 				io:as_base<list1>:insert( nl ):go_next;
 			}
