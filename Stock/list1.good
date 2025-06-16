@@ -382,23 +382,27 @@ type <t>list1 from list1
 
 		begin ( t_list other )  -- with <t> copy
 		{
-			for each ( node1 proxy ~node in other )  
+			for each ( node1 proxy ~other_node in other )  
 			{
-				link1 nl:begin<t_node> is t_node proxy:begin is <t> proxy ~new_item;  
-				~node:as<t_node>:use_item is <t> proxy ~other_item;
+				~other_node:as<t_node>:use_item is ~other_item;
+				link1 lnk:begin<t_node>:begin is <t> proxy ~new_item;
+				
 				~new_item:begin( ~other_item );
-				io:as_base<list1>:insert( nl ):go_next;
+
+				io:as_base<list1>:insert( lnk ):go_next;
 			}
 		}
 
 		begin ( t_list other ) with copier ( <t> )( <t> ) -- with copier
 		{
-			for each ( node1 proxy ~node in other ) 
+			for each ( node1 proxy ~other_node in other ) 
 			{
-				link1 nl:begin<t_node> is t_node proxy:begin is <t> proxy ~new_item;  
-				~node:as<t_node>:use_item is <t> proxy ~other_item;
+				~other_node:as<t_node>:use_item is ~other_item;
+				link1 lnk:begin<t_node>:begin is <t> proxy ~new_item;  
+
 				copier( ~other_item )( ~new_item );
-				io:as_base<list1>:insert( nl ):go_next;
+
+				io:as_base<list1>:insert( lnk ):go_next;
 			}
 		}
 
@@ -432,17 +436,7 @@ type <t>list1 from list1
 			if ( "is_not_null?( nl )" ) ~item -> nl:deref:as_actual<t_node>:use_item;
 		}
 
-		copy_and_remove_next [upd] ()( <t> item ) -- with <t> copy
-		{
-			io:as_base<list1>:get_next()( link1 nl );
-			if ( "is_not_null?( nl )" ) 
-			{
-				item:begin( nl:deref:as_actual<t_node>:use_item );
-				io:as_base<list1>:remove_next;
-			}
-		}
-
-		copy_and_remove_next [upd] ()( <t> item ) with copier ( <t> )( <t> )
+		remove_next [upd] ()( <t> item ) with copier ( <t> )( <t> )
 		{
 			io:as_base<list1>:get_next()( link1 nl );
 			if ( "is_not_null?( nl )" ) 
@@ -452,17 +446,7 @@ type <t>list1 from list1
 			}
 		}
 				
-		take_and_remove_next [upd] ()( <t> item ) -- with <t> take
-		{
-			io:as_base<list1>:get_next()( link1 nl );
-			if ( "is_not_null?( nl )" ) 
-			{
-				item:begin( *nl:deref:as_actual<t_node>:use_item );
-				io:as_base<list1>:remove_next;
-			}
-		}
-
-		take_and_remove_next [upd] ()( <t> item ) with taker ( <t> [upd] )( <t> )
+		remove_next [upd] ()( <t> item ) with taker ( <t> [upd] )( <t> )
 		{
 			io:as_base<list1>:get_next()( link1 nl );
 			if ( "is_not_null?( nl )" ) 
@@ -580,28 +564,17 @@ type <t>queue
 			~item -> io.t_list:go_last:insert;
 		}
 
-		copy_pull [upd]()( <t> item ) -- with <t> copy
-		{
-			if ( io.t_list:is_empty?()( =bool ):not ) 
-				io.t_list:go_front:copy_and_remove_next()( item );
-		}
 
-		copy_pull [upd]()( <t> item ) with copier ( <t> )( <t> )
+		pull [upd]()( <t> item ) with copier ( <t> )( <t> )
 		{
 			if ( io.t_list:is_empty?()( =bool ):not )
-				io.t_list:go_front:copy_and_remove_next()( item ) with copier;
+				io.t_list:go_front:remove_next()( item ) with copier;
 		}
 
-		take_pull [upd]()( <t> item ) -- with <t> taker
+		pull [upd]()( <t> item ) with taker ( <t> [upd] )( <t> )
 		{
 			if ( io.t_list:is_empty?()( =bool ):not )
-				io.t_list:go_front:take_and_remove_next()( item );
-		}
-
-		take_pull [upd]()( <t> item ) with taker ( <t> [upd] )( <t> )
-		{
-			if ( io.t_list:is_empty?()( =bool ):not )
-				io.t_list:go_front:take_and_remove_next()( item ) with taker;
+				io.t_list:go_front:remove_next()( item ) with taker;
 		}
 
 		use_first = <t> proxy [eval,init] ~item 
