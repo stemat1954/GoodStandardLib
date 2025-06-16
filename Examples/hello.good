@@ -40,7 +40,7 @@ type main_thread from entry
 			}
 			trap
 			{
-				text_editor:begin( 'abnormal exit, quit location = ' ):write( ~disruption:use_object( zero ):use_location ):detach()( report );
+				text_mediator:begin( 'abnormal exit, quit location = ' ):write( ~disruption:use_object( zero ):use_location ):detach()( report );
 			}
 			sys:use_console:write( report ); 
 		}
@@ -83,7 +83,7 @@ subroutine main ( signal active [upd], signal stop )()( extra )
 
 		-- timer tick
 
-		text_editor:begin:fwrite( tick:inc ):write( ' - Hello World!' ):detach()( string greeting );
+		text_mediator:begin:fwrite( tick:inc ):write( ' - Hello World!' ):detach()( string greeting );
 		sys:use_console:write( greeting );  
 	}
 }

@@ -59,7 +59,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stock", "Stock", "{0A5181F7
 		Stock\list1.good = Stock\list1.good
 		Stock\system.good = Stock\system.good
 		Stock\text_channel.good = Stock\text_channel.good
-		Stock\text_editor.good = Stock\text_editor.good
+		Stock\text_mediator.good = Stock\text_mediator.good
 		Stock\toggle.good = Stock\toggle.good
 		Stock\ucdb.good = Stock\ucdb.good
 	EndProjectSection

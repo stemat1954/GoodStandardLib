@@ -150,7 +150,7 @@ subroutine	-- string conversion
 {
 	alpha_to_cstr ( string )( addr )  -- orphan addr
 	{
-		text_editor:begin( platform_utf, platform_endian ):write( given\string ):add_zero():as_mediator():detach()( given\addr );
+		text_mediator:begin( platform_utf, platform_endian ):write( given\string ):add_zero():detach()( given\addr );
 	}
 
 	cstr_to_alpha ( addr )( string ) -- string owns addr
