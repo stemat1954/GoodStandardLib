@@ -79,6 +79,8 @@ type fp2 -- elementary, compatible, conventional
 
 		begin ( fp10 x );  -- fp10 conversion
 
+		begin ( int n );  -- int conversion
+
 		begin<#n> ( word<<#n>> w, expr fex );	-- word conversion
 
 
