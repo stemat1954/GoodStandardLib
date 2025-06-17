@@ -69,7 +69,7 @@ END					:	'%end'			;
 INFER				:	'%infer'		;
 
 
-// delimiters
+// punctuation and delimiters
 
 LEFT_CURLY			:	'{'				;
 RIGHT_CURLY			:	'}'				;
@@ -80,28 +80,43 @@ RIGHT_SQUARE		:	']'				;
 COMMA				:	','				;
 SEMI_COLON			:	';'				;
 DOUBLE_QUOTE		:	'"'				;
-
-
-// punctuation
-
 EQUAL				:	'='				;
 COLON				:	':'				;
-ASTERISK			:	'*'				;
+ASTERISK			:	'*'				;		// also used for MULTIPLY
+
+
+// native operator
+
 JOIN				:	'->'			;
+ASSIGN				:	'<='			;	
+
+
+// formula operator
+
+PLUS				: '+';
+MINUS				: '-';
+DIVIDE				: '/';
+
+fragment
+OP1					: [!-z{}~]					// char subset: printable, except SP and |
+					;
+
+OPERATOR			: '|' OP1+? '|'
+					;
 
 
 // literal 
 			
 fragment
-LIT0				:	'\''						// delim
+LIT0				:	'\''					// delim
 					;
 	
 fragment
-LIT1				: [!-&(-\]_-~\r\n\t ]			// char subset: printable, except ^ and ', plus whitespace
+LIT1				: [!-&(-\]_-~\r\n\t ]		// char subset: printable, except ^ and ', plus whitespace
 					;
 
 fragment
-LIT2				: [0-9][0-9][0-9]				// 3 digits
+LIT2				: [0-9][0-9][0-9]			// 3 digits
 					;
 
 fragment			
@@ -110,21 +125,6 @@ LIT3				: '^' ( '^' | LIT0 | LIT2 )		// insert subexpr
 
 LITERAL				: LIT0 ( LIT1 | LIT3 )*?  LIT0
 					;
-		
-
-
-// operator
-
-PLUS				: '+';
-MINUS				: '-';
-DIVIDE				: '/';
-
-fragment
-OP1					: [!-z{}~]						// char subset: printable, except SP and |
-					;
-
-OPERATOR			:  '|' OP1+? '|'
-					;
 
 
 
@@ -132,33 +132,33 @@ OPERATOR			:  '|' OP1+? '|'
 
 
 fragment
-ID0					: ' '							// embedded space			
+ID0					: ' '						// embedded space			
 					;
 
 fragment
-ID1					: [a-zA-Z0-9_~@&!?]+			// name, char subset = alphanumeric plus _~@&!?
+ID1					: [a-zA-Z0-9_~@&!?]+		// name, char subset = alphanumeric plus _~@&!?
 					;
 
 fragment			
-ID2					: '#' [a-zA-Z0-9]* 				// symbolic dimension 
-					| LIT0 [0-9]+ LIT0				// adhoc dimension
+ID2					: '#' [a-zA-Z0-9]* 			// symbolic dimension 
+					| LIT0 [0-9]+ LIT0			// adhoc dimension
 					;
 
 fragment												
 ID3					: '<' ID0* ( ID2 | ID5 ) ID0* '>'	// factor   
 					;
 
-fragment											// with factors (type,method,subroutine)
+fragment										// with factors (type,method,subroutine)
 ID4					: ID1 ( ID3+ ID1 )* ID3*	
 					| ID3+ ( ID1 ID3+ )* ID1?
 					;
 
 fragment
-ID5					: ( ID1 '\\' )? ID4				// qualified  
+ID5					: ( ID1 '\\' )? ID4			// qualified  
 					;
 
 
-SID					: ID5							// no sub-object
+SID					: ID5						// no sub-object
 					| (( ID1 '\\' )? ID1 )? '.' ID1	// sub-object 
 					;
 					
@@ -186,90 +186,28 @@ SPACE				: [ \t\r\n]+			-> skip
 
 // =====================  PARSER  ===========================
 /*
-	Good syntax is fairly simple and regular but context 
-	determines usage, so context is captured low in the
-	parse tree using redundant rules. 
-
-	In the broad view, a Good procedure is comprised of
-	executable expressions that create new objects and call
-	other procedures.
-
-	There are two kinds of procedures: method and subroutine.
-	A method is defined within the scope of a type definition
-	and references implied object "io".  A subroutine stands
-	alone and can only reference an object's general methods.
+		
+	Imperativee items can be grouped into blocks.
 	
-	Any procedure can have inputs, outputs, and additional
-	unspecified objects (extra). Subroutines can have auxiliary 
-	inputs.	Variable inputs are labeled [upd].  
-
-	Auxiliary inputs are used to pass context to a subroutine
-	used as a coroutine. 
-	
-	A coroutine can be called by any method or subroutine
-	to adapt it's algorithm.  Auxiliary inputs are given
-	to the coroutine using a with-clause in the procedure 
-	call.  A coroutine cannot itself call a coroutine 
-	(adaptation is only one	level deep).
-
-	A method is always called for some lead object given
-	in the method call, separate from inputs and outputs.
-	Method calls are annotated with a leading colon. The
-	result of calling a method is (usually) the lead
-	object.  Thus, methods can be chained together left-to-
-	right, with	each method targeting an object to the 
-	immediate left of the method, where the left object
-	propagates from the previous method. The default 
-	result can	be overridden by designating a particular
-	output with an equal sign =.
-
-	A subroutine call can generally be used wherever an 
-	object is required provided the subroutine has a result.
-	For	simplicity, grammar rules allow any (possibly non-
-	conforming) subroutine call, but conformance will be 
-	verified by the compiler.  
-
-	
-	Executable items can be grouped into executable blocks.
-	
-	Items and blocks can be incorporated into executable
+	Items and blocks can be incorporated into imperative
 	forms:  if/else, loop, for-each, select/value/else, 
 	isolate/trap.
-
-	A formula is an expression enclosed in double quotes.
-	A formula has familiar syntax consisting of operations
-	and traditional	function calls.  An operation is a
-	sub-expression of operands and operators. A traditional
-	function call has an implicit result given a list of 
-	const inputs.
 	
-	Any procedure with const inputs and a single output/
-	result can be called functionally inside a formula. A
-	procedure that has side effects and/or a result that 
-	depends on non-inputs is not suitable for formulae and 
-	they can be excluded from consideration using [naf].
-		
-	Generally, definitions that introduce names can be
-	truncated to allow references. These definitions are
-	called "trivial."
-
-	Here are possible object expressions and their
-	semantics:
+	Possible object expressions:
 	
-	SID				type ref:  new anon null obj, type = SID
-	SID				obj ref:  existing obj, type = per def
-	SID				proxy ref: existing obj, type = per proxy 
-	SID				dimension: new anon initialized obj, type = expr
-	SID				inconspicuous subroutine call: type = per proxy
-	NULL_			new anon null input/output obj, type = per spec 
-	LITERAL			new anon initialized obj, type = expr 
-	new_obj			new named null obj, type and name specified
-	new_analog		new anon initialized obj, type = analog 
-	formula			new anon initialized obj, type = contextual 
-	conversion		new anon initialized obj, type = specified
-	method_call_sequence	existing result obj (method obj, result
-					proxy, designated output)
-	subroutine_call	existing result obj (result proxy, designated output)
+	SID						type ref:  new anon null obj, type = SID
+	SID						bj ref:  existing obj, type = per def
+	SID						proxy ref: existing obj, type = per proxy 
+	SID						dimension: new anon initialized obj, type = expr
+	SID						trivial subroutine call: type = per proxy
+	NULL_					new anon null input/output obj, type = per spec 
+	LITERAL					new anon initialized obj, type = expr 
+	new_obj					new named null obj, type and name specified
+	new_analog				new anon initialized obj, type = analog 
+	formula					new anon initialized obj, type = contextual 
+	conversion				new anon initialized obj, type = specified
+	method_call_sequence	existing result obj (method obj, result	proxy, designated output)
+	subroutine_call			existing result obj (result proxy, designated output)
 */
 
 
@@ -278,25 +216,10 @@ SPACE				: [ \t\r\n]+			-> skip
 
 
 
-join_obj				: LITERAL
-						| VOID_
-						| SID
-						| formula
-						| method_call_sequence
-						| subroutine_call
-						| assignment
-						| conversion
-						;	
-
-join					: JOIN join_obj
-						;
-
-
-
 new_proxy_name			: SID
 						;
 
-new_proxy				: proxy_header proxy_attribution? new_proxy_name join?
+new_proxy				: proxy_header proxy_attribution? new_proxy_name
 						;
 
 
@@ -334,29 +257,36 @@ conversion				: conversion_obj conversion_chain
 						;
 
 
-
-assignment_obj_left		: SID
-						| method_call_sequence 
-						| subroutine_call	
+assignment_obj			: LITERAL
+						| SID
+						| formula
+						| method_call_sequence
+						| subroutine_call
+						| conversion
 						;
 
-assignment_obj_right	: NULL_
+assignment_ref			: SID	
+						;
+
+assignment				: assignment_ref ASSIGN ASTERISK? assignment_obj 
+						;
+
+
+
+association_obj			: VOID_
 						| LITERAL
 						| SID
 						| formula
 						| method_call_sequence
 						| subroutine_call
+						| conversion
+						;	
+
+association_proxy		: SID	// proxy ref
+						| new_proxy
 						;
 
-assignment				: assignment_obj_left EQUAL ASTERISK? assignment_obj_right conversion_chain?
-						;
-
-
-
-association_ref			: SID	
-						;
-
-association				: association_ref join
+association				: association_proxy JOIN association_obj
 						;
 
 
@@ -403,7 +333,6 @@ input_obj				: NULL_
 						| formula
 						| method_call_sequence
 						| subroutine_call	
-						| assignment
 						| conversion
 						;
 
@@ -441,7 +370,6 @@ extra_obj				: NULL_
 						| formula
 						| method_call_sequence
 						| subroutine_call	
-						| assignment
 						| conversion
 						;
 
@@ -540,7 +468,6 @@ condition_obj			: LITERAL
 						| formula
 						| method_call_sequence
 						| subroutine_call
-						| assignment
 						;
 
 condition				: LEFT_PAREN condition_obj RIGHT_PAREN	
@@ -602,8 +529,6 @@ isolate_block			: ISOLATE exec_block
 
 
 
-
-
 select_value_obj		: LITERAL		 
 						| SID		// pure const 
 						;
@@ -618,7 +543,6 @@ select_key_obj			: SID
 						| formula
 						| method_call_sequence
 						| subroutine_call	
-						| assignment
 						;
 
 select_labeled_branch	: select_branch_label exec_element? SEMI_COLON
@@ -671,7 +595,7 @@ non_exec_item			: subroutine
 						| enum_type
 						| nom_type
 						| operation
-						| common_obj	// syntactically non-executable
+						| common_obj	// non-executable in proc block
 						;
 
 proc_block				: LEFT_CURLY non_exec_item* exec_item* RIGHT_CURLY

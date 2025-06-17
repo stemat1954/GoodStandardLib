@@ -40,7 +40,7 @@ type node1 [incomplete]
 
 		set_link [upd]( link1 )
 		{
-			io.link1 = given\link1;
+			io.link1 <= given\link1;
 		}
 
 		unlink [upd]
@@ -215,30 +215,30 @@ type list1 from serial<node1><list1_cursor>
 
 		go_first [upd]
 		{
-			if ( "is_not_null?( io.first )" ) io.current = io.first;
+			if ( "is_not_null?( io.first )" ) io.current <= io.first;
 		}
 
 		go_last [upd]
 		{
-			if ( "is_not_null?( io.last )" ) io.current = io.last;
+			if ( "is_not_null?( io.last )" ) io.current <= io.last;
 		}
 
 		go_next [upd]
 		{
 			if ( "is_null?( io.current )" )
 			{
-				if ( "is_not_null?( io.first )" ) io.current = io.first;
+				if ( "is_not_null?( io.first )" ) io.current <= io.first;
 			}
 			else
 			{
 				io.current:deref:get_link()( link1 nl ); 
-				if ( "is_not_null?( nl )" ) io.current = nl;
+				if ( "is_not_null?( nl )" ) io.current <= nl;
 			}
 		}
 
 		go_here [upd]( link1 )  
 		{
-			io.current = given\link1;
+			io.current <= given\link1;
 		}
 				
 		insert [upd]( link1 )  -- after current  
@@ -249,7 +249,7 @@ type list1 from serial<node1><list1_cursor>
 				-- after current
 				io.current:deref[upd]:get_link()( link1 before ):set_link( given\link1 ); 
 				if ( "is_null?( before )" )
-					io.last = given\link1 
+					io.last <= given\link1 
 				else
 					given\link1:deref[upd]:set_link( before );
 			}
@@ -257,7 +257,7 @@ type list1 from serial<node1><list1_cursor>
 			{
 				-- front (before first)
 				given\link1:deref[upd]:set_link( io.first );
-				io.first = given\link1;
+				io.first <= given\link1;
 			}
 			else 
 			{
@@ -277,7 +277,7 @@ type list1 from serial<node1><list1_cursor>
 				{
 					next:deref[upd]:get_link()( link1 next_next ):unlink;
 					if ( "is_null?( next_next )" )
-						io.last = io.current -- new last
+						io.last <= io.current -- new last
 					else 
 						io.current:deref[upd]:set_link( next_next );
 				}
@@ -294,7 +294,7 @@ type list1 from serial<node1><list1_cursor>
 				}
 				else
 				{
-					io.first = next_next;  -- new first
+					io.first <= next_next;  -- new first
 				}
 			}
 		}
@@ -365,7 +365,6 @@ type <t>list1 from list1
 	nom type t_list = <<t>>list1;
 
 	nom type t_node = <<t>>node1;
-
 
 	general method
 	{
