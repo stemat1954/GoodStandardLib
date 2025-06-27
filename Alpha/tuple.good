@@ -42,8 +42,8 @@ type <#><t>tuple from indexed<<t>> -- compatible and conventional per <t>
 		begin ( nt_tuple other );								-- with <t> copy
 		begin ( nt_tuple other ) with copier ( <t> )( <t> );	-- with copier
 
-		begin ( mediator [upd], expr fex )()( extra );  -- fread
-		fwrite ( mediator [upd], expr fex )()( extra );
+		begin ( mediator [upd], expr fex )()( extra );  
+		store ( mediator [upd], expr fex )()( extra );
 	}
 
 	abstract in indexed<<t>>

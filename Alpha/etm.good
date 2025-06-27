@@ -71,9 +71,9 @@ type etm  -- conventional
 
 		begin ( etm other );	-- copy
 
-		begin ( mediator [upd], expr fex );		-- fread	
+		begin ( mediator [upd], expr fex );			
 
-		fwrite ( mediator [upd], expr fex );	
+		store ( mediator [upd], expr fex );	
 
 		is_equal? ( etm other )( bool );
 

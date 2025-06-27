@@ -146,8 +146,8 @@ type op<t>   -- intrinsic
 	
 	ops are generally portable if <t> is portable.  The 
 	portability mediator must have an open op service.
-	See type mediator for more info.  :fwrite disables the 
-	pointer and any attempt to use it after calling :fwrite
+	See type mediator for more info.  :store disables the 
+	pointer and any attempt to use it after calling :store
 	will disrupt the application.  Object formats are given
 	as extras.
 
@@ -194,9 +194,9 @@ type op<t>   -- intrinsic
 
 	general -- <t> dependent portability
 	{
-		begin ( mediator [upd], expr fex )()( extra );		-- fread
+		begin ( mediator [upd], expr fex )()( extra );		
 
-		fwrite [eval]( mediator [upd], expr fex )()( extra );
+		store [eval]( mediator [upd], expr fex )()( extra );
 	}
 }
 

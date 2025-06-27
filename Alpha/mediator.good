@@ -41,7 +41,7 @@ type mediator
 	coordinate the transfer.  Thus, the object must have
 	[init] access permission.
 	
-	:fwrite simply calls a corresponding object :fwrite 
+	:fwrite simply calls corresponding object :store 
 	which only needs [eval] access permission.
 	
 	Portable types have a conventional interface:
@@ -51,12 +51,12 @@ type mediator
 		begin ( mediator [upd], expr fex );
 		begin ( mediator [upd], expr fex )()( extra );
 
-		fwrite ( mediator [upd], expr fex );
-		fwrite ( mediator [upd], expr fex )()( extra );
+		store ( mediator [upd], expr fex );
+		store ( mediator [upd], expr fex )()( extra );
 	}
 
 	A portable type needs at least one conventional :begin
-	method and one conventional :fwrite meethod.
+	method and one conventional :store method.
 
 
 	"fex" is a type dependent format expression interpreted

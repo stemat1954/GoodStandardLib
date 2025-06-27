@@ -72,8 +72,8 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 		begin ( t_array other );							-- with <t> copy
 		begin ( t_array other ) with copier ( <t> )( <t> );	-- with copier
 
-		begin ( mediator [upd], expr fex )()( extra );		-- fread
-		fwrite [eval]( mediator [upd], expr fex )()( extra );
+		begin ( mediator [upd], expr fex )()( extra );		
+		store [eval]( mediator [upd], expr fex )()( extra );
 
 		insert [upd]( int i [opt], int q [opt], t_array other, int j [opt] );										-- with <t> copy: q (1) objs from other at j (0) to i (end) 
 		insert [upd]( int i [opt], int q [opt], t_array other, int j [opt] ) with copier ( <t> )( <t> );			-- with copier:  ditto

@@ -26,9 +26,9 @@ type handle -- compatible
 
 		begin ( handle other );	-- copy
 
-		begin ( mediator [upd], expr fex [opt] ); -- fread
+		begin ( mediator [upd], expr fex [opt] ); 
 
-		fwrite ( mediator [upd], expr fex [opt ] );
+		store ( mediator [upd], expr fex [opt ] );
 
 		is_equal? ( handle other )( bool );
 	}

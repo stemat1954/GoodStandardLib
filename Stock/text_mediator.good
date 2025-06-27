@@ -201,7 +201,7 @@ type text_mediator from mediator
 			int q2:begin;
 			loop ( "( q2 |<| ~q ) |and| not( rp_end?( other ) )" )
 			{
-				int n:begin( *other, other.codepoint_fex ):fwrite( *io, io.codepoint_fex );
+				int n:begin( *other, other.codepoint_fex ):store( *io, io.codepoint_fex );
 				q2:inc;
 			}
 		}
@@ -214,7 +214,7 @@ type text_mediator from mediator
 			int q2:begin;
 			loop ( "( q2 |<| ~q ) |and| not( rp_end?( io ) )" )
 			{
-				int n:begin( *io, io.codepoint_fex ):fwrite( *other, other.codepoint_fex );
+				int n:begin( *io, io.codepoint_fex ):store( *other, other.codepoint_fex );
 				q2:inc;
 			}
 		}
@@ -224,7 +224,7 @@ type text_mediator from mediator
 		 
 		add_zero [upd] -- at current wp
 		{
-			zero:fwrite( *io, io.codepoint_fex );
+			zero:store( *io, io.codepoint_fex );
 		}
 				
 		trim_zero [upd]
@@ -471,12 +471,12 @@ type text_mediator from mediator
 	{
 		write_one<t> [upd]( <t> c ) -- <t> ascii or unicode
 		{
-			c:as_int:fwrite( *io, io.codepoint_fex );
+			c:as_int:store( *io, io.codepoint_fex );
 		}
 
 		write_all<t> [upd]( <<t>>array arr ) -- <t> ascii or unicode
 		{
-			for each ( ~c in arr ) ~c:as_int:fwrite( *io, io.codepoint_fex );
+			for each ( ~c in arr ) ~c:as_int:store( *io, io.codepoint_fex );
 		}
 
 		read_one<t> [upd]()( <t> c ) -- <t> ascii or unicode

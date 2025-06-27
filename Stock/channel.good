@@ -58,7 +58,7 @@ page channel in StockByGood
 			%infer
 		}
 
-		fwrite ( mediator [upd], expr fex )	
+		store ( mediator [upd], expr fex )	
 		{
 			%infer
 		}
