@@ -44,6 +44,7 @@ NOM					:	'nom'			;		// nominal
 NULL_				:	'null'			;
 OPERATION			:	'operation'		;
 OPT					:	'opt'			;		// optional
+PACKET				:	'packet'		;
 PAGE				:	'page'			;
 PROXY				:	'proxy'			;	
 PWD					:	'pwd'			;		// previously well-defined
@@ -158,7 +159,7 @@ ID5					: ( ID1 '\\' )? ID4			// qualified
 					;
 
 
-SID					: ID5						// no sub-object
+FID					: ID5						// no sub-object
 					| (( ID1 '\\' )? ID1 )? '.' ID1	// sub-object 
 					;
 					
@@ -187,19 +188,21 @@ SPACE				: [ \t\r\n]+			-> skip
 // =====================  PARSER  ===========================
 /*
 		
-	Imperativee items can be grouped into blocks.
+	Imperative items can be grouped into blocks.
 	
 	Items and blocks can be incorporated into imperative
 	forms:  if/else, loop, for-each, select/value/else, 
 	isolate/trap.
 	
+	FID = Formal IDentifier
+
 	Possible object expressions:
 	
-	SID						type ref:  new anon null obj, type = SID
-	SID						bj ref:  existing obj, type = per def
-	SID						proxy ref: existing obj, type = per proxy 
-	SID						dimension: new anon initialized obj, type = expr
-	SID						trivial subroutine call: type = per proxy
+	FID						type ref:  new anon null obj, type = FID
+	FID						obj ref:  existing obj, type = per def
+	FID						proxy ref: existing obj, type = per proxy 
+	FID						dimension: new anon initialized obj, type = expr
+	FID						trivial subroutine call: type = per proxy
 	NULL_					new anon null input/output obj, type = per spec 
 	LITERAL					new anon initialized obj, type = expr 
 	new_obj					new named null obj, type and name specified
@@ -216,38 +219,38 @@ SPACE				: [ \t\r\n]+			-> skip
 
 
 
-new_proxy_name			: SID
+new_proxy_name			: FID
 						;
 
 new_proxy				: proxy_header proxy_attribution? new_proxy_name
 						;
 
 
-new_obj_type_ref		: SID
+new_obj_type_ref		: FID
 						;
 
-new_obj_name			: SID
+new_obj_name			: FID
 						;
 
 new_obj					: new_obj_type_ref new_obj_name	
 						;
 
 
-new_analog_ref			: SID	// proxy ref
+new_analog_ref			: FID	// proxy ref
 						;
 
 new_analog				: LEFT_SQUARE new_analog_ref RIGHT_SQUARE 
 						;
 
 
-conversion_type_ref		: SID
+conversion_type_ref		: FID
 						;
 
 conversion_chain		: ( AS conversion_type_ref )+
 						;
 
 conversion_obj			: LITERAL
-						| SID
+						| FID
 						| formula
 						| method_call_sequence
 						| subroutine_call
@@ -258,14 +261,14 @@ conversion				: conversion_obj conversion_chain
 
 
 assignment_obj			: LITERAL
-						| SID
+						| FID
 						| formula
 						| method_call_sequence
 						| subroutine_call
 						| conversion
 						;
 
-assignment_ref			: SID	
+assignment_ref			: FID	
 						;
 
 assignment				: assignment_ref ASSIGN ASTERISK? assignment_obj 
@@ -275,14 +278,14 @@ assignment				: assignment_ref ASSIGN ASTERISK? assignment_obj
 
 association_obj			: VOID_
 						| LITERAL
-						| SID
+						| FID
 						| formula
 						| method_call_sequence
 						| subroutine_call
 						| conversion
 						;	
 
-association_proxy		: SID	// proxy ref
+association_proxy		: FID	// proxy ref
 						| new_proxy
 						;
 
@@ -290,16 +293,12 @@ association				: association_proxy JOIN association_obj
 						;
 
 
-operator_				:  OPERATOR
-						| ( PLUS | MINUS | ASTERISK | DIVIDE )
-						;
-
 
 formula_operand			: LITERAL
-						| SID
+						| FID
 						| formula_closure
 						| formula_call
-						| formula_operand ( AS SID )+  // special case conversion
+						| formula_operand ( AS FID )+  // special case conversion
 						;
 
 formula_term			: operator_? formula_operand
@@ -316,7 +315,7 @@ formula_input			: NULL_
 						| formula_product
 						;
 
-formula_ref				: SID  // proc ref
+formula_ref				: FID  // proc ref
 						;
 
 formula_call			: formula_ref LEFT_PAREN ( formula_input ( COMMA formula_input )* )? RIGHT_PAREN
@@ -329,7 +328,7 @@ formula					: DOUBLE_QUOTE formula_product DOUBLE_QUOTE
 
 input_obj				: NULL_
 						| LITERAL
-						| SID
+						| FID
 						| formula
 						| method_call_sequence
 						| subroutine_call	
@@ -347,7 +346,7 @@ input_obj_list			: LEFT_PAREN input_obj_enum? RIGHT_PAREN
 
 
 output_obj				: NULL_
-						| SID
+						| FID
 						| new_obj	
 						| method_call_sequence	   
 						| subroutine_call  
@@ -365,7 +364,7 @@ output_obj_list			: LEFT_PAREN output_obj_enum? RIGHT_PAREN
 
 extra_obj				: NULL_
 						| LITERAL
-						| SID
+						| FID
 						| new_obj
 						| formula
 						| method_call_sequence
@@ -392,14 +391,14 @@ aux_given_obj_list		: LEFT_PAREN input_obj_list RIGHT_PAREN
 
 
 
-call_coroutine_ref		: SID
+call_coroutine_ref		: FID
 						;
 
 call_coroutine			: WITH call_coroutine_ref aux_given_obj_list?	
 						;
 
 
-call_overt_proxy_name	: SID	
+call_overt_proxy_name	: FID	
 						;
 
 call_overt_proxy		: proxy_attribution
@@ -413,14 +412,14 @@ call_provision			: reg_given_obj_list? call_coroutine? call_overt_proxy?
 
 
 method_obj				: LITERAL
-						| SID  
+						| FID  
 						| new_obj	
 						| new_analog
 						| formula
 						| subroutine_call	
 						;
 
-method_ref				: SID
+method_ref				: FID
 						;
 
 method_call				: COLON method_ref call_provision
@@ -431,7 +430,7 @@ method_call_sequence	: method_obj? method_call+
 
 
 
-subroutine_ref			: SID
+subroutine_ref			: FID
 						;
 
 subroutine_call			: subroutine_ref call_provision
@@ -439,7 +438,7 @@ subroutine_call			: subroutine_ref call_provision
 
 
 
-quit_type_ref			: SID			
+quit_type_ref			: FID			
 						;
 
 quit_obj				: quit_type_ref  method_call  // call to :begin
@@ -464,7 +463,7 @@ return					: RETURN after?
 
 
 condition_obj			: LITERAL	
-						| SID
+						| FID
 						| formula
 						| method_call_sequence
 						| subroutine_call
@@ -493,19 +492,19 @@ loop_block				: LOOP condition? exec_block
 
 
 
-for_each_collection_obj	: SID	
+for_each_collection_obj	: FID	
 						| method_call_sequence
 						| subroutine_call
 						;
 
-for_each_index_obj		: SID	
+for_each_index_obj		: FID	
 						| new_obj	
 						;
 
 for_each_item_spec		: proxy_header? proxy_attribution?
 						;
 
-for_each_item_name		: SID  // proxy 
+for_each_item_name		: FID  // proxy 
 						;
 
 for_each_list			: LEFT_PAREN for_each_item_spec for_each_item_name IN_ for_each_collection_obj ( COMMA for_each_index_obj )? RIGHT_PAREN
@@ -530,7 +529,7 @@ isolate_block			: ISOLATE exec_block
 
 
 select_value_obj		: LITERAL		 
-						| SID		// pure const 
+						| FID		// pure const 
 						;
 
 select_value_list		: LEFT_PAREN select_value_obj ( COMMA select_value_obj )* RIGHT_PAREN
@@ -539,7 +538,7 @@ select_value_list		: LEFT_PAREN select_value_obj ( COMMA select_value_obj )* RIG
 select_branch_label		: VALUE select_value_list
 						;
 
-select_key_obj			: SID
+select_key_obj			: FID
 						| formula
 						| method_call_sequence
 						| subroutine_call	
@@ -594,8 +593,9 @@ exec_item				: exec_element? SEMI_COLON
 non_exec_item			: subroutine
 						| enum_type
 						| nom_type
+						| packet_type
 						| operation
-						| common_obj	// non-executable in proc block
+						| common_obj	
 						;
 
 proc_block				: LEFT_CURLY non_exec_item* exec_item* RIGHT_CURLY
@@ -619,17 +619,17 @@ proxy_attribution		: LEFT_SQUARE proxy_attribute RIGHT_SQUARE
 						;
 
 
-proxy_header_type_ref	: SID
+proxy_header_type_ref	: FID
 						;
 
 proxy_header			: proxy_header_type_ref PROXY
 						;
 
 
-input_spec_type_ref		: SID
+input_spec_type_ref		: FID
 						;
 
-input_spec_obj_name		: SID
+input_spec_obj_name		: FID
 						;
 
 input_spec_attribute	: OPT
@@ -649,10 +649,10 @@ input_spec_list			: LEFT_PAREN input_spec_enum? RIGHT_PAREN
 						;
 
 
-output_spec_type_ref	: SID
+output_spec_type_ref	: FID
 						;
 
-output_spec_obj_name	: SID
+output_spec_obj_name	: FID
 						;
 
 output_spec				: output_spec_type_ref output_spec_obj_name?
@@ -666,10 +666,10 @@ output_spec_list		: LEFT_PAREN output_spec_enum? RIGHT_PAREN
 
 
 
-extra_spec_type_ref		: SID  // alpha\extra
+extra_spec_type_ref		: FID  // alpha\extra
 						;
 
-extra_spec_obj_name		: SID
+extra_spec_obj_name		: FID
 						;
 
 extra_spec				: extra_spec_type_ref extra_spec_obj_name?
@@ -688,14 +688,14 @@ aux_obj_spec_list		: LEFT_PAREN input_spec_list RIGHT_PAREN
 						;
 
 
-coroutine_name			: SID
+coroutine_name			: FID
 						;
 
 coroutine_spec			: WITH coroutine_name reg_obj_spec_list?
 						;
 
 
-proxy_result_name		: SID
+proxy_result_name		: FID
 						;
 
 proxy_result			: EQUAL proxy_header proxy_attribution? proxy_result_name?
@@ -703,7 +703,7 @@ proxy_result			: EQUAL proxy_header proxy_attribution? proxy_result_name?
 
 
 
-subroutine_name			: SID
+subroutine_name			: FID
 						;
 
 subroutine_attribution	: LEFT_SQUARE NAF RIGHT_SQUARE
@@ -733,7 +733,7 @@ method_attribution		: LEFT_SQUARE method_attribute RIGHT_SQUARE
 method_interface		: method_attribution? reg_obj_spec_list? coroutine_spec? proxy_result? 
 						;
 
-method_name				: SID
+method_name				: FID
 						;
 
 method_def				: method_name method_interface ( proc_block | infer_block | SEMI_COLON )
@@ -755,7 +755,7 @@ recap_attribute			: TBD
 recap_attribution		: LEFT_SQUARE recap_attribute RIGHT_SQUARE
 						;
 
-recap_base_ref			: SID
+recap_base_ref			: FID
 						;
 
 recap_method_def		: recap_attribution? method_def
@@ -769,10 +769,10 @@ recap_method_group		: ABSTRACT METHOD? IN_ recap_base_ref LEFT_CURLY recap_metho
 
 
 
-instance_item_type_ref		: SID
+instance_item_type_ref		: FID
 							;
 
-instance_item_obj_name		: SID
+instance_item_obj_name		: FID
 							;
 
 instance_item_attribute		: OPT
@@ -801,7 +801,7 @@ format_item_fex_list	: LEFT_PAREN format_item_fex ( COMMA format_item_fex )* RIG
 format_item_label		: LITERAL
 						;
 
-format_item_ref			: SID 
+format_item_ref			: FID 
 						;
 
 format_item				: format_item_ref format_item_label? format_item_fex_list? SEMI_COLON
@@ -811,7 +811,7 @@ format_item				: format_item_ref format_item_label? format_item_fex_list? SEMI_C
 format_block			: LEFT_CURLY format_item* RIGHT_CURLY
 						;
 
-format_name				: SID
+format_name				: FID
 						;
 
 format_key				: LITERAL
@@ -832,10 +832,10 @@ format					: FORMAT format_def
 
 						
 
-nom_type_name			: SID
+nom_type_name			: FID
 						;
 
-nom_type_ref			: SID
+nom_type_ref			: FID
 						;
 
 nom_type_def			: nom_type_name ( EQUAL nom_type_ref )? SEMI_COLON
@@ -855,7 +855,7 @@ enum_type_value			: LITERAL
 enum_type_list			: LEFT_PAREN enum_type_value ( COMMA enum_type_value )* RIGHT_PAREN
 						;
 
-enum_type_name			: SID	
+enum_type_name			: FID	
 						;
 
 enum_type_def			: enum_type_name enum_type_list? SEMI_COLON
@@ -869,7 +869,35 @@ enum_type_group			: ENUM TYPE LEFT_CURLY enum_type_def* RIGHT_CURLY
 
 
 
-operation_ref			: SID
+packet_type_item_obj_name	: FID
+							;
+
+packet_type_item_type_ref	: FID
+							;
+
+packet_type_item			: packet_type_item_type_ref packet_type_item_obj_name? SEMI_COLON 
+							;
+
+packet_type_block			: LEFT_CURLY packet_type_item* RIGHT_CURLY
+							;
+
+packet_type_name			: FID
+							;
+
+packet_type_def				: packet_type_name ( packet_type_block | SEMI_COLON )
+							;
+
+packet_type					: PACKET TYPE packet_type_def
+							;
+
+
+
+operator_				:  OPERATOR
+						| ( PLUS | MINUS | ASTERISK | DIVIDE )
+						;
+
+
+operation_ref			: FID
 						;
 
 operation_input			: NULL_
@@ -881,7 +909,7 @@ operation_input			: NULL_
 operation_function		: operation_ref LEFT_PAREN operation_input ( COMMA operation_input )* RIGHT_PAREN	
 						;
 
-operation_operand		: SID		
+operation_operand		: FID		
 						;
 
 operation_unary_expr	: operator_ operation_operand
@@ -911,10 +939,10 @@ operation_group			: OPERATION LEFT_CURLY operation_def* RIGHT_CURLY
 
 
 
-common_obj_type_ref		: SID
+common_obj_type_ref		: FID
 						;
 
-common_obj_name			: SID
+common_obj_name			: FID
 						;
 
 common_obj_attribute	: CONST_
@@ -923,7 +951,7 @@ common_obj_attribute	: CONST_
 common_obj_attribution	: LEFT_SQUARE common_obj_attribute RIGHT_SQUARE
 						;
 
-common_obj_proc			: SID proc_block   // SID = begin
+common_obj_proc			: FID proc_block   // FID = begin
 						;
 
 common_obj_def			: common_obj_type_ref common_obj_name method_call? common_obj_attribution? SEMI_COLON  // method_call = :begin with literal inputs only
@@ -944,6 +972,7 @@ type_item				: common_obj
 						| nom_type_group
 						| enum_type
 						| enum_type_group
+						| packet_type
 						| subroutine
 						| subroutine_group
 						| method
@@ -957,7 +986,7 @@ type_item				: common_obj
 type_item_group			: LEFT_CURLY type_item* RIGHT_CURLY
 						;
 
-type_base_ref			: SID
+type_base_ref			: FID
 						;
 
 type_base_list			: LEFT_PAREN type_base_ref ( COMMA type_base_ref )* RIGHT_PAREN
@@ -975,7 +1004,7 @@ type_attribute			: INCOMPLETE
 type_attribution		: LEFT_SQUARE type_attribute RIGHT_SQUARE
 						;
 
-type_name				: SID
+type_name				: FID
 						;
 
 type_def				: type_name type_attribution? type_from_sequence? ( type_item_group | SEMI_COLON )
@@ -998,15 +1027,16 @@ page_item				: page_internal? common_obj
 						| page_internal? enum_type_group
 						| page_internal? nom_type
 						| page_internal? nom_type_group
+						| page_internal? packet_type
 						| page_internal? subroutine
 						| page_internal? subroutine_group
 						| page_internal? type
 						;
 						
-page_uses_book_alias	: SID
+page_uses_book_alias	: FID
 						;
 
-page_uses_book_ref		: SID
+page_uses_book_ref		: FID
 						;
 
 page_uses_item			: page_uses_book_ref ( AS page_uses_book_alias )?
@@ -1024,10 +1054,10 @@ page_attribute			: COMPATIBLE
 page_attribution		: LEFT_SQUARE page_attribute RIGHT_SQUARE
 						;
 
-page_book_ref			: SID
+page_book_ref			: FID
 						;
 
-page_name				: SID
+page_name				: FID
 						;
 
 page_header				: page_name IN_ page_book_ref page_attribution? page_uses*
