@@ -2,9 +2,7 @@
 page utc in AlphaByGood
 
 
-nom type utc_pair = <'2'><int>tuple;
-
-common utc_pair utc_origin [const];	 -- (years,days)
+common <int><'2'>array utc_origin [const];	 -- (years,days) offset from Gregorian origin
 
 
 type utc  -- conventional
@@ -101,7 +99,7 @@ type utc  -- conventional
 	{
 		begin ( expr vex [opt] );	-- literal, default = "now"
 
-		begin ( utc_pair );			-- (days,ticks)
+		begin ( int days, int ticks );	-- offset from utc_origin
 
 		begin ( utc other );		-- copy
 
@@ -119,7 +117,7 @@ type utc  -- conventional
 	
 		update [upd];		-- "now"
 
-		analyze ()( utc_pair );	-- (days,ticks)
+		analyze ()( int days, int ticks );	-- offset from utc origin
 
 		add [upd]( etm t );
 		add [eval]( etm t )( utc );

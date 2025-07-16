@@ -449,6 +449,13 @@ type text_mediator from mediator
 	
 	}
 
+	abstract in mediator
+	{
+		[pwd,final] ~fread [upd]( expr fex )( op<object> op )( extra );
+
+		[pwd,final] ~fwrite [upd](  op<object> op, expr fex )()( extra );	
+	}
+
 
 	common 
 	{

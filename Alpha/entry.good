@@ -40,7 +40,7 @@ type entry [incomplete]
 		begin;
 	}
 
-	abstract 
+	abstract -- recap as [tbd]
 	{
 		~run [upd]( signal active [upd], signal stop, op<object> [opt] );
 	}

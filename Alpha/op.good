@@ -8,27 +8,27 @@ type op<t>   -- intrinsic
 	An op<t> object is an "object pointer" object that 
 	creates and/or accesses an object in heap memory.
 
-	An op is used to create an object at runtime in heap
+	An o<>p is used to create an object at runtime in heap
 	memory. The type of object created must be a complete
 	type, but in general, the op adhoc type can be any 
 	related (possibly incomplete) type.  
 
-	Logically, an op is a runtime reference object. That
-	is, the binding of op to object is made at runtime.
-	In this sense, ops are similar to proxies.  However, 
-	ops are first class objects with methods (proxies
-	aren't) and access to an op's bound object requires
+	Logically, an op<> is a runtime reference object. That
+	is, the binding of op<> to object is made at runtime.
+	In this sense, op<> is similar to a proxy.  However, 
+	op<> is a first class object with methods (proxies
+	aren't) and access to an op<>'s bound object requires
 	an explicit accessor call, while access to a proxy's
 	bound object is implicit.
 	
-	The op object accessor method is called :deref. Like 
+	The op<> object accessor method is called :deref. Like 
 	other accessors, :deref returns a result proxy which
 	can be used in any object context as a reference to 
 	the heap object. Thus, logically, there are two levels
 	of indirection to get to the object.
 	
-	Note:  In a sense, :deref converts an op into a proxy. 
-	The conversion is optimized and may in fact be virtual.
+	Note:  In a sense, :deref converts an op<> into a proxy. 
+	The conversion is optimized and may in fact be nominal.
 	
  	The proxy returned by :deref has unspecified permission,
 	so permissison must be stated in the call to gain [upd]
@@ -38,41 +38,41 @@ type op<t>   -- intrinsic
 	set permission if a type change is needed at the same 
 	time.
 
-	The heap object bound to an op is created when the op 
-	is initialized. The new object is null and it mustbe 
-	initialized before it can be used.  
+	The heap object bound to an op<> is created when the 
+	op<> is initialized. The new object is null and it must
+	be initialized before it can be used.  
 	
 	:begin returns an [init] proxy which allows the new
 	null object to be initialized immediately:
 	
 		op<thing> opt begin:begin; 
 
-	This expression creates and initializes an op named opt,
-	bound to an object of adhoc type thing, then initializes
-	the new heap object using default :begin.  
+	This expression creates and initializes an op<> named
+	opt, bound to an object of adhoc type thing, then 
+	initializes	the new heap object using default :begin.  
 
-	Note:  It's important to distinquish between a null op
-	and a possibly null heap object accessed by the op.  A 
-	null op can't be used, but a properly intialized op 
-	can always be used and it may or may not access a null
-	object.
+	Note:  It's important to distinquish between a null 
+	op<> and a possibly null heap object accessed by the 
+	op<>.  A null op<> can't be used, but a properly init-
+	ialized op<> can always be used and it may or may not
+	access a null object.
 	
-	An op can be initialized by copying an existing compat-
-	ible op. When ops are copied, the new op accesses an 
-	external subobject of the heap object.
+	An op<> can be initialized by copying an existing 
+	compatible op<>. When op<> is copied, the new op<>
+	accesses an external subobject of the heap object.
 	
-	The object accessed by an op is automatically deleted
-	when all ops that reference the object are deleted.
+	The object accessed by op<> is automatically deleted
+	when all op<> that reference the object are deleted.
 	
 	Note:  It's common to say that the object accessed by
-	an op is "reference counted."
+	an op<> is "reference counted."
 
-	Note:  Copying ops and reference counting is thread-
-	safe. ops are essential for sharing objects between
+	Note:  Copying op<> and reference counting is thread-
+	safe. op<> is essential for sharing objects between
 	threads.
 
-	An existing op is compatible with another op if the
-	two adhoc op types are related.
+	An existing op<t> is compatible with another op<u>
+	if the two adhoc types are related.
 	
 	For example:
 
@@ -94,12 +94,12 @@ type op<t>   -- intrinsic
 		op<widget> wp:begin:begin; -- new op to actual widget
 		op<thing> tp:begin( wp );  -- copy wp
 
-		wp:use_object:foo;	-- ok (foo is inherited)
-		wp:use_object:goo;	-- ok
+		wp:deref:foo;	-- ok (foo is inherited)
+		wp:deref:goo;	-- ok
 
-		tp:use_object:foo;	-- ok
-		tp:use_object:goo;	-- error! (goo not a method of thing)
-		tp:use_object:as<widget>:goo;  -- ok after type translation
+		tp:deref:foo;	-- ok
+		tp:deref:goo;	-- error! (goo not a method of thing)
+		tp:deref:as<widget>:goo;  -- ok after type translation
 	}
 		
 
@@ -140,35 +140,31 @@ type op<t>   -- intrinsic
 
 	are all legit and return valid proxies.
 
-	ops can be used to create logically heterogenous arrays.
+	op<> can be used to create logically heterogenous arrays.
 	They're also essential for creating dynamically linked
 	object collections like trees, lists, and networks.
 	
-	ops are generally portable if <t> is portable.  The 
-	portability mediator must have an open op service.
-	See type mediator for more info.  :store disables the 
-	pointer and any attempt to use it after calling :store
-	will disrupt the application.  Object formats are given
-	as extras.
+	op<t> is generally portable if <t> is portable.  The 
+	given mediator must be adapted to implement a specific 
+	sharing scheme.
 
-	ops can be compared using standard methods. Cross type
-	comparisions are allowed, even if the ops are copy-
+	op<> can be compared using standard methods. Cross type
+	comparisions are allowed, even if the op<> is copy-
 	incompatible.  Comparisons are based on heap address, so
-	equal ops reference the same heap object.  Furthermore, if
-	a:before?(b) is false and b:before?(a) is false, then a 
-	and b are par equal ( "a |par| b" is true).
+	equal op<> reference the same heap object.  Furthermore, 
+	if a:before?(b) is false and b:before?(a) is false, then
+	a and b are par equal ( "a |par| b" is true).
 		
-	Note:  Par equality is persistent provided hps are properly
-	restored using techniques already described. However, 
-	ordinality is a completely transient property and any 
-	ordered collection of hps is only ordered for a single 
-	runtime session.
+	Note:  Par equality is persistent provided op<> is 
+	properly restored. However, ordinality is a completely 
+	transient property and any ordered collection of op<>
+	is only ordered for a single runtime session.
 
 	Note: In some applications, it may be preferable to
-	compare ops by passing the comparison on to the common
+	compare op<> by passing the comparison on to the common
 	object.  A general solution is too complicated.  For
 	particular scenarios, an application can define a new
-	type that encapsulates an op and provides the desired
+	type that encapsulates an op<> and provides the desired
 	pass-through methods.
 
 }}
@@ -183,20 +179,17 @@ type op<t>   -- intrinsic
 
 		begin<xt> ( op<<xt>> [upd] );		-- take compatible op, <xt> related to <t> (may quit)
 
-		begin ( typename ) = <t> proxy [init];	-- access new <t> object, typename:is<t>? must be true (may quit)
+
+		begin ( mediator [upd], expr fex )()( extra );	-- requires adapted mediator (may quit)
+
+		store ( mediator [upd], expr fex )()( extra );  -- requires adapted mediator (may quit)
+
 
 		deref = <t> proxy;					-- always works (never void)
 
 		is_equal<xt>? ( op<<xt>> )( bool );
 
 		is_before<xt>? ( op<<xt>> )( bool );
-	}
-
-	general -- <t> dependent portability
-	{
-		begin ( mediator [upd], expr fex )()( extra );		
-
-		store [eval]( mediator [upd], expr fex )()( extra );
 	}
 }
 

@@ -286,20 +286,6 @@ type mediator
 	next char is not 'NUL', rp is not moved and the output
 	is 'false'.
 			
-	Object pointer (op) service is optional and provided by
-	an internal array of mediators. An array of mediators is
-	a logical heap whereby each mediator encapsulates an 
-	individual object image.  Serialized object pointers 
-	index the mediator that encapsulates the pointer's 
-	object.	Shared references are properly maintained.
-
-	:open_op_service enables op<t> mediation.
-
-	:close_op_service disables op<t> mediation and assigns
-	the mediator array to an output.
-	
-	Pointer service is useful (necessary) for peristing a 
-	complex network of objects. 
 
 	:write_checksum writes a 4 byte checksum at the 
 	current wp. The sum is calculated from all bytes
@@ -316,6 +302,12 @@ type mediator
 	
 	med:get_size()( =int where ):sub( '4' );
 	med:set_rp( where ) ):read_checksum()( bool ok );  -- verify
+
+
+	If an application intends to mediate object pointers
+	( op<t> ) then it must derive and adapt this base type
+	to implement a scheme to store and restore the pointer
+	and it's object.
 }}
 {
 
@@ -337,14 +329,7 @@ type mediator
 
 		attach [upd]( addr pmem, int size [opt] );  -- adopt pmem
 
-
-		open_op_service [upd];  -- original
-
-		open_op_service [upd]( <mediator>array [upd] );  -- restore
-
-		close_op_service [upd]()( <mediator>array );
-
-		
+				
 		enable_auto_align [upd];		-- binary alignment
 
 
@@ -419,5 +404,13 @@ type mediator
 		move [upd]( int q, int n );		-- see notes
 
 		copy [upd]( mediator source, int q [opt], int rp [opt] )( int q2 );	-- see notes
+	}
+
+
+	abstract -- recap as [pwd]
+	{
+		~fread [upd]( expr fex )( op<object> )( extra );	
+
+		~fwrite [upd]( op<object>, expr fex )()( extra );	
 	}
 }

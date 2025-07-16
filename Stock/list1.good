@@ -98,7 +98,7 @@ type list1_cursor
 
 
 
-type list1 from serial<node1><list1_cursor>
+type list1 from serial_access<node1><list1_cursor>
 {{
 	One-way linked list with heterogenous nodes.
 
@@ -160,15 +160,15 @@ type list1 from serial<node1><list1_cursor>
 
 	until next is null.
 
-	Note: A list1 can also be traversed using a serial 
-	cursor or Good for-loop.
+	Note: A list1 can also be traversed using a serial_
+	access cursor or Good for-loop.
 }}
 {
 	general method
 	{
 		begin  -- original empty
 		{
-			io:as_base<serial<node1><list1_cursor>>:begin;
+			io:as_base<serial_access<node1><list1_cursor>>:begin;
 		}
 
 		begin ( list1 other [upd] )  -- take 
@@ -301,7 +301,7 @@ type list1 from serial<node1><list1_cursor>
 	}
 
 
-	abstract in serial<node1><list1_cursor>
+	abstract in serial_access<node1><list1_cursor>
 	{
 		[final] ~open_cursor ( int step )( list1_cursor c )
 		{	

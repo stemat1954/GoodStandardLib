@@ -2,7 +2,7 @@
 page extra in AlphaByGood
 
 
-type extra from indexed<object> -- intrinsic, restricted
+type extra from random_access<object> -- intrinsic, restricted
 {{
 	extra is an adjectival type that refers to a uniform
 	set of unspecified objects given to a procedure after
@@ -40,14 +40,14 @@ type extra from indexed<object> -- intrinsic, restricted
 		delete [upd]( int q [opt] );  -- q objects from front
 	}
 
-	general  -- similar in indexed<object>
+	general  -- similar in random_access<object>
 	{
 		count ()( int );
 
 		use_object ( int i ) = object proxy; 
 	}
 
-	abstract in indexed<object>
+	abstract in random_access<object>
 	{
 		[final] ~count ()( int n );
 

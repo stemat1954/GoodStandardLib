@@ -1,16 +1,16 @@
 
 page serial in AlphaByGood
 
-type serial<t><c> [incomplete] -- intrinsic
+type serial_access<t><c> [incomplete] -- intrinsic
 {{
-	serial<t><c> is a base type for generic object 
+	serial_access<t><c> is a base type for generic object 
 	collections that can be accessed serially.
 		
 	<t> is the symbolic object type and <c> is the symbolic 
 	cursor type. 
 	
-	Collections that derive from serial<t><c> manage an
-	ordered set of objects where individual objects are
+	Collections that derive from serial_access<t><c> manage
+	an ordered set of objects where individual objects are
 	accessed in serial order using a bespoke cursor.
 
 	Access to the collection starts by opening a cursor	
@@ -19,11 +19,11 @@ type serial<t><c> [incomplete] -- intrinsic
 	steps.  A positive or negative step determines 
 	direction and resolution of the cursor. 
 	
-	Generally, a serial cursor must have a final inoper-
-	able state that doesn't provide access to any object. 
-	The inoperable state must be distinguishable from 
-	null and an inoperable cursor must be accepted by all
-	methods.
+	Generally, a serial_access cursor must have a final 
+	inoperable state that doesn't provide access to any
+	object. The inoperable state must be distinguishable
+	from null and an inoperable cursor must be accepted by
+	all	methods.
 
 	:open_cursor( step ) creates an original cursor placed 
 	at one end of the sequence.  If step is positive, the 
@@ -46,7 +46,8 @@ type serial<t><c> [incomplete] -- intrinsic
 	a given cursor. If the cursor is inoperable, the proxy
 	will be void.
 
-	A serial collection can be scanned in a Good for loop.
+	A serial_access collection can be scanned in a Good 
+	for loop.
 }}
 {
 	general
@@ -63,7 +64,7 @@ type serial<t><c> [incomplete] -- intrinsic
 	}
 
 
-	abstract  
+	abstract  -- recap as [tbd]
 	{
 		~open_cursor ( int )( <c> );  
 

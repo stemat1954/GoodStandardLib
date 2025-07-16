@@ -1,31 +1,13 @@
 
 page array in AlphaByGood
 
-
-nom type array_cursor = <'2'><int>tuple;
-
-
-type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and conventional per <t>
 {{
-	An array<t> is a resizable object set.  Objects are
-	uniform and logically contiguous in memory.
+	<t>array
+	<t><#>array
 
-	<t> is the symbolic object type. The adhoc type must
-	be a complete type.  
-		
-	Methods that require a given index quit if the index is
-	invalid. A valid index is between zero and count
-	(inclusive).  index = count is a valid insertion index.
-
-	If given index is valid, :insert always works provided 
-	there is available memory, and :delete always works by 
-	ignoring attempts to remove too many objects.
-
-	Note: delete without an index (default) when array is
-	empty doesn't do anything.
-
-	Inserting and deleting at the end of an array is most
-	efficient.
+	An array is an ordered collection of homogenous
+	objects. Objects are uniform and logically contiguous
+	in memory. <t> is the symbolic object type.
 
 	An array can be configured from any type <t> but some
 	methods are type dependent.
@@ -33,21 +15,53 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 	An array is portable if <t> is portable.  <t> formats
 	are given as extras.
 
-	An array cursor is bidirectional and represented by
-	a pair of ints.  One int carries the current position,
-	while the other carries step.  If step is zero, the 
-	cursor is inoperable.
+	A fixed size array has a symbolic dimension <#>.
 
+	If an array is not fixed size, objects can be added
+	and deleted.
+
+	Methods that require a given index quit if the index 
+	is invalid. A valid index is between zero and count
+	(inclusive).  index = count is a valid insertion index.
+
+	Arrays derive from random_access and serial_access.
+	Thus they can be iterated in a for-each loop.
+
+	An array cursor is bidirectional and opaque.
+}}
+
+
+type array_cursor;
+
+
+type <t>array from ( random_access<<t>>, serial_access<<t>><array_cursor> ) -- compatible and conventional per <t>
+{{
+	:insert always works provided there is available memory
+	(and index is valid).
+	
+	:delete always works by ignoring attempts to remove too
+	many objects.
+
+	Note: delete without an index (default) when array is
+	empty doesn't do anything.
+
+	Inserting and deleting at the end of an array is most
+	efficient.
 
 }}
 {
 	nom type t_array = <<t>>array;
+
+	nom type t<#>_array = <<t>><<#>>array;
+
 
 	general method 
 	{
 		begin ( int reserve [opt] ); 
 
 		begin ( t_array other [upd] );	-- take 
+
+		begin<#> ( t<<#>>_array other [upd] );	-- take 
 
 		insert [upd]( int i [opt], int q );				-- q null objs at i (end)
 
@@ -60,7 +74,7 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 		shrink [upd];						-- release unused memory
 	}
 	
-	general method -- similar in indexed<<t>>
+	general method -- similar in random_access<<t>>
 	{
 		count ()( int );  
 
@@ -72,6 +86,9 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 		begin ( t_array other );							-- with <t> copy
 		begin ( t_array other ) with copier ( <t> )( <t> );	-- with copier
 
+		begin<#> ( t<<#>>_array other );							-- with <t> copy
+		begin<#> ( t<<#>>_array other ) with copier ( <t> )( <t> );	-- with copier
+
 		begin ( mediator [upd], expr fex )()( extra );		
 		store [eval]( mediator [upd], expr fex )()( extra );
 
@@ -79,6 +96,11 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 		insert [upd]( int i [opt], int q [opt], t_array other, int j [opt] ) with copier ( <t> )( <t> );			-- with copier:  ditto
 		insert [upd]( int i [opt], int q [opt], t_array other [upd], int j [opt] );									-- with <t> take: ditto
 		insert [upd]( int i [opt], int q [opt], t_array other [upd], int j [opt] ) with taker ( <t> [upd] )( <t> );	-- with taker:  ditto
+
+		insert<#> [upd]( int i [opt], int q [opt], t<<#>>_array other, int j [opt] );										-- with <t> copy: q (1) objs from other at j (0) to i (end) 
+		insert<#> [upd]( int i [opt], int q [opt], t<<#>>_array other, int j [opt] ) with copier ( <t> )( <t> );			-- with copier:  ditto
+		insert<#> [upd]( int i [opt], int q [opt], t<<#>>_array other [upd], int j [opt] );									-- with <t> take: ditto
+		insert<#> [upd]( int i [opt], int q [opt], t<<#>>_array other [upd], int j [opt] ) with taker ( <t> [upd] )( <t> );	-- with taker:  ditto
 
 		copy [eval]( int i [opt] )( <t> obj );								-- with <t> copy: one obj at i (end) to obj
 		copy [eval]( int i [opt] )( <t> obj ) with copier ( <t> )( <t> );	-- with copier: ditto
@@ -89,14 +111,14 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 		rank [eval]( <t> )( int i, bool unique ) with sorter ( <t> a, <t> b )( bool ); -- find ordered insertion point
 	}
 
-	abstract method in indexed<<t>>
+	abstract method in random_access<<t>>
 	{
 		[final] ~count ()( int n );
 		
 		[final] ~use_object ( int i ) = <t> proxy;
 	}
 
-	abstract method in serial<<t>><array_cursor>
+	abstract method in serial_access<<t>><array_cursor>
 	{
 		[final] ~open_cursor ( int )( array_cursor );  
 
@@ -108,4 +130,54 @@ type <t>array from ( indexed<<t>>, serial<<t>><array_cursor> ) -- compatible and
 	}
 }
 
+
+
+type <t><#>array from ( random_access<<t>>, serial_access<<t>><array_cursor> ) -- compatible and conventional per <t>
+{{
+}}
+{
+	nom type tn_array = <<t>><<#>>array;
+
+	general 
+	{
+		begin;	-- all objects null
+		
+		begin ( tn_array other [upd] );  -- take
+	}
+
+	general -- similar in random_access<<t>>
+	{
+		use_object ( int i ) = <t> proxy [eval,init]; 
+	}
+
+	general -- <t> dependent
+	{
+		begin ( <t> seed );								-- with <t> copy
+		begin ( <t> seed ) with copier ( <t> )( <t> );	-- with copier
+
+		begin ( tn_array other );								-- with <t> copy
+		begin ( tn_array other ) with copier ( <t> )( <t> );	-- with copier
+
+		begin ( mediator [upd], expr fex )()( extra );  
+		store ( mediator [upd], expr fex )()( extra );
+	}
+
+	abstract in random_access<<t>>
+	{
+		[final]	~count ()( int n );
+
+		[final] ~use_object ( int i ) = <t> proxy;
+	}
+
+	abstract in serial_access<<t>><array_cursor>
+	{
+		[final] ~open_cursor ( int )( array_cursor );  
+
+		[final] ~move_cursor ( array_cursor [upd] );
+
+		[final] ~flip_cursor ( array_cursor [upd] ); 
+
+		[final] ~use_object ( array_cursor ) = <t> proxy; 
+	}
+}
 

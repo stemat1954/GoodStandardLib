@@ -44,7 +44,6 @@ NOM					:	'nom'			;		// nominal
 NULL_				:	'null'			;
 OPERATION			:	'operation'		;
 OPT					:	'opt'			;		// optional
-PACKET				:	'packet'		;
 PAGE				:	'page'			;
 PROXY				:	'proxy'			;	
 PWD					:	'pwd'			;		// previously well-defined
@@ -56,6 +55,7 @@ SUBROUTINE			:	'subroutine'	;
 TBD					:	'tbd'			;		// to-be-defined 
 TERM				:	'term'			;		// terminate
 TRAP				:	'trap'			;
+CRUDE				:	'tuple'			;
 TYPE				:	'type'			;
 USES				:   'uses'			;
 UPD					:	'upd'			;		// update
@@ -593,7 +593,7 @@ exec_item				: exec_element? SEMI_COLON
 non_exec_item			: subroutine
 						| enum_type
 						| nom_type
-						| packet_type
+						| crude_type
 						| operation
 						| common_obj	
 						;
@@ -869,25 +869,25 @@ enum_type_group			: ENUM TYPE LEFT_CURLY enum_type_def* RIGHT_CURLY
 
 
 
-packet_type_item_obj_name	: FID
+crude_type_item_obj_name	: FID
 							;
 
-packet_type_item_type_ref	: FID
+crude_type_item_type_ref	: FID
 							;
 
-packet_type_item			: packet_type_item_type_ref packet_type_item_obj_name? SEMI_COLON 
+crude_type_item				: crude_type_item_type_ref crude_type_item_obj_name? SEMI_COLON 
 							;
 
-packet_type_block			: LEFT_CURLY packet_type_item* RIGHT_CURLY
+crude_type_block			: LEFT_CURLY crude_type_item* RIGHT_CURLY
 							;
 
-packet_type_name			: FID
+crude_type_name				: FID
 							;
 
-packet_type_def				: packet_type_name ( packet_type_block | SEMI_COLON )
+crude_type_def				: crude_type_name ( crude_type_block | SEMI_COLON )
 							;
 
-packet_type					: PACKET TYPE packet_type_def
+crude_type					: CRUDE TYPE crude_type_def
 							;
 
 
@@ -972,7 +972,7 @@ type_item				: common_obj
 						| nom_type_group
 						| enum_type
 						| enum_type_group
-						| packet_type
+						| crude_type
 						| subroutine
 						| subroutine_group
 						| method
@@ -1027,7 +1027,7 @@ page_item				: page_internal? common_obj
 						| page_internal? enum_type_group
 						| page_internal? nom_type
 						| page_internal? nom_type_group
-						| page_internal? packet_type
+						| page_internal? crude_type
 						| page_internal? subroutine
 						| page_internal? subroutine_group
 						| page_internal? type

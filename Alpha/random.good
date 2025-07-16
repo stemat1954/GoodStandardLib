@@ -1,17 +1,17 @@
 
-page indexed in AlphaByGood
+page random in AlphaByGood
 
 
-type indexed<t> [incomplete] -- intrinsic
+type random_access<t> [incomplete] -- intrinsic
 {{
-	indexed<t> is a base type for uniform generic object
-	collections.
+	random_access<t> is a base type for uniform generic
+	object collections.
 		
 	<t> is the symbolic object type. 
 
-	Collections that derive from indexed<t> manage a countable
-	set of objects where individual objects are directly
-	accessed by a numeric position index.
+	Collections that derive from random_access<t> manage 
+	a countable set of objects where individual objects
+	are directly accessed by a numeric position index.
 
 	Valid indexes range from zero to count - 1.
 
@@ -35,7 +35,7 @@ type indexed<t> [incomplete] -- intrinsic
 		use_object ( int i ) = <t> proxy;
 	}
 
-	abstract
+	abstract -- recap as [tbd]
 	{
 		~count ()( int );	
 
