@@ -49,7 +49,9 @@ type string
 	{
 		begin ( addr, utf, endian, int len [opt] );  -- sequence
 
-		begin ( <unicode>array, utf, endian );  -- array
+		begin ( array<unicode>, utf, endian );  -- array
+		
+		begin<#> ( array<unicode><<#>>, utf, endian );  -- array
 
 		begin ( expr, utf [opt], endian [opt] );  -- expr/literal conversion
 
@@ -74,7 +76,7 @@ type string
 
 		extract ( int i )( unicode );	 -- one char 
 
-		extract ( int i [opt], int q [opt] )( <unicode>array );  -- multiple chars
+		extract ( int i [opt], int q [opt] )( array<unicode> );  -- multiple chars
 
 		find ( string other, int i [upd] )( bool );
 

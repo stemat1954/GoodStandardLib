@@ -44,7 +44,7 @@ type text_mediator from mediator
 
 	Most applications can use text mediator methods alone
 	to accomplish common serial formatting and parsing tasks.
-	However, more advanced applications will need access
+	However, more advanced applications will need access to
 	the base mediator read/write cursors.
 	
 	Encoding of the unicode image is specified to :begin.
@@ -245,24 +245,24 @@ type text_mediator from mediator
 			io:write_one( c );
 		}
 				
-		write [upd]( <unicode>array arr )
+		write [upd]( array<unicode> arr )
 		{
 			io:write_all( arr );
 		}
 
-		write [upd]( <ascii>array arr )
+		write [upd]( array<ascii> arr )
 		{
 			io:write_all( arr );
 		}
 
 		write [upd]( string s ) 
 		{
-			io:write_all( s:extract()( =<unicode>array ) );
+			io:write_all( s:extract()( =array<unicode> ) );
 		}
 
 		write [upd]( expr e ) 
 		{
-			io:write_all( e:extract()( =<ascii>array ) );
+			io:write_all( e:extract()( =array<ascii> ) );
 		}
 			
 			
@@ -291,49 +291,49 @@ type text_mediator from mediator
 			io:read_one()( c );
 		}
 
-		read [upd]( unicode delim )( <unicode>array arr )
+		read [upd]( unicode delim )( array<unicode> arr )
 		{
 			io:read_array( delim )( arr );
 		}
 
-		read [upd]( ascii delim )( <ascii>array arr )  
+		read [upd]( ascii delim )( array<ascii> arr )  
 		{
 			io:read_array( delim )( arr );
 		}
 
 		read [upd]( unicode delim )( string )
 		{
-			io:read_array( delim )( <unicode>array arr );
+			io:read_array( delim )( array<unicode> arr );
 			io:get_utf()( utf f ):get_endian()( endian e );
 			given\string:begin( arr, f, e );
 		}
 				
 		read [upd]( ascii delim )( expr )
 		{
-			io:read_array( delim )( <ascii>array arr );
+			io:read_array( delim )( array<ascii> arr );
 			given\expr:begin( arr );
 		}
 
-		read [upd]( int q [opt] )( <unicode>array arr ) -- null q -> all
+		read [upd]( int q [opt] )( array<unicode> arr ) -- null q -> all
 		{
 			io:read_array( q )( arr );
 		}
 
-		read [upd]( int q [opt] )( <ascii>array arr )  
+		read [upd]( int q [opt] )( array<ascii> arr )  
 		{
 			io:read_array( q )( arr );
 		}
 
 		read [upd]( int q [opt] )( string )
 		{
-			io:read_array( q )( <unicode>array arr );
+			io:read_array( q )( array<unicode> arr );
 			io:get_utf()( utf f ):get_endian()( endian e );
 			given\string:begin( arr, f, e );
 		}
 
 		read [upd]( int q [opt] )( expr )
 		{
-			io:read_array( q )( <ascii>array arr );
+			io:read_array( q )( array<ascii> arr );
 			given\expr:begin( arr );
 		}
 
@@ -481,17 +481,25 @@ type text_mediator from mediator
 			c:as_int:store( *io, io.codepoint_fex );
 		}
 
-		write_all<t> [upd]( <<t>>array arr ) -- <t> ascii or unicode
+		write_all<t> [upd]( array<<t>> arr ) -- <t> ascii or unicode
 		{
 			for each ( ~c in arr ) ~c:as_int:store( *io, io.codepoint_fex );
 		}
+
+%ignore
+		write_all<t><#> [upd]( array<<t>><<#>> arr ) -- <t> ascii or unicode
+		{
+			for each ( ~c in arr ) ~c:as_int:store( *io, io.codepoint_fex );
+		}
+%end
+
 
 		read_one<t> [upd]()( <t> c ) -- <t> ascii or unicode
 		{
 			c:begin( int:begin( *io, io.codepoint_fex ) ); -- int:fread
 		}
 
-		read_array<t> [upd]( <t> delim )( <<t>>array arr ) -- <t> ascii or unicode
+		read_array<t> [upd]( <t> delim )( array<<t>> arr ) -- <t> ascii or unicode
 		{
 			arr:begin;
 			if ( "rp_end?( io )" ) return;
@@ -505,7 +513,7 @@ type text_mediator from mediator
 			}
 		}
 
-		read_array<t> [upd]( int q [opt] )( <<t>>array arr ) -- <t> ascii or unicode
+		read_array<t> [upd]( int q [opt] )( array<<t>> arr ) -- <t> ascii or unicode
 		{
 			arr:begin;
 			if ( "rp_end?( io )" ) return;

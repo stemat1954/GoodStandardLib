@@ -2,8 +2,8 @@
 page array in AlphaByGood
 
 {{
-	<t>array
-	<t><#>array
+	array<t>
+	array<t><#>
 
 	An array is an ordered collection of homogenous
 	objects. Objects are uniform and logically contiguous
@@ -24,17 +24,17 @@ page array in AlphaByGood
 	is invalid. A valid index is between zero and count
 	(inclusive).  index = count is a valid insertion index.
 
-	Arrays derive from random_access and serial_access.
+	Arrays derive from direct_access and serial_access.
 	Thus they can be iterated in a for-each loop.
 
 	An array cursor is bidirectional and opaque.
 }}
 
 
-type array_cursor;
+type array_cursor;  -- opaque and restricted
 
 
-type <t>array from ( random_access<<t>>, serial_access<<t>><array_cursor> ) -- compatible and conventional per <t>
+type array<t> from direct_access<<t>>, from serial_access<<t>><array_cursor> -- compatible and conventional per <t>
 {{
 	:insert always works provided there is available memory
 	(and index is valid).
@@ -50,18 +50,18 @@ type <t>array from ( random_access<<t>>, serial_access<<t>><array_cursor> ) -- c
 
 }}
 {
-	nom type t_array = <<t>>array;
+	nom type array_t = array<<t>>;
 
-	nom type t<#>_array = <<t>><<#>>array;
+	nom type array_t<#> = array<<t>><<#>>;
 
 
 	general method 
 	{
 		begin ( int reserve [opt] ); 
 
-		begin ( t_array other [upd] );	-- take 
+		begin ( array_t other [upd] );	-- take 
 
-		begin<#> ( t<<#>>_array other [upd] );	-- take 
+		begin<#> ( array_t<<#>> other [upd] );	-- take 
 
 		insert [upd]( int i [opt], int q );				-- q null objs at i (end)
 
@@ -74,33 +74,33 @@ type <t>array from ( random_access<<t>>, serial_access<<t>><array_cursor> ) -- c
 		shrink [upd];						-- release unused memory
 	}
 	
-	general method -- similar in random_access<<t>>
+	general method -- similar in direct_access<<t>>
 	{
 		count ()( int );  
 
-		use_object ( int i ) = <t> proxy [eval,init];
+		use ( int i ) = <t> proxy [eval,init];
 	}
 
 	general method  -- <t> dependent
 	{
-		begin ( t_array other );							-- with <t> copy
-		begin ( t_array other ) with copier ( <t> )( <t> );	-- with copier
+		begin ( array_t other );							-- with <t> copy
+		begin ( array_t other ) with copier ( <t> )( <t> );	-- with copier
 
-		begin<#> ( t<<#>>_array other );							-- with <t> copy
-		begin<#> ( t<<#>>_array other ) with copier ( <t> )( <t> );	-- with copier
+		begin<#> ( array_t<<#>> other );							-- with <t> copy
+		begin<#> ( array_t<<#>> other ) with copier ( <t> )( <t> );	-- with copier
 
 		begin ( mediator [upd], expr fex )()( extra );		
 		store [eval]( mediator [upd], expr fex )()( extra );
 
-		insert [upd]( int i [opt], int q [opt], t_array other, int j [opt] );										-- with <t> copy: q (1) objs from other at j (0) to i (end) 
-		insert [upd]( int i [opt], int q [opt], t_array other, int j [opt] ) with copier ( <t> )( <t> );			-- with copier:  ditto
-		insert [upd]( int i [opt], int q [opt], t_array other [upd], int j [opt] );									-- with <t> take: ditto
-		insert [upd]( int i [opt], int q [opt], t_array other [upd], int j [opt] ) with taker ( <t> [upd] )( <t> );	-- with taker:  ditto
+		insert [upd]( array_t other, int i [opt], int q [opt], int j [opt] );										-- with <t> copy: q (all) objs from other at j (0) to i (end) 
+		insert [upd]( array_t other, int i [opt], int q [opt], int j [opt] ) with copier ( <t> )( <t> );			-- with copier:  ditto
+		insert [upd]( array_t other [upd], int i [opt], int q [opt], int j [opt] );									-- with <t> take: ditto
+		insert [upd]( array_t other [upd], int i [opt], int q [opt], int j [opt] ) with taker ( <t> [upd] )( <t> );	-- with taker:  ditto
 
-		insert<#> [upd]( int i [opt], int q [opt], t<<#>>_array other, int j [opt] );										-- with <t> copy: q (1) objs from other at j (0) to i (end) 
-		insert<#> [upd]( int i [opt], int q [opt], t<<#>>_array other, int j [opt] ) with copier ( <t> )( <t> );			-- with copier:  ditto
-		insert<#> [upd]( int i [opt], int q [opt], t<<#>>_array other [upd], int j [opt] );									-- with <t> take: ditto
-		insert<#> [upd]( int i [opt], int q [opt], t<<#>>_array other [upd], int j [opt] ) with taker ( <t> [upd] )( <t> );	-- with taker:  ditto
+		insert<#> [upd]( array_t<<#>> other, int i [opt], int q [opt], int j [opt] );										-- with <t> copy: q (all) objs from other at j (0) to i (end) 
+		insert<#> [upd]( array_t<<#>> other, int i [opt], int q [opt], int j [opt] ) with copier ( <t> )( <t> );			-- with copier:  ditto
+		insert<#> [upd]( array_t<<#>> other [upd], int i [opt], int q [opt], int j [opt] );									-- with <t> take: ditto
+		insert<#> [upd]( array_t<<#>> other[upd], int i [opt], int q [opt],  int j [opt] ) with taker ( <t> [upd] )( <t> );	-- with taker:  ditto
 
 		copy [eval]( int i [opt] )( <t> obj );								-- with <t> copy: one obj at i (end) to obj
 		copy [eval]( int i [opt] )( <t> obj ) with copier ( <t> )( <t> );	-- with copier: ditto
@@ -108,14 +108,14 @@ type <t>array from ( random_access<<t>>, serial_access<<t>><array_cursor> ) -- c
 		take [upd]( int i [opt] )( <t> obj );									-- with <t> taker: one obj at i (end) to obj
 		take [upd]( int i [opt] )( <t> obj ) with taker ( <t> [upd] )( <t> );	-- with taker: ditto
 
-		rank [eval]( <t> )( int i, bool unique ) with sorter ( <t> a, <t> b )( bool ); -- find ordered insertion point
+		rank ( <t> )( int i, bool unique ) with sorter ( <t> a, <t> b )( bool ); -- find ordered insertion point
 	}
 
-	abstract method in random_access<<t>>
+	abstract method in direct_access<<t>>
 	{
 		[final] ~count ()( int n );
 		
-		[final] ~use_object ( int i ) = <t> proxy;
+		[final] ~use ( int i ) = <t> proxy;
 	}
 
 	abstract method in serial_access<<t>><array_cursor>
@@ -126,28 +126,28 @@ type <t>array from ( random_access<<t>>, serial_access<<t>><array_cursor> ) -- c
 
 		[final] ~flip_cursor ( array_cursor [upd] ); 
 
-		[final] ~use_object ( array_cursor ) = <t> proxy; 
+		[final] ~apply_cursor ( array_cursor ) = <t> proxy; 
 	}
 }
 
 
 
-type <t><#>array from ( random_access<<t>>, serial_access<<t>><array_cursor> ) -- compatible and conventional per <t>
-{{
-}}
+type array<t><#> from direct_access<<t>>, from serial_access<<t>><array_cursor> -- compatible and conventional per <t>
 {
-	nom type tn_array = <<t>><<#>>array;
+	nom type array_tn = array<<t>><<#>>;
 
 	general 
 	{
 		begin;	-- all objects null
 		
-		begin ( tn_array other [upd] );  -- take
+		begin ( array_tn other [upd] );  -- take
 	}
 
-	general -- similar in random_access<<t>>
+	general -- similar in direct_access<<t>>
 	{
-		use_object ( int i ) = <t> proxy [eval,init]; 
+		count ()( int n );
+
+		use ( int i ) = <t> proxy [eval,init]; 
 	}
 
 	general -- <t> dependent
@@ -155,18 +155,18 @@ type <t><#>array from ( random_access<<t>>, serial_access<<t>><array_cursor> ) -
 		begin ( <t> seed );								-- with <t> copy
 		begin ( <t> seed ) with copier ( <t> )( <t> );	-- with copier
 
-		begin ( tn_array other );								-- with <t> copy
-		begin ( tn_array other ) with copier ( <t> )( <t> );	-- with copier
+		begin ( array_tn other );								-- with <t> copy
+		begin ( array_tn other ) with copier ( <t> )( <t> );	-- with copier
 
 		begin ( mediator [upd], expr fex )()( extra );  
 		store ( mediator [upd], expr fex )()( extra );
 	}
 
-	abstract in random_access<<t>>
+	abstract in direct_access<<t>>
 	{
 		[final]	~count ()( int n );
 
-		[final] ~use_object ( int i ) = <t> proxy;
+		[final] ~use ( int i ) = <t> proxy;
 	}
 
 	abstract in serial_access<<t>><array_cursor>
@@ -177,7 +177,7 @@ type <t><#>array from ( random_access<<t>>, serial_access<<t>><array_cursor> ) -
 
 		[final] ~flip_cursor ( array_cursor [upd] ); 
 
-		[final] ~use_object ( array_cursor ) = <t> proxy; 
+		[final] ~apply_cursor ( array_cursor ) = <t> proxy; 
 	}
 }
 

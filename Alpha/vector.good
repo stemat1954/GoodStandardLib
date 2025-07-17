@@ -2,7 +2,7 @@
 page vector in AlphaByGood
 
 
-type <t><#>vector
+type vector<t><#>
 {{
 	Linear algebra vector with <#> coordinates of numeric type <t>.
 

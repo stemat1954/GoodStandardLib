@@ -42,9 +42,9 @@ type serial_access<t><c> [incomplete] -- intrinsic
 	Note: If a cursor can't be flipped, the cursor will 
 	become inoperable.
 
-	:use_object returns access to the object referenced by 
-	a given cursor. If the cursor is inoperable, the proxy
-	will be void.
+	:use returns access to the object referenced by a given
+	cursor. If the cursor is inoperable, the proxy will be
+	void.
 
 	A serial_access collection can be scanned in a Good 
 	for loop.
@@ -60,7 +60,7 @@ type serial_access<t><c> [incomplete] -- intrinsic
 
 		flip_cursor ( <c> [upd] );
 
-		use_object ( <c> ) = <t> proxy;
+		apply_cursor ( <c> ) = <t> proxy;
 	}
 
 
@@ -72,7 +72,7 @@ type serial_access<t><c> [incomplete] -- intrinsic
 
 		~flip_cursor ( <c> [upd]);
 
-		~use_object ( <c> ) = <t> proxy; 
+		~apply_cursor ( <c> ) = <t> proxy; 
 	}
 
 }

@@ -80,7 +80,9 @@ type expr -- intrinsic, conventional
 {
 	general 	
 	{
-		begin ( <ascii>array );  -- synthetic
+		begin ( array<ascii> );  -- synthetic
+
+		begin<#> ( array<ascii><<#>> );  -- synthetic
 
 		begin ( expr other );	-- copy
 
@@ -98,7 +100,7 @@ type expr -- intrinsic, conventional
 
 		extract ( int i )( ascii );	 -- one char 
 
-		extract ( int i [opt], int q [opt] )( <ascii>array );  -- multiple chars
+		extract ( int i [opt], int q [opt] )( array<ascii> );  -- multiple chars
 
 		find ( expr other, int i [upd] )( bool );
 

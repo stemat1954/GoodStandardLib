@@ -2,7 +2,31 @@
 page utc in AlphaByGood
 
 
-common <int><'2'>array utc_origin [const];	 -- (years,days) offset from Gregorian origin
+
+type utc_offset 
+{{
+	A utc_offset is a two-part int used to specify a utc
+	point relative to some origin.
+
+	offset pairs are either (year,days) or (days,ticks).
+}}
+{
+	general
+	{
+		begin ( int first, int second );
+
+		use_first = int proxy [eval,init];
+
+		get_first ()( int );
+
+		use_second = int proxy [eval,init];
+
+		get_second ()( int );
+	}
+}
+
+
+common utc_offset utc_origin [const];	 -- (years,days) in Gregorian calendar
 
 
 type utc  -- conventional
@@ -99,7 +123,7 @@ type utc  -- conventional
 	{
 		begin ( expr vex [opt] );	-- literal, default = "now"
 
-		begin ( int days, int ticks );	-- offset from utc_origin
+		begin ( utc_offset );	-- (days,ticks) from utc_origin
 
 		begin ( utc other );		-- copy
 
@@ -117,7 +141,7 @@ type utc  -- conventional
 	
 		update [upd];		-- "now"
 
-		analyze ()( int days, int ticks );	-- offset from utc origin
+		analyze ()( utc_offset );	-- (days,ticks) from utc origin
 
 		add [upd]( etm t );
 		add [eval]( etm t )( utc );

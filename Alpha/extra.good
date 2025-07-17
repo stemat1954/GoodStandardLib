@@ -2,7 +2,7 @@
 page extra in AlphaByGood
 
 
-type extra from random_access<object> -- intrinsic, restricted
+type extra from direct_access<object> -- intrinsic, restricted
 {{
 	extra is an adjectival type that refers to a uniform
 	set of unspecified objects given to a procedure after
@@ -30,9 +30,9 @@ type extra from random_access<object> -- intrinsic, restricted
 	forwarding.  :delete removes a specified number of 
 	objects in given order (fifo).  
 
-	given\extra:use_object( i )[eval]:as<thing>
-	given\extra:use_object( i )[upd]:as<thing>
-	given\extra:use_object( i ):as_actual<thing>
+	given\extra:use( i )[eval]:as<thing>
+	given\extra:use( i )[upd]:as<thing>
+	given\extra:use( i ):as_actual<thing>
 }}
 {
 	general
@@ -40,17 +40,17 @@ type extra from random_access<object> -- intrinsic, restricted
 		delete [upd]( int q [opt] );  -- q objects from front
 	}
 
-	general  -- similar in random_access<object>
+	general  -- similar in direct_access<object>
 	{
 		count ()( int );
 
-		use_object ( int i ) = object proxy; 
+		use ( int i ) = object proxy; 
 	}
 
-	abstract in random_access<object>
+	abstract in direct_access<object>
 	{
 		[final] ~count ()( int n );
 
-		[final] ~use_object ( int i ) = object proxy;
+		[final] ~use ( int i ) = object proxy;
 	}
 }

@@ -2,7 +2,7 @@
 page disruption in AlphaByGood
 
 
-type disruption from random_access<trace>  -- intrinsic, restricted
+type disruption from direct_access<trace>  -- intrinsic, restricted
 {{
 	A disruption is a uniform collection of trace objects.
 
@@ -31,17 +31,17 @@ type disruption from random_access<trace>  -- intrinsic, restricted
 	A disruption is not portable. 
 }}
 {
-	general  -- similar in random_access<trace>
+	general  -- similar in direct_access<trace>
 	{
 		count ()( int );
 
 		use_trace ( int i ) = trace proxy [eval]; 
 	}
 
-	abstract in random_access<trace>
+	abstract in direct_access<trace>
 	{
 		[final] ~count ()( int n );
 
-		[final] ~use_object ( int i ) = object proxy;
+		[final] ~use ( int i ) = object proxy;
 	}
 }
