@@ -18,6 +18,7 @@ BASE				:	'base'			;
 COMMON				:	'common'		;	
 COMPATIBLE			:	'compatible'	;		
 CONST_				:	'const'			;		// constant
+CRUDE				:	'crude'			;
 EACH				:	'each'			;
 ELSE				:	'else'			;
 ENUM				:	'enum'			;		// enumerated
@@ -55,7 +56,6 @@ SUBROUTINE			:	'subroutine'	;
 TBD					:	'tbd'			;		// to-be-defined 
 TERM				:	'term'			;		// terminate
 TRAP				:	'trap'			;
-CRUDE				:	'tuple'			;
 TYPE				:	'type'			;
 USES				:   'uses'			;
 UPD					:	'upd'			;		// update
