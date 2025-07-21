@@ -60,7 +60,7 @@ type serial_access<t><c> [incomplete] -- intrinsic
 
 		flip_cursor ( <c> [upd] );
 
-		apply_cursor ( <c> ) = <t> proxy;
+		use@ ( <c> ) = <t> proxy;
 	}
 
 
@@ -72,7 +72,7 @@ type serial_access<t><c> [incomplete] -- intrinsic
 
 		~flip_cursor ( <c> [upd]);
 
-		~apply_cursor ( <c> ) = <t> proxy; 
+		~use@ ( <c> ) = <t> proxy; 
 	}
 
 }

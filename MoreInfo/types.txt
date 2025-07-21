@@ -14,8 +14,8 @@ general method
 	:use_addr can be used to uniquely identify and sort 
 	objects.
 
-	:reuse reconstructs an object without changing the
-	object's addr. A reused object has a null value.
+	:recycle reconstructs an object without changing the
+	object's addr. A recycled object has a null value.
 }}
 {
 	is_null? [eval]()( bool );
@@ -40,7 +40,7 @@ general method
 
 	as_base<t> [eval] = <t> proxy [eval,upd,init]; -- verified at compile-time, reserved proxy permission syntax
 
-	reuse [term];	 
+	recycle [term];	 
 
 }
 

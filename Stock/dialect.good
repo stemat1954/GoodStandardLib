@@ -5,12 +5,11 @@ page dialect in StockByGood
 	Useful types, subroutines, and operations that comprise
 	a stock Good dialect.
 
+	Equality operators are backed by :is_equal?.
 
-	Equal predicates are backed by :is_equal?.
+	Ordinal operators are backed by :is_before?.
 
-	Ordinal predicates are backed by :is_before?.
-
-	Cardinal predicates are backed by :is_less?.
+	Cardinal operators are backed by :is_less?.
 
 	Logical operators are backed by :and, :or, :xor, :not.
 
@@ -18,8 +17,8 @@ page dialect in StockByGood
 	:div, :neg.
 
 
-	Following example demonstrates how operations
-	and formulas reduce code.  These are equivalent bool
+	Following example demonstrates how operations and 
+	formulas reduce code.  These are equivalent bool
 	object expressions:
 
 		"a |before| b"
@@ -40,10 +39,10 @@ common
 	bool false:begin( 'false' ) [const];
 
 	addr no_addr:begin [const];	 
+	
+	handle no_handle:begin [const];		
 
 	etm max_etm:begin( 'max' ) [const];
-
-	handle no_handle:begin [const];		
 }
 	
 common -- fp2
@@ -150,7 +149,7 @@ subroutine	-- string conversion
 {
 	alpha_to_cstr ( string )( addr )  -- orphan addr
 	{
-		text_mediator:begin( platform_utf, platform_endian ):write( given\string ):add_zero():detach()( given\addr );
+		text_mediator:begin( platform_utf, platform_endian ):write( given\string ):add_zero():detach()( given\addr );  -- ignore size
 	}
 
 	cstr_to_alpha ( addr )( string ) -- string owns addr
@@ -162,17 +161,17 @@ subroutine	-- string conversion
 
 subroutine  --  coroutines
 {
-	std_copy<t> ( <t> a )( <t> b )
+	std_copy<t> ( <t> a )( <t> b ) -- from a to b using <t> copy
 	{
 		b:begin( a );
 	}
 
-	std_take<t> ( <t> a [upd] )( <t> b )
+	std_take<t> ( <t> a [upd] )( <t> b )  -- from a to b using <t> take
 	{
 		b:begin( *a );
 	}
 
-	std_before<t> ( <t> a, <t> b )( bool yes )
+	std_before<t> ( <t> a, <t> b )( bool yes ) -- a before b ? using <t> is_before?
 	{
 		a:is_before?( b )( yes );
 	}

@@ -30,9 +30,9 @@ type extra from direct_access<object> -- intrinsic, restricted
 	forwarding.  :delete removes a specified number of 
 	objects in given order (fifo).  
 
-	given\extra:use( i )[eval]:as<thing>
-	given\extra:use( i )[upd]:as<thing>
-	given\extra:use( i ):as_actual<thing>
+	given\extra:use@( i )[eval]:as<thing>
+	given\extra:use@( i )[upd]:as<thing>
+	given\extra:use@( i ):as_actual<thing>
 }}
 {
 	general
@@ -44,13 +44,13 @@ type extra from direct_access<object> -- intrinsic, restricted
 	{
 		count ()( int );
 
-		use ( int i ) = object proxy; 
+		use@ ( int i ) = object proxy; 
 	}
 
 	abstract in direct_access<object>
 	{
 		[final] ~count ()( int n );
 
-		[final] ~use ( int i ) = object proxy;
+		[final] ~use@ ( int i ) = object proxy;
 	}
 }

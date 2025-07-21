@@ -416,7 +416,7 @@ type text_mediator from mediator
 			{
 				io:get_rp()( int mark );
 
-				io:match( *ptm, ~d )( bool ok, q:reuse, int rp ) with helper;
+				io:match( *ptm, ~d )( bool ok, q:recycle, int rp ) with helper;
 
 				if ( ok ) return after io:set_rp( mark );
 
@@ -486,12 +486,10 @@ type text_mediator from mediator
 			for each ( ~c in arr ) ~c:as_int:store( *io, io.codepoint_fex );
 		}
 
-%ignore
 		write_all<t><#> [upd]( array<<t>><<#>> arr ) -- <t> ascii or unicode
 		{
 			for each ( ~c in arr ) ~c:as_int:store( *io, io.codepoint_fex );
 		}
-%end
 
 
 		read_one<t> [upd]()( <t> c ) -- <t> ascii or unicode

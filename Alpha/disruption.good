@@ -29,19 +29,20 @@ type disruption from direct_access<trace>  -- intrinsic, restricted
 	will return a void proxy.
 	
 	A disruption is not portable. 
+	
 }}
 {
 	general  -- similar in direct_access<trace>
 	{
 		count ()( int );
 
-		use_trace ( int i ) = trace proxy [eval]; 
+		use@ ( int i ) = trace proxy [eval]; 
 	}
 
 	abstract in direct_access<trace>
 	{
 		[final] ~count ()( int n );
 
-		[final] ~use ( int i ) = object proxy;
+		[final] ~use@ ( int i ) = object proxy;
 	}
 }

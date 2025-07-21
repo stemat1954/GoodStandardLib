@@ -78,7 +78,7 @@ type array<t> from direct_access<<t>>, from serial_access<<t>><array_cursor> -- 
 	{
 		count ()( int );  
 
-		use ( int i ) = <t> proxy [eval,init];
+		use@ ( int i ) = <t> proxy [eval,init];
 	}
 
 	general method  -- <t> dependent
@@ -115,7 +115,7 @@ type array<t> from direct_access<<t>>, from serial_access<<t>><array_cursor> -- 
 	{
 		[final] ~count ()( int n );
 		
-		[final] ~use ( int i ) = <t> proxy;
+		[final] ~use@ ( int i ) = <t> proxy;
 	}
 
 	abstract method in serial_access<<t>><array_cursor>
@@ -126,7 +126,7 @@ type array<t> from direct_access<<t>>, from serial_access<<t>><array_cursor> -- 
 
 		[final] ~flip_cursor ( array_cursor [upd] ); 
 
-		[final] ~apply_cursor ( array_cursor ) = <t> proxy; 
+		[final] ~use@ ( array_cursor ) = <t> proxy; 
 	}
 }
 
@@ -147,7 +147,7 @@ type array<t><#> from direct_access<<t>>, from serial_access<<t>><array_cursor> 
 	{
 		count ()( int n );
 
-		use ( int i ) = <t> proxy [eval,init]; 
+		use@ ( int i ) = <t> proxy [eval,init]; 
 	}
 
 	general -- <t> dependent
@@ -166,7 +166,7 @@ type array<t><#> from direct_access<<t>>, from serial_access<<t>><array_cursor> 
 	{
 		[final]	~count ()( int n );
 
-		[final] ~use ( int i ) = <t> proxy;
+		[final] ~use@ ( int i ) = <t> proxy;
 	}
 
 	abstract in serial_access<<t>><array_cursor>
@@ -177,7 +177,7 @@ type array<t><#> from direct_access<<t>>, from serial_access<<t>><array_cursor> 
 
 		[final] ~flip_cursor ( array_cursor [upd] ); 
 
-		[final] ~apply_cursor ( array_cursor ) = <t> proxy; 
+		[final] ~use@ ( array_cursor ) = <t> proxy; 
 	}
 }
 

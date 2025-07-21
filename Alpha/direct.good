@@ -34,14 +34,14 @@ type direct_access<t> [incomplete] -- intrinsic
 
 		count ()( int n );
 
-		use ( int i ) = <t> proxy;
+		use@ ( int i ) = <t> proxy;
 	}
 
 	abstract -- recap as [tbd]
 	{
 		~count ()( int );	
 
-		~use ( int i ) = <t> proxy; 
+		~use@ ( int i ) = <t> proxy; 
 	}
 }
 
