@@ -7,7 +7,7 @@ type bool  -- elementary, intrinsic, compatible, conventional
 	A bool object encapsulates a boolean logic value.
 		
 	Type bool has special status in Good.  bool objects 
-	are evaluated in executable forms to control execution.
+	are evaluated in imperative forms to control execution.
 
 	A bool can be initialized with a literal vex of	'true'
 	or 'false'. Interpretation is obvious.
@@ -26,7 +26,6 @@ type bool  -- elementary, intrinsic, compatible, conventional
 		begin ( bool other );		-- copy
 
 		begin ( mediator [upd], expr fex );	
-
 		store ( mediator [upd], expr fex );
 
 		is_equal? ( bool other )( bool );

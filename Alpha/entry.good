@@ -3,8 +3,8 @@ page entry in AlphaByGood
 
 type entry [incomplete]
 {{
-	An entry is a base type for types that represent app-
-	lication entry points.
+	An entry is a base type for types that represent 
+	application entry points.
 
 	:~run defines an application entry point.  Entry points
 	are called on concurrently executing threads.
@@ -26,13 +26,13 @@ type entry [incomplete]
 	Generally, :~run should internally trap disruptions	and
 	capture whatever it needs for posterity.
 
-	When the application starts a thread, it can pass a 
-	heap object of any type using an op. An op  is optional, 
+	When the application starts a thread, it can pass a heap
+	object of any type using an op<t>. An op<t> is optional, 
 	and generally the referenced object is used for inter-
 	thread communication. 
 	
-	Note:  An application's main entry point doesn't receive
-	an op from the startup routine.
+	Note:  op<object> is null for entries called by the 
+	startup routine.
 }}
 {
 	general 

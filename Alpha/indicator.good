@@ -37,9 +37,9 @@ type indicator  -- restricted
 	null, then :wait only returns when the indicator is in
 	a release state, and the output is necessarily 'true'. 
 	Thus, a simple call to :wait with no givens usually 
-	means an infinite wait until the indicator releases,
-	but technically it means a default wait while ignoring
-	what caused the	method to return.
+	means an indefinite wait until the indicator releases,
+	but technically it means a default wait that ignores
+	the output condition.
 
 	:test evaluates the indicator's release state and
 	returns immediately.  It doesn't yield.  A bool output 

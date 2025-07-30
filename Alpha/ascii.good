@@ -117,6 +117,8 @@ type ascii from enumerated
 
 		use_notation = expr proxy [eval];
 
+		get_notation ()( expr );
+
 		is_before? ( ascii )( bool );
 
 		is_equal? ( ascii )( bool );

@@ -67,7 +67,7 @@ type fault  -- intrinsic
 	and external errors beyond the direct control of an 
 	application.
 		
-	Disruptions (caused  by quitting) are generally trapped 
+	Disruptions (caused by quitting) are generally trapped 
 	in a high level context where a decision can be made to
 	either adapt and retry, or leave.  Such a decision
 	should be made solely on the kind of fault sent, not on
@@ -98,6 +98,10 @@ type fault  -- intrinsic
 
 		use_category = fault_category proxy [eval];
 
+		get_category ()( fault_category );
+
 		use_comment = expr proxy [eval];
+
+		get_comment ()( expr );
 	}
 }

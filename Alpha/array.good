@@ -9,7 +9,7 @@ page array in AlphaByGood
 	objects. Objects are uniform and logically contiguous
 	in memory. <t> is the symbolic object type.
 
-	An array can be configured from any type <t> but some
+	An array can be configured for any type <t> but some
 	methods are type dependent.
 
 	An array is portable if <t> is portable.  <t> formats
@@ -59,19 +59,19 @@ type array<t> from direct_access<<t>>, from serial_access<<t>><array_cursor> -- 
 	{
 		begin ( int reserve [opt] ); 
 
-		begin ( array_t other [upd] );	-- take 
+		begin ( array_t other [upd] );			-- take 
 
 		begin<#> ( array_t<<#>> other [upd] );	-- take 
 
-		insert [upd]( int i [opt], int q );				-- q null objs at i (end)
+		insert [upd]( int i [opt], int q );		-- q null objs at i (end)
 
 		insert [upd]( int i [opt] ) = <t> proxy [init];  -- one null obj at i (end), return access
 
 		delete [upd]( int i [opt], int q [opt] );	-- q (1) objs at i (end)
 
-		resize [upd]( int q );				-- insert or delete at end, new count = q
+		resize [upd]( int q );			-- insert or delete at end, new count = q
 
-		shrink [upd];						-- release unused memory
+		shrink [upd];					-- release unused memory
 	}
 	
 	general method -- similar in direct_access<<t>>
@@ -102,14 +102,15 @@ type array<t> from direct_access<<t>>, from serial_access<<t>><array_cursor> -- 
 		insert<#> [upd]( array_t<<#>> other [upd], int i [opt], int q [opt], int j [opt] );									-- with <t> take: ditto
 		insert<#> [upd]( array_t<<#>> other[upd], int i [opt], int q [opt],  int j [opt] ) with taker ( <t> [upd] )( <t> );	-- with taker:  ditto
 
-		copy [eval]( int i [opt] )( <t> obj );								-- with <t> copy: one obj at i (end) to obj
-		copy [eval]( int i [opt] )( <t> obj ) with copier ( <t> )( <t> );	-- with copier: ditto
+		copy [eval]( int i [opt] )( <t> obj );									-- with <t> copy: one obj at i (end) to obj
+		copy [eval]( int i [opt] )( <t> obj ) with copier ( <t> )( <t> );		-- with copier: ditto
 
 		take [upd]( int i [opt] )( <t> obj );									-- with <t> taker: one obj at i (end) to obj
 		take [upd]( int i [opt] )( <t> obj ) with taker ( <t> [upd] )( <t> );	-- with taker: ditto
 
 		rank ( <t> )( int i, bool unique ) with sorter ( <t> a, <t> b )( bool ); -- find ordered insertion point
 	}
+	
 
 	abstract method in direct_access<<t>>
 	{

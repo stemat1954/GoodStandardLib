@@ -12,9 +12,10 @@ type expr -- intrinsic, conventional
 	and to otherwise create lexical elements that can be
 	expressed in source code.
 
-	In code, a lexical expr is any sequence of characters 
-	enclosed by single quotes.  The compiler automatically 
-	creates and initializes an expr object by copying data 
+	In Good, a sequence of characters enclosed by single 
+	quotes is a lexical literal, i.e. literal expression. 
+	The compiler automatically creates and initializes an 
+	expr object from a literal expression by copying data
 	from the source file to the object instance.  Printable 
 	characters are generally copied	as-is while non-
 	printable characters are ignored.  The caret ^ has 
@@ -45,13 +46,13 @@ type expr -- intrinsic, conventional
 	should be avoided because they ARE retained and	mimic
 	tabs when displayed at the start of a new line.
 
-	Application can synthesize exprs by constructing an 
+	Applications can synthesize exprs by constructing an 
 	array<ascii>.
 		
 	In a very general way, exprs provide a way to extend
 	the language.  Types can invent their own unique 
-	expressions, documenting or publishing the syntax and
-	semantics.  
+	literal expressions, documenting or publishing the
+	syntax and semantics.  
 		
 	The Good compiler doesn't know anything about expr
 	syntax or semantics, so object methods take over the

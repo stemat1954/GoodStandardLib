@@ -2,8 +2,6 @@
 page handle in AlphaByGood
 
 
-
-
 type handle -- compatible
 {{
 	A handle encapsulates a kernel resource identifier.

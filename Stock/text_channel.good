@@ -112,7 +112,7 @@ page text_channel in StockByGood
 
 			else -- 'pending', 'busy', 'end', 'other'
 			{
-				text_mediator:begin( 'unexpected channel report [' ):write( cr:as_expr ):write( ']' ):detach()( error );
+				text_mediator:begin( 'unexpected channel report [' ):write( cr:use_token ):write( ']' ):detach()( error );
 			}
 		}
 	}

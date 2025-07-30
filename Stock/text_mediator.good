@@ -375,12 +375,12 @@ type text_mediator from mediator
 
 		seek [upd]( unicode c )( bool ok )
 		{
-			io:seek_chr( c:as_int )( ok );
+			io:seek_chr( c:use_code )( ok );
 		}
 
 		seek [upd]( ascii c )( bool ok )
 		{
-			io:seek_chr( c:as_int )( ok );
+			io:seek_chr( c:use_code )( ok );
 		}
 
 		seek [upd]( expr pattern, sign d [opt], match_mode [opt] )( int q ) -- expr pattern per mode, q = chars matched (zero = no match)
@@ -478,17 +478,17 @@ type text_mediator from mediator
 	{
 		write_one<t> [upd]( <t> c ) -- <t> ascii or unicode
 		{
-			c:as_int:store( *io, io.codepoint_fex );
+			c:use_code:store( *io, io.codepoint_fex );
 		}
 
 		write_all<t> [upd]( array<<t>> arr ) -- <t> ascii or unicode
 		{
-			for each ( ~c in arr ) ~c:as_int:store( *io, io.codepoint_fex );
+			for each ( ~c in arr ) ~c:use_code:store( *io, io.codepoint_fex );
 		}
 
 		write_all<t><#> [upd]( array<<t>><<#>> arr ) -- <t> ascii or unicode
 		{
-			for each ( ~c in arr ) ~c:as_int:store( *io, io.codepoint_fex );
+			for each ( ~c in arr ) ~c:use_code:store( *io, io.codepoint_fex );
 		}
 
 
@@ -501,7 +501,7 @@ type text_mediator from mediator
 		{
 			arr:begin;
 			if ( "rp_end?( io )" ) return;
-			int dn:begin( delim:as_int );
+			int dn:begin( delim:use_code );
 			loop
 			{
 				int xn:begin( *io, io.codepoint_fex );  -- int:fread

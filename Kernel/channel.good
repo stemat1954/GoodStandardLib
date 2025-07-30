@@ -1,7 +1,6 @@
 
 page channel in KernelByGood [compatible]
 
-
 subroutine
 {{
 	This subroutine group provides a queueing facility for

@@ -1,0 +1,41 @@
+
+
+{{
+	Universal methods are general methods that can be 
+	called for any object. They're intrinsic to every
+	type definition and have special status because they 
+	evaluate the construction of an object rather than 
+	it's value. In particular, universal methods can be
+	called for null objects without causing disruption.
+
+	:recycle reconstructs an object without changing the
+	object's addr. A recycled object has a null value.
+}}
+
+general method -- intrinsic in every type
+{
+	is_null? [eval]()( bool );
+
+	is_not_null? [eval]()( bool );
+
+	use_typeid [eval] = typeid proxy [eval];  -- access 
+
+	get_typeid [eval]()( typeid );	-- copy
+
+	use_addr [eval] = addr proxy [eval];	-- access
+
+	get_addr [eval]() addr );  -- copy
+	
+	is<t>? [eval]()( bool );  
+
+	as<t> [eval] = <t> proxy [eval,upd];	-- may be void
+
+	is_actual<t>? [eval]()( bool );
+
+	as_actual<t> [eval] = <t> proxy [eval,init];  -- may be void
+
+	as_base<t> [eval] = <t> proxy [eval,upd,init]; -- verified at compile-time, reserved permission syntax
+
+	recycle [term];	 
+
+}

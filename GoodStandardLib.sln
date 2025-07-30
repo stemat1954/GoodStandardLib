@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32929.386
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36310.24 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alpha", "Alpha", "{B85B8CE5-506E-4CDE-A0BC-95C7FC02A1D4}"
 	ProjectSection(SolutionItems) = preProject
@@ -65,8 +65,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stock", "Stock", "{0A5181F7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MoreInfo", "MoreInfo", "{922EE76A-8570-484F-804C-C4D426B96A0C}"
 	ProjectSection(SolutionItems) = preProject
+		MoreInfo\crude_type.good = MoreInfo\crude_type.good
+		MoreInfo\enum_type.good = MoreInfo\enum_type.good
 		MoreInfo\Good.g4 = MoreInfo\Good.g4
-		MoreInfo\types.txt = MoreInfo\types.txt
+		MoreInfo\universal.good = MoreInfo\universal.good
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{E45DFF69-0C37-4392-93DD-31FDE37D417F}"
