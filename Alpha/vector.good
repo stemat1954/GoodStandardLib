@@ -4,10 +4,9 @@ page vector in AlphaByGood
 
 type vector<t><#>
 {{
-	Linear algebra vector with <#> coordinates of numeric type <t>.
-
+	Linear algebra vector.
 	
-	DEFINITION PENDING
+	<#> coordinates, numeric type <t>.
 }}
 {
 }

@@ -8,7 +8,7 @@ type indicator  -- restricted
 		
 	An indicator is internally abstract and restricted. 
 	The only allowed derivations are alpha\signal, 
-	alpha\tally, and alpha\timer.
+	alpha\counter, and alpha\timer.
 
 	An indicator is used to coordinate cooperating threads.
 	Using a shared indicator, one thread can wait with a 

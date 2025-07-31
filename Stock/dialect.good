@@ -225,14 +225,6 @@ operation	-- arithmetic
 	"a * b"			= "mul( a, b )";
 	"a / b"			= "div( a, b )";
 	"-a"			= "neg( a )";
-
-	"a |+| b"		= "add( a, b )";
-	"a |-| b"		= "sub( a, b )";
-	"a |*| b"		= "mul( a, b )";
-	"a |/| b"		= "div( a, b )";
-	"|-|a"			= "neg( a )";
-
-	"a |mod| b"		= "mod( a, b)";
 }
 
 

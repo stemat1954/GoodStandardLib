@@ -27,13 +27,13 @@ type lock
 
 	If an ACID method has [eval] intent, it can be called
 	by multiple threads simultaneously.  That is, multiple 
-	calls can overlap without causing corruption or
-	unexpected results.
+	calls to an [eval] method can overlap without causing
+	corruption or unexpected results.
 		
 	If an ACID method has [upd] intent, it can only	be
 	called when a thread has exclusive access to the object.
-	That is, other threads must be locked out while the method
-	is making changes.
+	That is, other threads must be locked out while a [upd]
+	method is making changes.
 
 	A [upd] method uses :set and :reset to control access to 
 	an object.  The lock must be :set before changes are made, 
@@ -41,14 +41,14 @@ type lock
 
 	Note:  :set and :reset have [upd] primary intent.
 		
-	A [eval] method uses :hold and :release to control 
+	An [eval] method uses :hold and :release to control 
 	access to an object.  :hold prevents the lock from 
 	being :set and :release reverses the effect.
 
 	Note: :hold and :release have [eval] primary intent.
-	This allows the [eval] ACID method to hold the lock.
-	Multiple threads can :hold a lock, allowing simultaneous 
-	[eval] calls on an object.
+	This allows the [eval] ACID method to hold the lock
+	without conflict. Multiple threads can :hold a lock, 
+	allowing simultaneous [eval] calls on an object.
 		
 	Two versions of :set and :hold are provided.  One 
 	quits if time expires while the other always returns
@@ -165,17 +165,17 @@ type lock
 
 	general
 	{
-		begin ( etm );	
+		begin ( etm );	-- default time-out
 
 
-		set [upd]( etm [opt] );	-- quits
+		set [upd]( etm [opt] );
 
 		set [upd]( etm [opt] )( bool ok );
 
 		reset [upd];
 
 
-		hold [eval]( etm [opt] );	-- quits
+		hold [eval]( etm [opt] );	-- time-outquits
 
 		hold [eval]( etm [opt] )( bool ok );
 

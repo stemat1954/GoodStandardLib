@@ -36,13 +36,13 @@ type mediator
 	memory to object, while :fwrite copies and transforms 
 	data from object to external memory. 
 
-	Reading an object's value is tantamount to object 
-	initialization, so :fread calls object :begin to
-	coordinate the transfer.  Thus, the object must have
-	[init] access permission.
+	Reading an object's value is tantamount to object init-
+	ialization, so :fread calls object :begin to coordinate 
+	the transfer.  Thus, the object must have [init] access 
+	permission.
 	
-	:fwrite simply calls corresponding object :store 
-	which only needs [eval] access permission.
+	:fwrite simply calls corresponding object :store which
+	only needs [eval] access permission.
 	
 	Portable types have a conventional interface:
 
@@ -58,11 +58,9 @@ type mediator
 	A portable type needs at least one conventional :begin
 	method and one conventional :store method.
 
-
 	"fex" is a type dependent format expression interpreted
-	by the portability method. Supported formats and the 
-	exprs that describe them are documented in the Alpha 
-	Type Reference.
+	by the method. Supported formats and the exprs that 
+	describe them are documented in the Alpha Type Reference.
 
 	Note:  A particular type may support numerous external
 	formats and versions of those formats.	Format exprs
@@ -109,35 +107,34 @@ type mediator
 	Endianess controls byte order.  For example, if an int
 	fex specifies an 8 byte, twos-complement binary value,
 	and a mediator is initialized with 'little-endian', 
-	the 8 int bytes are serially written least-significant 
-	to most-significant in memory.  Conversly,  if the 
-	mediator is initialized with 'big-endian', the 8 bytes
-	are serially written most-significant to least-signifi-
-	cant in memory.
+	8 bytes are serially written least-significant to most-
+	significant in memory.  Conversly,  if the mediator is 
+	initialized with 'big-endian', 8 bytes are serially 
+	written most-significant to least-significant in memory.
 
 	UTF encoding controls text encoding.  If an object
 	value is formatted using any unicode text format, UTF 
-	encoding controls how characters (code point values) are 
-	stored. UTF encoding does not apply to binary formats.
-	If 'UTF-16' or 'UTF-32' is used, endianess controls
-	byte order. 
+	encoding controls how characters (code point values) 
+	are stored. UTF encoding does not apply to binary for-
+	mats. If 'UTF-16' or 'UTF-32' is used, endianess con-
+	trols byte order. 
 		
 	Note: External memory can contain an arbitrary mix of 
 	object data stored using binary and text formats. 
 	
 	An output mediator automatically allocates heap memory
-	to contain translated data. Translated data is naturally 
-	intended for external consumption, so at some point the
-	memory must be detached from the mediator and given to
-	some compatible subroutine (e.g.kernel subroutine) for
-	final disposition.  
+	as data is transferred to the mediator. Output data is 
+	naturally intended for external consumption, so at some 
+	point the memory must be detached from the mediator and
+	given to some compatible subroutine (e.g.kernel sub-
+	routine) for final disposition.  
 	
-	Detaching memory creates a detached mediator and an orphan
-	heap pointer that must be reattached to some mediator or
-	released by some other procedure. Basically, the mediator
-	disowns the detached memory. Detaching memory does not 
-	affect the mediator's internal read/write position 
-	cursors.
+	Detaching memory creates a detached mediator and an 
+	orphan heap pointer that must be reattached to some 
+	mediator or released by some other procedure. Basically,
+	the mediator disowns the detached memory. Detaching 
+	memory does not affect the mediator's internal read/
+	write position cursors.
 
 	External heap memory can be attached (or reattached) to 
 	a detached mediator.  The memory usually originates from 
@@ -152,12 +149,11 @@ type mediator
 	and	two position cursors rp (read position or pointer) 
 	and	wp (write position or pointer).
 	
-	Size measures the logical extent of	formatted data
-	in bytes, rp defines the current (next) read position
-	in bytes, and wp defines the current (next) write
-	position in bytes.  Various methods directly set these
-	values, while object methods automatically update
-	these values.
+	Size measures the logical extent of	formatted data in
+	bytes, rp defines the current (next) read position in
+	bytes, and wp defines the current (next) write position
+	in bytes.  Various methods directly set these values,
+	while object methods automatically update these values.
 
 	Note: size measures the logical extent of formatted 
 	data.  The actual block size may be greater	than the
@@ -168,7 +164,7 @@ type mediator
 	
 	wp and rp are constrained such that
 	
-		0 <= rp,wp <= size 
+		0 <= (rp,wp) <= size 
 	
 	at all times. rp and wp equal to size is a limit aka
 	"end" position.
@@ -184,8 +180,8 @@ type mediator
 	not possible to disrupt the app by writing past	the end. 
 	However, "randomly" setting wp beyond the end creates an
 	unformatted "hole" in the exteral data, so random access 
-	applications must carefully track the location of formatted
-	data and holes.
+	applications must carefully track the location of 
+	formatted data and holes.
 
 	Methods that increase size do not change wp or rp, but
 	if size is decreased, wp and rp may be adjusted	to their
@@ -229,8 +225,8 @@ type mediator
 	adjust size (truncate) and/or fill holes as needed.
 	 
 	:copy copies a q-byte block from a source mediator 
-	without changing source rp.  Thus, the given source 
-	mediator does not need [upd] access permission.
+	without changing the source rp.  Thus, the given source 
+	mediator is not modified.
 	
 	(1) block read up to q bytes from source using given
 		rp or source rp
@@ -262,7 +258,7 @@ type mediator
 	current indention level in an output.
 
 	Note: Indention level is used to maintain the format
-	nesting  level, which in turn can be used to calculate 
+	nesting level, which in turn can be used to calculate 
 	the	indention of subobjects. Initial indent is zero.
 
 	:write_new_line writes a string of ascii control characters
@@ -287,21 +283,16 @@ type mediator
 	is 'false'.
 			
 
-	:write_checksum writes a 4 byte checksum at the 
-	current wp. The sum is calculated from all bytes
-	preceding wp.  
+	:write_checksum writes a 4 byte checksum at the	current 
+	wp. The sum is calculated from all bytes preceding wp.  
 
-	:read_checksum reads a 4 byte checksum at the 
-	current rp. The sum read is compared to the
-	actual sum calculated from all bytes preceding
-	rp (before reading the checksum).  If the two
-	sums agree, output is 'true'.  Otherwise, it's
-	'false'.
-
-	med:set_wp_end:write_checksum;  -- write 4 byte sum at end
-	
-	med:get_size()( =int where ):sub( '4' );
-	med:set_rp( where ) ):read_checksum()( bool ok );  -- verify
+	:read_checksum calculates a 4 byte checksum by reading
+	from the current rp to the position 4 bytes before the
+	end.  Then it reads 4 bytes as an integer checksum 
+	(assuming they were written by :write_checksum ). The
+	output bool is 'true' if the values agree, otherwise 
+	it's 'false'.  Before returning, rp is restored to it's 
+	initial position.
 
 
 	If an application intends to mediate object pointers
@@ -330,51 +321,51 @@ type mediator
 		attach [upd]( addr pmem, int size [opt] );  -- adopt pmem
 
 				
-		enable_auto_align [upd];		-- binary alignment
+		enable_auto_align [upd];		-- binary formats
 
 
-		set_size [upd]( int );			-- size = given
+		set_size [upd]( int );			-- size <= given
 
-		set_size_wp [upd];				-- size = wp
+		set_size_wp [upd];				-- size <= wp
 
-		set_size_rp [upd];				-- size = rp
+		set_size_rp [upd];				-- size <= rp
 
-		get_size ()( int );				-- out = size
-
-
-		set_rp [upd]( int );			-- rp = given
-
-		set_rp_last [upd];				-- rp = size - 1
-
-		set_rp_end [upd];				-- rp = size
-
-		set_rp_mod [upd]( int );		-- rp = modulo boundary
-
-		get_rp ()( int );				-- out = rp
-
-		rp_first? ()( bool );			-- rp |=| zero ? 
-
-		rp_last? ()( bool );			-- rp |=| (size - 1) ? 
-
-		rp_end? ()( bool );				-- rp |=| size ?
+		get_size ()( int );				-- out <= size
 
 
-		set_wp [upd]( int );			-- wp = given
+		set_rp [upd]( int n );			-- rp <= n
 
-		set_wp_end [upd];				-- wp = size
+		set_rp_last [upd];				-- rp <= size - 1
 
-		set_wp_mod [upd]( int );		-- wp = modulo boundary
+		set_rp_end [upd];				-- rp <= size
 
-		get_wp ()( int );				-- out = wp
+		set_rp_mod [upd]( int n );		-- rp <= next n-byte boundary
 
-		wp_end? ()( bool );				-- wp |=| size ?
+		get_rp ()( int n );				-- n <= rp
+
+		rp_first? ()( bool );			-- rp |=| zero  
+
+		rp_last? ()( bool );			-- rp |=| (size - 1)  
+
+		rp_end? ()( bool );				-- rp |=| size 
 
 
-		inc_indent [upd];				-- indent = add 1
+		set_wp [upd]( int n );			-- wp <= n
 
-		dec_indent [upd];				-- indent = sub 1
+		set_wp_end [upd];				-- wp <= size
 
-		get_indent ()( int );			-- out = indent
+		set_wp_mod [upd]( int n );		-- wp <= next n-byte boundary
+
+		get_wp ()( int n );				-- n <= wp
+
+		wp_end? ()( bool );				-- wp |=| size 
+
+
+		inc_indent [upd];				-- indent <= indent + 1
+
+		dec_indent [upd];				-- indent <= indent - 1
+
+		get_indent ()( int n );			-- n <= indent
 
 
 		write_new_line [upd]( expr label );	-- ascii (CR) LF label (platform dependent)

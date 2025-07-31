@@ -22,7 +22,7 @@ type signal from indicator
 
 	:indicate sets the signal release state.
 
-	base :reset clears the signal release state.
+	indicator:reset clears the signal release state.
 }}
 {
 

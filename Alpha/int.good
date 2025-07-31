@@ -7,7 +7,13 @@ type int -- elementary, compatible, conventional
 	An int encapsulates the higest precision integer
 	type supported by the runtime platform.
 
-	See documentation for value expressions.
+	See documentation for initial value expressions.
+
+	[upd] methods that change value also have [eval] 
+	functional equivalents that don't.
+
+
+
 
 	An int is portable. See documentation for supported
 	formats.
@@ -29,66 +35,77 @@ type int -- elementary, compatible, conventional
 
 	Specific binary 'b:ascii' writes a non-negative
 	value as one byte and reads the same.
+
 }}
 {
 	general 		
 	{
-		begin ( expr vex [opt] );	-- literal, default '0'
+		begin ( expr vex [opt] );				-- value expr, default '0'
 
-		begin ( int other );	-- copy
+		begin ( int other );					-- copy
 
 		begin<#n> ( word<<#n>> w, expr fex );	 -- word conversion
 
 		
-		begin ( mediator [upd], expr fex );	
+		begin ( mediator [upd], expr fex );		-- mediation
 
-		store ( mediator [upd], expr fex );
+		store ( mediator [upd], expr fex );		-- ditto
 
 
-		is_equal? ( int n )( bool );
+		is_equal? ( int n )( bool );			-- equality
+				
+		is_before? ( int n )( bool );			-- ordinality ( same as is_less? )
 
-		is_before? ( int n )( bool );	
+		is_less? ( int n )( bool );				-- cardinality ( same as is_before? )
 
-		is_less? ( int n )( bool );
 	
-		set [upd]( int n );  -- replace
+		set [upd]( int n );						-- v <= n (immediate replace)
 
-		add [upd]( int n );
-		add [eval] ( int n )( int );		
+		add [upd]( int n );						-- v <= v + n  (add)
+		add [eval] ( int n )( int x );			-- x <= v + n
 
-		sub [upd]( int n );
-		sub [eval] ( int n )( int );
+		sub [upd]( int n );						-- v <= v - n  (subtract)
+		sub [eval] ( int n )( int x );			-- x <= v + n
 
-		mul [upd]( int n );
-		mul [eval] ( int n )( int );	
+		mul [upd]( int n );						-- v <= v * n  (multiply)
+		mul [eval] ( int n )( int x );			-- x <= v * n
 
-		div [upd]( int n );
-		div [upd]( int n )( int r );	
-		div [eval]( int n )( int v, int r );	
+		div [upd]( int n );						-- v <= v \ n (divide and round-in)
+		div [upd]( int n )( int r );			-- v <= v \ n, r <= mod(v,n) 
+		div [eval]( int n )( int x, int r );	-- x <= v \ n, r <= mod(v,n)
 
-		mod [upd]( int n );					
-		mod [eval]( int n )( int );	
+		mod [upd]( int n );						-- v <= residual of v \ n (modulo)
+		mod [eval]( int n )( int x );			-- x <= residual of v \ n	
 
-		pow [upd]( int n );
-		pow [eval]( int n )( int );	
+		pow [upd]( int n );						-- v <= v ^ n (power)
+		pow [eval]( int n )( int x );			-- x <= v ^ n
 
-		fma [upd]( int m, int b );				-- fused mul add v = m*v + b
-		fma [eval]( int m, int b )( int );
+		fma [upd]( int m, int b );				-- v <= m * v + b (fused mul add)
+		fma [eval]( int m, int b )( int x );	-- x <= m * v + b	
 
-		dis [upd]( int n );						-- distance between v and n (abs diff)
-		dis [eval]( int n )( int );
+		dis [upd]( int n );						-- v <= | v - n | (distance, absolute diff)
+		dis [eval]( int n )( int x );			-- x <= | v - n |
 
-		neg [upd];	
-		neg [eval]()( int );	
+		neg [upd];								-- v <= -v  (negate)
+		neg [eval]()( int x );					-- x <= -v
 
-		abs [upd];	
-		abs [eval]()( int );	
+		abs [upd];								-- v <= |v| (absolute value)
+		abs [eval]()( int x );					-- x <= |v|
 
-		inc [upd];
-		inc [eval]()( int );	
+		sgn [upd];								-- v <= (-1,0,1) (sign)
+		sgn [eval]()( int x );					-- x <= (-1,0,1)
 
-		dec [upd];
-		dec [eval]()( int );	
+		inc [upd];								-- v <= v + 1 (increment)
+		inc [eval]()( int x );					-- x <= v + 1
+
+		dec [upd];								-- v <= v - 1 (decrement)
+		dec [eval]()( int x );					-- x <= v - 1
+
+		inf [upd];								-- v <= v + sgn(v) (inflate)
+		inf [eval]()( int x );					-- x <= v + sgn(v)
+
+		def [upd];								-- v <= v - sgn(v) (deflate)
+		def [eval]()( int x );					-- x <= v - sgn(v)
 	}
 }
 

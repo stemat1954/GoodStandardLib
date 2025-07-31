@@ -2,7 +2,7 @@
 page typeid in AlphaByGood
 
 
-subroutine typeid<t>()( typeid );
+subroutine get_typeid<t>( <t> obj )( typeid );
 
 
 type typeid -- intrinsic

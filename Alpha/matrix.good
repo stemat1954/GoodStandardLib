@@ -3,10 +3,9 @@ page matrix in AlphaByGood
 
 type matrix<t><#r><#c>
 {{
-	Rectangular matrix <#r> rows by <#c> columns with 
-	elements of numeric type <t>
-
-	DEFINITION PENDING
+	Generic algebraic matrix.
+	
+	<#r> rows, <#c> columns, numeric type <t>
 }}
 {
 }

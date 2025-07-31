@@ -13,29 +13,36 @@ enum type thread_state ( 'new', 'starting', 'active', 'stopping', 'done', 'dead'
 	'stopping'	=> :stop called, but not done
 	'done'		=> normal return from entry:~run 
 	'dead'		=> :kill called or entry:~run was trapped
-	
-	one verion of ...
-	:wait returns when the thread state is not equal 
-	to the last state it returned on, or a specified 
-	time expires. It returns when the state is not 
-	'new' the first	time.  The state that releases 
-	:wait is copied to output thread_state. If it's
-	'dead', output trace is significant.  If a time
-	limit is not specified, :wait will not expire ???
-
-	A thread cannot be incorrectly controlled. State
-	progression is well behaved.  Extraneous or redun-
-	dent control calls are ignored. Once a thread is 
-	'done' or 'dead', it cannot be restarted.
 }}
 
 
 
 type thread -- intrinsic
 {{
-	A thread object represents a system thread.  It 
-	can be used to control and monitor a running thread.
-	An op<thread> is returned by start_thread.
+	A thread object represents a system thread.  It	can be 
+	used to control and monitor a running thread. 
+	
+	An op<thread> is returned by start_thread. See sub-
+	routine definition later on this page.
+		
+	:wait returns when the thread state changes. 
+
+	One version of :wait returns when the thread has reached 
+	a specified state or it times-out. An output indicator
+	is 'true' if the state was reached, or 'false' if the
+	wait timed-out.
+	
+	Another version of :wait returns when the state has 
+	changed from the last state it returned on. The first
+	time it returns when the state is not 'new'. The state
+	that releases :wait is copied to an output.
+	
+	:get_trace copies the
+
+	A thread cannot be incorrectly controlled. State
+	progression is well behaved.  Extraneous or redun-
+	dent control calls are ignored. Once a thread is 
+	'done' or 'dead', it cannot be restarted.
 }}
 {
 	general
@@ -50,11 +57,9 @@ type thread -- intrinsic
 
 		wait ( etm [opt] )( thread_state ); 
 
-		use_state = thread_state proxy [eval];
+		get_state ()( thread_state );
 
-		use_trace = trace proxy [eval]; 
-
-		use_id = expr proxy [eval];
+		get_id ()( expr );
 
 		use_handle = handle proxy [eval];
 	}
@@ -64,9 +69,9 @@ type thread -- intrinsic
 
 subroutine
 {
-	this_thread_id = expr proxy [eval];  
+	get_thread_id ()( expr ); -- of caller
 
-	this_process_id = expr proxy [eval]; 
+	get_process_id ()( expr ); -- of caller
 
 	start_thread<ept> ( op<object> [opt] )( op<thread> ); 
 	{{
@@ -74,7 +79,7 @@ subroutine
 		type <ept> which derives from alpha\entry, then 
 		calls adaptable entry method :run on a new thread,
 		forwarding the given object pointer. The entry 
-		point object is created in the new thread's local
+		point object is created in the new thread's stack
 		memory.
 
 		A thread object that controls the new thread is

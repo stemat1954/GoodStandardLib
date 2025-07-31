@@ -13,24 +13,28 @@ type string
 	(1) using a heap addr:
 
 		string assumes ownership of addr.  If len is not
-		specified, sequence must be delimited by a zero 
-		char (aka "null-terminated").  Encoding	must be 
-		specified.  Note: a mediator or compatible sub-
-		routine is usually the source for this initial-
+		specified, the caracter sequence must be delimited
+		by a zero char (aka "null-terminated").  Encoding
+		must be specified.  Note: a mediator or compatible
+		subroutine is usually the source for this initial-
 		izer.
 	
 	(2) from array of characters:
 
-		encoding must be specified
+		encoding must be specified, length is determined
+		by the array count.
 
 	(3) from ascii expr (literal):
 
-		If encoding is not specified, default encoding is
-		used (see alpha\mediator).
+		If encoding is not specified, platform default 
+		encoding is	used (see alpha\mediator).
 
-	(4) from mediator
+	(4) copy another
 
-		fex specifies which encoding and delimitation.
+
+	(5) from mediator
+
+		fex specifies external encoding and delimitation.
 		Binary formats usually use intrinsic string encoding
 		and length or null delimitation. Text formats use 
 		mediator encoding and some kind	of quotation or eol 
@@ -39,9 +43,6 @@ type string
 		Note: generic binary 'b' uses platform encoding and
 		and null-delimitation, making it a platform compat-
 		ible c string.
-
-	(5) copy another
-	
 
 }}
 {

@@ -10,12 +10,10 @@ type unicode from enumerated
 	large and complex, and it's not practical to encapsul-
 	ate it behind property methods in this type.
 
-	Instead, the UCD will be provided as a stock type which 
-	can be instantiated and used to look up properties given 
-	a unicode object. The stock UCD	will be based on a
-	C-compatible book that provides access to the public data 
-	(the compatible book and public UCD will be delivered with 
-	the PDK).
+	Instead, the UCD will be provided in a GDK book which
+	has the necessary types and subroutines to look up 
+	properties for a given unicode object.
+	
 
 	https://en.wikipedia.org/wiki/Unicode_character_property
 
@@ -38,6 +36,8 @@ type unicode from enumerated
 		store ( mediator m [upd], expr fex )()( extra ); 
 
 		use_notation = expr proxy [eval];
+
+		get_notation ()( expr );
 
 		is_before? ( unicode )( bool );
 

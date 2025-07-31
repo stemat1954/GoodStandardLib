@@ -25,15 +25,15 @@ type semaphore
 	remains in it's configured range.
 
 	:add_wait "spins" in a loop until the counter can be
-	successfully updated. 
+	successfully updated (without going out of range). 
 
-	Note:  If the app's inter-thread protocol is flawed, 
+	Note:  If the app's synchronization strategy is flawed, 
 	:add_wait may never return.
 
 	:add_no_wait tries once to update the counter and 
 	returns with an indication. A false indication means
 	the new value would exceed the counter's configured
-	range.
+	range so it wasn't changed.
 	
 	A semaphore can be used to implement various kinds of
 	locks, signals, and counters.  Information is readily
@@ -43,22 +43,23 @@ type semaphore
 
 	binary signal:
 
-		s:begin( false );			-- initially false
-		s:add_wait( negative );		-- one thread waits for true to set false
-		s:add_no_wait( positive );  -- another thread sets true (ignore output, may already be true)
+		s:begin( '0', '1' );	-- initially '0', max = '1'
+		s:add_wait( '-1' );		-- one thread waits for '1' to set '0'
+		s:add_no_wait( '1' );	-- another thread adds '1' (ignore output, don't care if already '1')
 
 	binary lock:
 
-		l:begin( false );			-- initially false
-		l:add_wait( positive );		-- one thread waits for false to set true
-		l:add_no_wait( negative );	-- same thread sets false (ignore output, always works)
+		l:begin( '0', '1' );		-- initially '0', max = '1'
+		l:add_wait( '1' );			-- one thread waits for '0' to set '1'
+		l:add_no_wait( '-1' );		-- same thread adds '-1' (ignore output, trust it works )
 
-	resource count:
+	resource counter:
 
-		x:begin( zero );			-- initally zero with no configured max
-		x:add_wait( negative );		-- consumer thread waits for non-zero to consume one
-		x:add_no_wait( positive );	-- provider thread provides one resource (ignore output, assume ok)
-	
+		x:begin( '0', max );		  -- initally '0' with some max number of resources
+		x:add_wait( '-1' );			  -- consumer thread waits for a resouce to consume one 
+		x:add_no_wait( '1' );		  -- provider thread provides one resource (ignore output, trust it works)
+		x:add_no_wait( '1' )( bool ); -- provider thread provides one resource (check output, verify 'true')
+
 
 	See stock\toggle for a standard binary semaphore.
 }}

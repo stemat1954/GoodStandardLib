@@ -10,8 +10,9 @@ type serial_access<t><c> [incomplete] -- intrinsic
 	cursor type. 
 	
 	Collections that derive from serial_access<t><c> manage
-	an ordered set of objects where individual objects are
-	accessed in serial order using a bespoke cursor.
+	an ordered collection of objects where individual 
+	objects are accessed in serial order using a bespoke 
+	cursor.
 
 	Access to the collection starts by opening a cursor	
 	positioned at one end of the logical sequence. The 
@@ -32,8 +33,8 @@ type serial_access<t><c> [incomplete] -- intrinsic
 	the last object and moves toward the first.  step = 0 
 	is invalid.  The default step is one.
 
-	Note: If a collection doesn't support step < 0 or |step|
-	> 1,  the output cursor is inoperable.
+	Note: If a collection doesn't support step < 0 or 
+	|step| > 1,  the output cursor is inoperable.
 
 	:move_cursor updates the position of a given cursor.
 	
@@ -42,9 +43,13 @@ type serial_access<t><c> [incomplete] -- intrinsic
 	Note: If a cursor can't be flipped, the cursor will 
 	become inoperable.
 
-	:use returns access to the object referenced by a given
+	:use@ returns access to the object referenced by a given
 	cursor. If the cursor is inoperable, the proxy will be
 	void.
+
+	The proxy returned by :use@ has unspecified access.
+	Permission must be specified in the call and it's 
+	verified at runtime.
 
 	A serial_access collection can be scanned in a Good 
 	for loop.
