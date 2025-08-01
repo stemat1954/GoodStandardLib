@@ -24,7 +24,7 @@ general method -- intrinsic in every type
 
 	use_addr [eval] = addr proxy [eval];	-- access
 
-	get_addr [eval]() addr );  -- copy
+	get_addr [eval]()( addr );  -- copy
 	
 	is<t>? [eval]()( bool );  
 

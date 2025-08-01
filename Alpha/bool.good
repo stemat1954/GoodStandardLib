@@ -41,6 +41,15 @@ type bool  -- elementary, intrinsic, compatible, conventional
 
 		not [upd];
 		not	[eval]()( bool );
+
+		nand [upd]( bool other );
+		nand [eval]( bool other )( bool );
+
+		nor [upd]( bool other );
+		nor [eval]( bool other )( bool );
+
+		xnor [upd]( bool other );
+		xnor [eval]( bool other )( bool );
 	}
 
 }

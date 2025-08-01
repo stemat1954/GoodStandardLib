@@ -1,79 +1,38 @@
 
 page float in AlphaByGood
 
-
 {{
-	There are two elementary float types: fp2 (base 2)
-	and fp10 (base 10).  Their interfaces are similar
-	if not identical, but the type is not generic.  
+	fp2 and fp10 are two distinct floating point types 
+	with esentially the same api. 
 	
-	This page is a work in progress.  Eventually, there
-	should be two type defs on the page.
+	Note: fp2 and fp10 are NOT adhoc configurations of a 
+	single generic type.
+
+	See math.good for built-in functional subroutines
+	for numeric types.
+
 }}
 
 
-type fp10;  -- def pending
+enum type fp_const ( 'min', 'max', 'epsilon', 'infinity', 'nan' );
+
 
 
 type fp2 -- elementary, compatible, conventional
 {{
-	fp is a generic floating point number type.
-		
-
-	THOUGHTS...
-
-	what does Good guarantee about conversion 
-	to int and decomposition into parts?  Hmmm
-
-	conversion is subject to quit-fail and app
-	must predetermine value.
-
-	Decomposition is deprecated.
-
-	word fread/store gives app a way to examine
-	and twiddle bits of an fp value.  This is
-	alternative to decomposition methods. Word size
-	must be compatible with portable format. This is
-	clearly an advanced feature.
-
-	inc and dec add and sub epsilon
-
-	div returns remainder 
-
-	rem returns low bits of internal division
-	useful for trig calcs??  See C++	remquo.
-
-	see math page for other common
-	functions, see C++
-
-		exp, log, trig, hyperbolic,
-		stastical, stats
-
-	exp(n,d) can handle special case of 1/2
-	(sqrt) and 1/3 (cube rt).  What else?
-		
-	C++ and IEEE define "hypot" which is
-	really used to calc distance/magnitude
-	of 2d/3d point/vector.  This should 
-	probably be a subroutine (not
-	method), since Alpha does not define
-	any vector types. UPDATE: yes, alpha
-	vector types are available
-
-	undirected rounding is round near.
-	One version allows specification of
-	directed half rounding.  The other
-	version (pure generic rounding) needs
-	internal round-to-even for half.
-
-	integer conversion truncates fraction
-	and may quit-fail if value is too large
+	fp2 is a base-2 floating point number.  
+	
+	fp2 numbers can exactly represent any number that is
+	a power of two, subject to inherent limits of exponent
+	and fraction (mantissa).
 }}
 {
 
 	general
 	{
-		begin ( expr vex [opt] );	-- literal, default = 0
+		begin ( expr vex [opt] );	-- numeric expr, default = 0
+
+		begin ( fp_const vex );
 
 		begin ( fp2 x );  -- copy
 
@@ -95,71 +54,167 @@ type fp2 -- elementary, compatible, conventional
 
 		is_less? ( fp2 x )( bool );
 
-		is_precise? ( fp2 u )( bool );
+		is_precise? ( fp2 x )( bool );			-- v/x is not fractional
 
-		to_int ()( int n );	
-
-		set [upd]( fp2 x );  -- replace
-
-		add [upd]( fp2 x );								
-		add [eval]( fp2 x )( fp2 );	
-
-		sub [upd]( fp2 x );
-		sub [eval]( fp2 x )( fp2 );
-
-		mul [upd]( fp2 x );
-		mul [eval]( fp2 x )( fp2 );		
-
-		div [upd]( fp2 x );
-		div [eval]( fp2 x )( fp2 );
-		div [eval]( fp2 x )( fp2 q, fp2 r );	--  q = "rpn( v/x )", r = "v - q * x" 
-
-		rem [upd]( fp2 x );								-- "v - ( rpn( v/x ) * x )" 
-		rem [eval]( fp2 x )( fp2 );		
-
-		pow [upd]( fp2 x );								-- v to x power
-		pow [upd]( int n, int d );							-- v to (n/d) power 
-		pow [eval]( fp2 x )( fp2 );
-		pow [eval]( int n, int d )( fp2 );
-
-		scl [upd]( int n );									-- "v * pow( #, n )"
-		scl [eval]( int n )( fp2 );
-
-		fma [upd]( fp2 m, fp2 b );						-- fused mul add 
-		fma [eval]( fp2 m, fp2 b )( fp2 );
-
-		dis [upd]( fp2 x );								-- distance between v and x (abs diff)
-		dis [eval]( fp2 x )( fp2 );
-
-		neg [upd];									
-		neg [eval]()( fp2);
-
-		abs [upd];
-		abs [eval]()( fp2 );
-
-		inc [upd];											--  v + epsilon
-		inc [eval]()( fp2 );
-
-		dec [upd];											--  v - epsilon
-		dec [eval]()( fp2 );
-
-		rpu [upd]( fp2 u [opt] );							-- round to precision up	
-		rpu [eval]( fp2 u [opt] )( fp2 );
-
-		rpd [upd]( fp2 u [opt] );							-- round to precision down 
-		rpd [eval]( fp2 u [opt] )( fp2 );
-
-		rpi [upd]( fp2 u [opt] );							-- round to precision in
-		rpi [eval]( fp2 u [opt] )( fp2 );
-
-		rpo [upd]( fp2 u [opt] );							-- round to precision out
-		rpo [eval]( fp2 u [opt] )( fp2 );
 		
-		rpn [upd]( fp2 u [opt] );							-- round to precision near 
-		rpn [eval]( fp2 u [opt] )( fp2 );	
+		set [upd]( fp2 x );						-- v <= x (intrinsic assign)
 
-		rpn [upd]( fp2 u [opt] ) with rh ( fp2 x, fp2 u )( fp2 );			-- co-routine for .5
-		rpn [eval]( fp2 u [opt] )( fp2 ) with rh ( fp2 x, fp2 u )( fp2 );
+		to_int [eval]()( int n );				-- n <= v (int conversion, if v not fractional)
+
+		sgn [eval]()( int s );					-- s <= {-1,0,1} (sign) 
+
+
+		add [upd]( fp2 x );						-- v <= v + x (add)	
+		add [eval]( fp2 x )( fp2 y );	
+
+		sub [upd]( fp2 x );						-- v <= v - x (subtract)
+		sub [eval]( fp2 x )( fp2 y );
+
+		mul [upd]( fp2 x );						-- v <= v * x (multiply)
+		mul [eval]( fp2 x )( fp2 y );		
+
+		div [upd]( fp2 x );						-- v <= v / x ( divide)
+		div [eval]( fp2 x )( fp2 y );
+
+		pow [upd]( fp2 x );						-- v <= v ^ x (power,real)
+		pow [eval]( fp2 x )( fp2 y );
+
+		pow [upd]( int n, int d );				-- v <= v ^ (n/d) (power,rational) 
+		pow [eval]( int n, int d )( fp2 y );
+
+		scl [upd]( int n );						-- v <= v * ( 2 ^ n ) (scale)
+		scl [eval]( int n )( fp2 y );
+
+		fma [upd]( fp2 m, fp2 b );				-- v <= ( m * v ) + b  (fused mul add, linear transform) 
+		fma [eval]( fp2 m, fp2 b )( fp2 y );
+
+		dis [upd]( fp2 x );						-- v <= | v - x | (distance, absolute diff)
+		dis [eval]( fp2 x )( fp2 y );
+
+		neg [upd];								-- v <= -v (negate)		
+		neg [eval]()( fp2 y );
+
+		abs [upd];								-- v <= |v| (abs value)
+		abs [eval]()( fp2 y );
+
+		rpu [upd]( fp2 x [opt] );				-- v <= v/x snap up/more (round to precision up)	
+		rpu [eval]( fp2 x [opt] )( fp2 y );
+
+		rpd [upd]( fp2 x [opt] );				-- v <= v/x snap down/less (round to precision down) 
+		rpd [eval]( fp2 x [opt] )( fp2 y );
+
+		rpi [upd]( fp2 x [opt] );				-- v <= v/x snap toward zero (round to precision in)
+		rpi [eval]( fp2 x [opt] )( fp2 y );
+
+		rpo [upd]( fp2 x [opt] );				-- v <= v/x snap away from zero (round to precision out)
+		rpo [eval]( fp2 x [opt] )( fp2 y );
+		
+		rpn [upd]( fp2 x [opt] );				-- v <= v/x snap closest (round to precision near, .5 round out)
+		rpn [eval]( fp2 x [opt] )( fp2 y );	
+
+		rpn [upd]( fp2 x [opt] ) with rh ( fp2 v, fp2 x )( fp2 y );	-- v <= v/x snap closest (round to precision near, with .5 co-routine) 
+		rpn [eval]( fp2 x [opt] )( fp2 y ) with rh ( fp2 v, fp2 x )( fp2 y );
+	}
+
+}
+
+
+type fp10 -- elementary, compatible, conventional
+{{
+	fp10 is a base-10 floating point number.  
+	
+	fp10 numbers can exactly represent any number that is
+	a power of ten, subject to inherent limits of exponent
+	and fraction (mantissa).
+}}
+{
+
+	general
+	{
+		begin ( expr vex [opt] );	-- numeric expr, default = 0
+
+		begin ( fp_const vex );
+
+		begin ( fp10 x );  -- copy
+
+		begin ( fp2 x );  -- fp2 conversion
+
+		begin ( int n );  -- int conversion
+
+		begin<#n> ( word<<#n>> w, expr fex );	-- word conversion
+
+
+		begin ( mediator [upd], expr fex );	 
+
+		store ( mediator [upd], expr fex );	
+
+
+		is_equal? ( fp10 x )( bool );
+		
+		is_before? ( fp10 x )( bool );	
+
+		is_less? ( fp10 x )( bool );
+
+		is_precise? ( fp10 x )( bool );			-- v/x is not fractional
+
+		
+		set [upd]( fp10 x );					-- v <= x (intrinsic assign)
+
+		to_int [eval]()( int n );				-- n <= v (int conversion, if v not fractional)
+
+		sgn [eval]()( int s );					-- s <= {-1,0,1} (sign) 
+
+
+		add [upd]( fp10 x );					-- v <= v + x (add)	
+		add [eval]( fp10 x )( fp10 y );	
+
+		sub [upd]( fp10 x );					-- v <= v - x (subtract)
+		sub [eval]( fp10 x )( fp10 y );
+
+		mul [upd]( fp10 x );					-- v <= v * x (multiply)
+		mul [eval]( fp10 x )( fp10 y );		
+
+		div [upd]( fp10 x );					-- v <= v / x ( divide)
+		div [eval]( fp10 x )( fp10 y );
+
+		pow [upd]( fp10 x );					-- v <= v ^ x (power,real)
+		pow [eval]( fp10 x )( fp10 y );
+
+		pow [upd]( int n, int d );				-- v <= v ^ (n/d) (power,rational) 
+		pow [eval]( int n, int d )( fp10 y );
+
+		scl [upd]( int n );						-- v <= v * ( 2 ^ n ) (scale)
+		scl [eval]( int n )( fp10 y );
+
+		fma [upd]( fp10 m, fp10 b );			-- v <= ( m * v ) + b  (fused mul add, linear transform) 
+		fma [eval]( fp10 m, fp10 b )( fp10 y );
+
+		dis [upd]( fp10 x );					-- v <= | v - x | (distance, absolute diff)
+		dis [eval]( fp10 x )( fp10 y );
+
+		neg [upd];								-- v <= -v (negate)		
+		neg [eval]()( fp10 y );
+
+		abs [upd];								-- v <= |v| (abs value)
+		abs [eval]()( fp10 y );
+
+		rpu [upd]( fp10 x [opt] );				-- v <= v/x snap up/more (round to precision up)	
+		rpu [eval]( fp10 x [opt] )( fp10 y );
+
+		rpd [upd]( fp10 x [opt] );				-- v <= v/x snap down/less (round to precision down) 
+		rpd [eval]( fp10 x [opt] )( fp10 y );
+
+		rpi [upd]( fp10 x [opt] );				-- v <= v/x snap toward zero (round to precision in)
+		rpi [eval]( fp10 x [opt] )( fp10 y );
+
+		rpo [upd]( fp10 x [opt] );				-- v <= v/x snap away from zero (round to precision out)
+		rpo [eval]( fp10 x [opt] )( fp10 y );
+		
+		rpn [upd]( fp10 x [opt] );				-- v <= v/x snap closest (round to precision near, .5 round out)
+		rpn [eval]( fp10 x [opt] )( fp10 y );	
+
+		rpn [upd]( fp10 x [opt] ) with rh ( fp10 v, fp10 x )( fp10 y );	-- v <= v/x snap closest (round to precision near, with .5 co-routine) 
+		rpn [eval]( fp10 x [opt] )( fp10 y ) with rh ( fp10 v, fp10 x )( fp10 y );
 	}
 
 }
