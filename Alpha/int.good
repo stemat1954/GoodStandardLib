@@ -59,52 +59,52 @@ type int -- elementary, compatible, conventional
 		is_less? ( int n )( bool );				-- cardinality ( same as is_before? )
 
 	
-		set [upd]( int n );						-- v <= n (intrinsic assign)
+		set [upd]( int n );						-- io <= n (intrinsic assign)
 
-		add [upd]( int n );						-- v <= v + n  (add)
+		add [upd]( int n );						-- io <= io + n  (add)
 		add [eval] ( int n )( int x );			
 
-		sub [upd]( int n );						-- v <= v - n  (subtract)
+		sub [upd]( int n );						-- io <= io - n  (subtract)
 		sub [eval] ( int n )( int x );
 
-		mul [upd]( int n );						-- v <= v * n  (multiply)
+		mul [upd]( int n );						-- io <= io * n  (multiply)
 		mul [eval] ( int n )( int x );	
 
-		div [upd]( int n );						-- v <= v \ n (divide and round-in)
-		div [upd]( int n )( int r );			-- v <= v \ n, r <= mod(v,n) 
-		div [eval]( int n )( int x, int r );	-- x <= v \ n, r <= mod(v,n)
+		div [upd]( int n );						-- io <= io \ n (divide and round-in)
+		div [upd]( int n )( int r );			-- io <= io \ n, r <= mod(io,n) 
+		div [eval]( int n )( int x, int r );	-- x <= io \ n, r <= mod(io,n)
 
-		mod [upd]( int n );						-- v <= residual of v \ n (modulo)
+		mod [upd]( int n );						-- io <= residual of io \ n (modulo)
 		mod [eval]( int n )( int x );	
 
-		pow [upd]( int n );						-- v <= v ^ n (power)
+		pow [upd]( int n );						-- io <= io ^ n (power)
 		pow [eval]( int n )( int x );
 
-		fma [upd]( int m, int b );				-- v <= m * v + b (fused mul add, linear transform)
+		fma [upd]( int m, int b );				-- io <= m * io + b (fused mul add, linear transform)
 		fma [eval]( int m, int b )( int x );
 
-		dis [upd]( int n );						-- v <= | v - n | (distance, absolute diff)
+		dis [upd]( int n );						-- io <= | io - n | (distance, absolute diff)
 		dis [eval]( int n )( int x );
 
-		neg [upd];								-- v <= -v  (negate)
+		neg [upd];								-- io <= -io  (negate)
 		neg [eval]()( int x );
 
-		abs [upd];								-- v <= |v| (absolute value)
+		abs [upd];								-- io <= |io| (absolute value)
 		abs [eval]()( int x );	
 
-		sgn [upd];								-- v <= (-1,0,1) (sign)
+		sgn [upd];								-- io <= (-1,0,1) (sign)
 		sgn [eval]()( int x );
 
-		inc [upd];								-- v <= v + 1 (increment)
+		inc [upd];								-- io <= io + 1 (increment)
 		inc [eval]()( int x );	
 
-		dec [upd];								-- v <= v - 1 (decrement)
+		dec [upd];								-- io <= io - 1 (decrement)
 		dec [eval]()( int x );
 
-		inf [upd];								-- v <= v + sgn(v) (inflate)
+		inf [upd];								-- io <= io + sgn(io) (inflate)
 		inf [eval]()( int x );
 
-		def [upd];								-- v <= v - sgn(v) (deflate)
+		def [upd];								-- io <= io - sgn(io) (deflate)
 		def [eval]()( int x );
 	}
 }

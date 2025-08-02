@@ -4,9 +4,66 @@ page vector in AlphaByGood
 
 type vector<t><#>
 {{
-	Linear algebra vector.
+	algebraic vector.
 	
 	<#> coordinates, numeric type <t>.
+
+
 }}
 {
+	nom type vector_tn = vector<<t>><<#>>;
+
+	general method
+	{
+		begin;  -- zero vector
+
+		begin ( <t> x, <t> y, <t> z [opt], <t> w [opt] )()( extra );  -- cordinates
+
+		begin ( array<<t>><<#>> coordinates );
+
+		begin ( vector_tn other );  -- copy
+
+		begin<u><#n> ( vector<<u>><<#n>> other );  -- convert 
+
+
+		begin ( mediator m [upd], expr fex );
+
+		store ( mediator m [upd], expr fex );
+
+	
+		is_equal? ( vector_tn v )( bool );
+
+		is_zero? ()( bool );
+
+
+		set_coord [upd]( int i, <t> n );
+
+		get_coord [eval]( int i )( <t> n );
+
+		use_coord [eval]( int i ) = <t> proxy [eval,upd];
+
+
+		dot [eval]( vector_tn v [opt] )( <t> n ); -- n <= io . v (dot product) default = self-dot
+
+
+		add [upd]( vector_tn v );			-- io <= io + v (add)
+		add [eval]( vector_tn v1 )( vector_tn v2 );
+
+		sub [upd]( vector_tn v );			-- io <= io - v (subtract)
+		sub [eval]( vector_tn v1 )( vector_tn v2 );
+
+		mul [upd]( <t> n );					-- io <= io * n (multiply)
+		mul [eval]( <t> n )( vector_tn v );
+
+		div [upd]( <t> n );					-- io <= io / n (divide)
+		div [eval]( <t> n )( vector_tn v ); 
+
+		neg [upd];							-- io <= -io (negate)
+		neg [eval]()( vector_tn v );
+
+		norm [upd];							-- io <= unit vector (normalize)
+		norm [eval]()( vector_tn v );
+	}
+
 }
+
