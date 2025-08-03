@@ -8,13 +8,22 @@ page float in AlphaByGood
 	Note: fp2 and fp10 are NOT adhoc configurations of a 
 	single generic type.
 
+	fp2 is always supported by hardware and should be used
+	for most purposes when decimal precision isn't required.
+	
+	fp10 is usually implemented in software and it should
+	only be used in applications that need precise decimal
+	fractions or powers of 10, such as financial and 
+	accounting applications.
+	
 	See math.good for built-in functional subroutines
 	for numeric types.
 
 }}
 
 
-enum type fp_const ( 'min', 'max', 'epsilon', 'infinity', 'nan' );
+
+enum type fp_const ( 'min', 'max', 'epsilon', '+infinity', '-infinity', 'nan' );
 
 
 
@@ -30,22 +39,22 @@ type fp2 -- elementary, compatible, conventional
 
 	general
 	{
-		begin ( expr vex [opt] );	-- numeric expr, default = 0
+		begin ( expr vex [opt] );				-- digital expr, default = 0
 
-		begin ( fp_const vex );
+		begin ( fp_const vex );					-- enumerated const
 
-		begin ( fp2 x );  -- copy
+		begin ( fp2 x );						-- copy
 
-		begin ( fp10 x );  -- fp10 conversion
+		begin ( fp10 x );						-- fp10 conversion
 
-		begin ( int n );  -- int conversion
+		begin ( int n );						-- int conversion
 
 		begin<#n> ( word<<#n>> w, expr fex );	-- word conversion
 
 
-		begin ( mediator [upd], expr fex );	 
+		begin ( mediator [upd], expr fex );		-- mediation
 
-		store ( mediator [upd], expr fex );	
+		store ( mediator [upd], expr fex );		-- mediation
 
 
 		is_equal? ( fp2 x )( bool );
@@ -54,7 +63,8 @@ type fp2 -- elementary, compatible, conventional
 
 		is_less? ( fp2 x )( bool );
 
-		is_precise? ( fp2 x )( bool );			-- io/x is not fractional
+
+		is_precise? ( fp2 x )( bool );			-- not io/x fractional?
 
 		
 		set [upd]( fp2 x );						-- io <= x (intrinsic assign)
@@ -131,22 +141,22 @@ type fp10 -- elementary, compatible, conventional
 
 	general
 	{
-		begin ( expr vex [opt] );	-- numeric expr, default = 0
+		begin ( expr vex [opt] );				-- digital expr, default = 0
 
-		begin ( fp_const vex );
+		begin ( fp_const vex );					-- enumerated const
 
-		begin ( fp10 x );  -- copy
+		begin ( fp10 x );						-- copy
 
-		begin ( fp2 x );  -- fp2 conversion
+		begin ( fp2 x );						-- fp2 conversion
 
-		begin ( int n );  -- int conversion
+		begin ( int n );						-- int conversion
 
 		begin<#n> ( word<<#n>> w, expr fex );	-- word conversion
 
 
-		begin ( mediator [upd], expr fex );	 
+		begin ( mediator [upd], expr fex );		-- mediation
 
-		store ( mediator [upd], expr fex );	
+		store ( mediator [upd], expr fex );		-- mediation
 
 
 		is_equal? ( fp10 x )( bool );
@@ -155,7 +165,8 @@ type fp10 -- elementary, compatible, conventional
 
 		is_less? ( fp10 x )( bool );
 
-		is_precise? ( fp10 x )( bool );			-- io/x is not fractional
+
+		is_precise? ( fp10 x )( bool );			-- not io/x fractional
 
 		
 		set [upd]( fp10 x );					-- io <= x (intrinsic assign)

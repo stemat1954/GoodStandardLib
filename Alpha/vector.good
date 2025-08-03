@@ -6,29 +6,29 @@ type vector<t><#>
 {{
 	algebraic vector.
 	
-	<#> coordinates, numeric type <t>.
-
-
+	<#> coordinates
+	
+	numeric type <t> = int,	fp2, fp10
 }}
 {
 	nom type vector_tn = vector<<t>><<#>>;
 
 	general method
 	{
-		begin;  -- zero vector
+		begin;										-- default zero vector
 
-		begin ( <t> x, <t> y, <t> z [opt], <t> w [opt] )()( extra );  -- cordinates
+		begin ( <t> x, <t> y, <t> z [opt], <t> w [opt] )()( extra );  -- coordinates
 
-		begin ( array<<t>><<#>> coordinates );
+		begin ( array<<t>><<#>> );					-- import 
 
-		begin ( vector_tn other );  -- copy
+		begin ( vector_tn other );					-- copy
 
-		begin<u><#n> ( vector<<u>><<#n>> other );  -- convert 
+		begin<u><#n> ( vector<<u>><<#n>> other );	-- conversion 
 
 
-		begin ( mediator m [upd], expr fex );
+		begin ( mediator m [upd], expr fex );		-- mediation
 
-		store ( mediator m [upd], expr fex );
+		store ( mediator m [upd], expr fex );		-- mediation
 
 	
 		is_equal? ( vector_tn v )( bool );
@@ -42,26 +42,28 @@ type vector<t><#>
 
 		use_coord [eval]( int i ) = <t> proxy [eval,upd];
 
+		export [eval]()( array<<t>><<#>> );			
 
-		dot [eval]( vector_tn v [opt] )( <t> n ); -- n <= io . v (dot product) default = self-dot
+
+		dot [eval]( vector_tn v [opt] )( <t> n );	 -- n <= io . v (dot product) default = self-dot
 
 
-		add [upd]( vector_tn v );			-- io <= io + v (add)
+		add [upd]( vector_tn v );					-- io <= io + v (add)
 		add [eval]( vector_tn v1 )( vector_tn v2 );
 
-		sub [upd]( vector_tn v );			-- io <= io - v (subtract)
+		sub [upd]( vector_tn v );					-- io <= io - v (subtract)
 		sub [eval]( vector_tn v1 )( vector_tn v2 );
 
-		mul [upd]( <t> n );					-- io <= io * n (multiply)
+		mul [upd]( <t> n );							-- io <= io * n (multiply)
 		mul [eval]( <t> n )( vector_tn v );
 
-		div [upd]( <t> n );					-- io <= io / n (divide)
+		div [upd]( <t> n );							-- io <= io / n (divide)
 		div [eval]( <t> n )( vector_tn v ); 
 
-		neg [upd];							-- io <= -io (negate)
+		neg [upd];									-- io <= -io (negate)
 		neg [eval]()( vector_tn v );
 
-		norm [upd];							-- io <= unit vector (normalize)
+		norm [upd];									-- io <= unit vector (normalize)
 		norm [eval]()( vector_tn v );
 	}
 

@@ -1,6 +1,8 @@
 
 page int in AlphaByGood
 
+enum type int_const ( 'min', 'max' );
+
 
 type int -- elementary, compatible, conventional
 {{
@@ -40,7 +42,9 @@ type int -- elementary, compatible, conventional
 {
 	general 		
 	{
-		begin ( expr vex [opt] );				-- value expr, default '0'
+		begin ( expr vex [opt] );				-- digital expr, default '0'
+
+		begin ( int_const vex );				-- enumerated const
 
 		begin ( int other );					-- copy
 
