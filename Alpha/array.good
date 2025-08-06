@@ -35,7 +35,7 @@ page array in AlphaByGood
 type array_cursor;  -- opaque and restricted
 
 
-type base_array<t> from ( direct_access<<t>>, serial_access<<t>><array_cursor> )
+type base_array<t> [incomplete] from ( direct_access<<t>>, serial_access<<t>><array_cursor> )
 {
 	general method
 	{
@@ -48,25 +48,25 @@ type base_array<t> from ( direct_access<<t>>, serial_access<<t>><array_cursor> )
 
 	abstract method in direct_access<<t>>
 	{
-		[final] ~count ()( int n );
+		[tbd] ~count ()( int n );
 		
-		[final] ~use@ ( int i ) = <t> proxy;
+		[tbd] ~use@ ( int i ) = <t> proxy;
 	}
 
 	abstract method in serial_access<<t>><array_cursor>
 	{
-		[final] ~open_cursor ( int )( array_cursor );  
+		[tbd] ~open_cursor ( int )( array_cursor );  
 
-		[final] ~move_cursor ( array_cursor [upd] );
+		[tbd] ~move_cursor ( array_cursor [upd] );
 
-		[final] ~flip_cursor ( array_cursor [upd] ); 
+		[tbd] ~flip_cursor ( array_cursor [upd] ); 
 
-		[final] ~use@ ( array_cursor ) = <t> proxy; 
+		[tbd] ~use@ ( array_cursor ) = <t> proxy; 
 	}
 }
 
 
-type array<t> from base_array<t> -- compatible and conventional per <t>
+type array<t> from base_array<<t>> -- compatible and conventional per <t>
 {{
 	:insert always works provided there is available memory
 	(and index is valid).
@@ -82,13 +82,15 @@ type array<t> from base_array<t> -- compatible and conventional per <t>
 
 }}
 {
+	nom type same_array_t = array<<t>>;
+
 	nom type any_array_t = base_array<<t>>;
 
 	general method 
 	{
 		begin ( int reserve [opt] ); 
 
-		begin ( any_array_t other [upd] );		-- take 
+		begin ( same_array_t other [upd] );		-- take 
 
 		insert [upd]( int i [opt], int q );		-- q null objs at i (end)
 
@@ -123,19 +125,36 @@ type array<t> from base_array<t> -- compatible and conventional per <t>
 
 		rank ( <t> )( int i, bool unique ) with sorter ( <t> a, <t> b )( bool ); -- find ordered insertion point
 	}
+
+	abstract method in base_array<<t>>
+	{
+		[final] ~count ()( int n );
+		
+		[final] ~use@ ( int i ) = <t> proxy;
+
+		[final] ~open_cursor ( int )( array_cursor );  
+
+		[final] ~move_cursor ( array_cursor [upd] );
+
+		[final] ~flip_cursor ( array_cursor [upd] ); 
+
+		[final] ~use@ ( array_cursor ) = <t> proxy; 
+	}
 }
 
 
 
 type array<t><#> from base_array<t> -- compatible and conventional per <t>
 {
-	nom type array_tn = array<<t>><<#>>;
+	nom type same_array_tn = array<<t>><<#>>;
+
+	nom type any_array_t = base_array<<t>>;
 
 	general 
 	{
 		begin;	-- all objects null
 		
-		begin ( array_tn other [upd] );  -- take
+		begin ( same_array_tn other [upd] );  -- take
 	}
 
 	general -- <t> dependent
@@ -143,11 +162,26 @@ type array<t><#> from base_array<t> -- compatible and conventional per <t>
 		begin ( <t> seed );								-- with <t> copy
 		begin ( <t> seed ) with copier ( <t> )( <t> );	-- with copier
 
-		begin ( array_tn other );								-- with <t> copy
-		begin ( array_tn other ) with copier ( <t> )( <t> );	-- with copier
+		begin ( any_array_t other );							-- with <t> copy
+		begin ( any_array_t other ) with copier ( <t> )( <t> );	-- with copier
 
 		begin ( mediator [upd], expr fex )()( extra );	-- mediate
 		store ( mediator [upd], expr fex )()( extra );	-- mediate
+	}
+
+	abstract method in base_array<<t>>
+	{
+		[final] ~count ()( int n );
+		
+		[final] ~use@ ( int i ) = <t> proxy;
+
+		[final] ~open_cursor ( int )( array_cursor );  
+
+		[final] ~move_cursor ( array_cursor [upd] );
+
+		[final] ~flip_cursor ( array_cursor [upd] ); 
+
+		[final] ~use@ ( array_cursor ) = <t> proxy; 
 	}
 
 }
