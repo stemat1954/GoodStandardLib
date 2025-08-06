@@ -1,11 +1,133 @@
 
 page matrix in AlphaByGood
 
+
 type matrix<t><#r><#c>
 {{
-	Generic algebraic matrix.
+	rectangular algebraic matrix.
 	
-	<#r> rows, <#c> columns, numeric type <t>
+	<#r> rows, <#c> columns ( #r not equal #c )
+
+	numeric type <t> ( int, fp2, fp10 )
+
+	When filling a matrix from an array of individual 
+	entries, columns are filled row-by-row:
+	
+	for each ( ~n in entries, ai )
+	{
+		int:begin( ai ):div( #c )( int mi, int mj );
+		matrix:set_entry( mi, mj, ~n );
+	}
+
 }}
 {
+	nom type row_vector = vector<<t>><<#c>>;
+
+	nom type col_vector = vector<<t>><<#r>>;
+
+	nom type matrix_trc = matrix<<t>><<#r>><<#c>>;  -- same shape
+
+	nom type matrix_tc<#n> = matrix<<t>><<#c>><<#n>>;  -- dot input
+
+	nom type matrix_tr<#n> = matrix<<t>><<#r>><<#n>>;  -- dot output
+
+
+	general method
+	{
+
+		begin;										-- zero matrix
+
+		begin ( matrix_trc other );					-- copy
+
+		begin ( matrix_trc other [upd] );			-- take
+
+		begin ( array<row_vector><<#r>> vectors );	-- row vector array
+
+		begin ( array<col_vector><<#c>> vectors );	-- col vector array
+
+		begin ( array<<t>> entries );				-- <t> array, see notes
+		
+		begin ( mediator m [upd], expr fex );		-- mediation
+
+		store ( mediator m [upd], expr fex );		-- mediation
+
+	
+		set_row [upd]( int i, row_vector rv );
+
+		get_row [eval]( int i )( row_vector rv );
+
+
+		set_col [upd]( int j, col_vector cv );
+
+		get_col [eval]( int j )( col_vector cv );
+
+		
+		set_entry [upd]( int i, int j, <t> n );
+
+		get_entry [eval]( int i, int j )( <t> n );
+
+		use_entry [eval]( int i, int j ) = <t> proxy [eval,init];
+
+
+		add [upd]( matrix_trc m );					-- io <= io + m (add)
+		add [eval]( matrix_trc m1 )( matrix_trc m2 );
+
+		sub [upd]( matrix_trc m );					-- io <= io - m (subtract)
+		sub [eval]( matrix_trc m1 )( matrix_trc m2 );
+
+		mul [upd]( <t> n );							-- io <= io * n (multiply)
+		mul [eval]( <t> n )( matrix_trc m );
+
+		div [upd]( <t> n );							-- io <= io / n (divide)
+		div [eval]( <t> n )( matrix_trc m ); 
+
+		neg [upd];									-- io <= -io (negate)
+		neg [eval]()( matrix_trc m );
+
+		
+		dot<#> [eval]( matrix_tc<<#>> )( matrix_tr<<#>> );
+	}
+
+}
+
+
+type square_matrix<t><#> from matrix<<t>><<#>><#>>
+{{
+	square algebraic matrix
+
+}}
+{
+	nom type vector_tn = vector<<t>><<#>>;
+
+	nom type sq_matrix_tn = square_matrix<<t>><<#>>;
+
+
+	general method
+	{
+		begin;										-- zero matrix
+
+		begin ( sq_matrix_tn other );				-- copy
+
+		begin ( sq_matrix_tn other [upd] );			-- take
+
+		begin ( array<vector_tn><<#>> vectors, );	-- vector array
+
+		begin ( array<<t>> entries );				-- <t> array, see notes
+		
+
+		begin ( mediator m [upd], expr fex )()( extra );	-- mediation
+
+		store ( mediator m [upd], expr fex )()( extra );	-- mediation
+		
+		is_zero?
+
+		is_diag?
+
+		is_ident?
+
+		set_diag [upd]( vector_tn v [opt] );		-- default = identity
+		get_diag [eval]()( vector_tn v );
+
+		invert [eval]()( sq_matrix_tn );		-- null if not invetible
+	}
 }

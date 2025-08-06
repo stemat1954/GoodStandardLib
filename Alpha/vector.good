@@ -15,20 +15,20 @@ type vector<t><#>
 
 	general method
 	{
-		begin;										-- default zero vector
+		begin;										-- zero vector
 
-		begin ( <t> x, <t> y, <t> z [opt], <t> w [opt] )()( extra );  -- coordinates
+		begin ( <t> x, <t> y, <t> z [opt], <t> w [opt] )()( extra );  -- coordinate list
 
-		begin ( array<<t>><<#>> );					-- import 
+		begin ( array<<t>><<#>> );					-- coordinate array
 
 		begin ( vector_tn other );					-- copy
 
 		begin<u><#n> ( vector<<u>><<#n>> other );	-- conversion 
 
 
-		begin ( mediator m [upd], expr fex );		-- mediation
+		begin ( mediator m [upd], expr fex )()( extra );	-- mediation
 
-		store ( mediator m [upd], expr fex );		-- mediation
+		store ( mediator m [upd], expr fex )()( extra );	-- mediation
 
 	
 		is_equal? ( vector_tn v )( bool );
@@ -40,12 +40,9 @@ type vector<t><#>
 
 		get_coord [eval]( int i )( <t> n );
 
-		use_coord [eval]( int i ) = <t> proxy [eval,upd];
+		use_coord [eval]( int i ) = <t> proxy [eval,init];
 
-		export [eval]()( array<<t>><<#>> );			
-
-
-		dot [eval]( vector_tn v [opt] )( <t> n );	 -- n <= io . v (dot product) default = self-dot
+		get_coords [eval]()( array<<t>><<#>> );			
 
 
 		add [upd]( vector_tn v );					-- io <= io + v (add)
@@ -63,8 +60,7 @@ type vector<t><#>
 		neg [upd];									-- io <= -io (negate)
 		neg [eval]()( vector_tn v );
 
-		norm [upd];									-- io <= unit vector (normalize)
-		norm [eval]()( vector_tn v );
+		dot [eval]( vector_tn v [opt] )( <t> n );	 -- n <= io . v (dot product) default = self-dot
 	}
 
 }
