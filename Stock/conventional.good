@@ -1,76 +1,86 @@
 
-page dialect in StockByGood
+page conventional in StockByGood
 
 {{
-	Useful types, subroutines, and operations that comprise
-	a stock Good dialect.
-
-	Equality operators are backed by :is_equal?.
-
-	Ordinal operators are backed by :is_before?.
-
-	Cardinal operators are backed by :is_less?.
-
-	Logical operators are backed by :and, :or, :xor, :not.
-
-	Arithmetic operators are backed by :add, :sub, :mul,
-	:div, :neg.
-
-
-	Following example demonstrates how operations and 
-	formulas reduce code.  These are equivalent bool
-	object expressions:
-
-		"a |before| b"
-		"before?( a, b )"
-		a:before?( b )( =bool )
-
-
-		"( a |before| b ) |and| ( b |before| c )"
-		"and( before?( a, b ), before?( b, c ) )"
-		a:before?( b )( =bool ):and( b:before?( c )( =bool ) )
+	Useful types, subroutines, operations, and constants
+	that comprise a conventional Good dialect. 
 }}
 
 
-common
+
+
+common -- compatible pseudo null 
+{
+	addr no_addr:begin [const];	 
+	
+	handle no_handle:begin [const];		
+}
+
+
+common -- bool
 {
 	bool true:begin( 'true' ) [const];
 
 	bool false:begin( 'false' ) [const];
-
-	addr no_addr:begin [const];	 
-	
-	handle no_handle:begin [const];		
-
-	etm max_etm:begin( 'max' ) [const];
-}
-	
-common -- fp2
-{
-	fp2 max_fp2:begin( 'max' ) [const];
-	-- MORE TBD
-}
-
-
-common -- fp10
-{
-	-- TBD
 }
 
 
 common -- int
 {
+	int int_min:begin( 'min' as int_const ) [const];
+
+	int int_max:begin( 'max' as int_const ) [const];
+
 	int zero:begin( '0' ) [const];
 
 	int one:begin( '1' ) [const];
 
+	int two:begin( '2' ) [const];
+
+	int three:begin( '3' ) [const];
+
+	int four:begin( '4' ) [const];
+
+	int five:begin( '5' ) [const];
+
+	int six:begin( '6' ) [const];
+
+	int seven:begin( '7' ) [const];
+
+	int eight:begin( '8' ) [const];
+
+	int nine:begin( '9' ) [const];
+
+	int ten:begin( '10' ) [const];
+
 	int neg_one:begin( '-1' ) [const];
+}
+	
+common -- fp2
+{
+	fp2 fp2_max:begin( 'max' as fp_const ) [const];
 
-	int max_int:begin( 'max' ) [const];
+	fp2 fp2_min:begin( 'min' as fp_const ) [const];
 
-	int min_int:begin( 'min' ) [const];
+	fp2 fp2_epsilon:begin( 'epsilon' as fp_const ) [const];
 
-	-- more tbd
+	fp2 fp2_nan:begin( 'nan' as fp_const ) [const];
+
+	fp2 fp2_infinity:begin( '+infinity' as fp_const ) [const];
+}
+
+
+common -- fp10
+{
+	fp10 fp10_max:begin( 'max' as fp_const ) [const];
+
+	fp10 fp10_min:begin( 'min' as fp_const ) [const];
+
+	fp10 fp10_epsilon:begin( 'epsilon' as fp_const ) [const];
+
+	fp10 fp10_nan:begin( 'nan' as fp_const ) [const];
+
+	fp10 fp10_infinity:begin( '+infinity' as fp_const ) [const];
 }
 
 
@@ -177,6 +187,34 @@ subroutine  --  coroutines
 	}
 }
 
+
+
+{{
+	Equality operators are backed by :is_equal?.
+
+	Ordinal operators are backed by :is_before?.
+
+	Cardinal operators are backed by :is_less?.
+
+	Logical operators are backed by :and, :or, :xor, :not.
+
+	Arithmetic operators are backed by :add, :sub, :mul,
+	:div, :neg.
+
+
+	Following example demonstrates how operations and 
+	formulas reduce code.  These are equivalent bool
+	object expressions:
+
+		"a |before| b"
+		"before?( a, b )"
+		a:before?( b )( =bool )
+
+
+		"( a |before| b ) |and| ( b |before| c )"
+		"and( before?( a, b ), before?( b, c ) )"
+		a:before?( b )( =bool ):and( b:before?( c )( =bool ) )
+}}
 
 
 operation	-- equality  

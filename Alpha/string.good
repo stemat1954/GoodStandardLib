@@ -19,7 +19,7 @@ type string
 		subroutine is usually the source for this initial-
 		izer.
 	
-	(2) from array of characters:
+	(2) from serial_access collection of characters:
 
 		encoding must be specified, length is determined
 		by the array count.
@@ -46,14 +46,14 @@ type string
 
 }}
 {
+	nom type serial<c> = serial_access<unicode><<c>>;
+
 	general method
 	{
-		begin ( addr, utf, endian, int len [opt] );  -- sequence
+		begin ( addr, utf, endian, int len [opt] );  -- sequence in mem
 
-		begin ( array<unicode>, utf, endian );  -- array
+		begin<c> ( serial<<c>> source, utf, endian );  -- serial collection
 		
-		begin<#> ( array<unicode><<#>>, utf, endian );  -- array
-
 		begin ( expr, utf [opt], endian [opt] );  -- expr/literal conversion
 
 		begin ( string other );  -- copy 

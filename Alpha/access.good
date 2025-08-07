@@ -1,10 +1,12 @@
 
-page serial in AlphaByGood
+page access in AlphaByGood
+
 
 type serial_access<t><c> [incomplete] -- intrinsic
 {{
 	serial_access<t><c> is a base type for generic object 
-	collections that can be accessed serially.
+	collections that can be accessed serially using a
+	cursor.
 		
 	<t> is the symbolic object type and <c> is the symbolic 
 	cursor type. 
@@ -81,6 +83,73 @@ type serial_access<t><c> [incomplete] -- intrinsic
 	}
 
 }
+
+
+
+type direct_access<t> [incomplete] from serial_access<<t>><int>  -- intrinsic
+{{
+	direct_access<t> is a base type for uniform generic
+	object collections that can be directly accessed by
+	index.
+		
+	<t> is the symbolic object type. 
+
+	Collections that derive from direct_access<t> manage 
+	a countable set of objects where individual objects
+	are directly accessed by a numeric position index.
+
+	Valid indexes range from zero to count - 1.
+
+	:use@ returns access to an object at a given position. 
+	If the index is out of range, the result proxy will be 
+	void.
+
+	Note:  access permission is specified by caller and 
+	verified at runtime.
+
+	direct access collections are naturally ordered by index,
+	but there is no	presumption that objects with a lesser 
+	index compare less than or before objects with a greater
+	index.
+
+	Any direct_access collection can also be accessed 
+	serially through an integer cursor. This allows a 
+	direct_access collection to be used wherever a serial_
+	access collection is specified.  In particular, any
+	direct access collection can be scanned in a for-each
+	loop.
+
+}}
+{
+	general 
+	{
+		begin;
+
+		count ()( int n );
+
+		use@ ( int i ) = <t> proxy;
+	}
+
+	abstract -- recap as [tbd]
+	{
+		~count ()( int );	
+
+		~use@ ( int i ) = <t> proxy; 
+	}
+
+	abstract in serial_access<<t>><int>
+	{
+		[final] ~open_cursor ( int )( int );  
+
+		[final] ~move_cursor ( int [upd] );
+
+		[final] ~flip_cursor ( int [upd] );
+
+		[final] ~use@ ( int ) = <t> proxy; 
+	}
+}
+
+
 
 
 

@@ -46,8 +46,8 @@ type expr -- intrinsic, conventional
 	should be avoided because they ARE retained and	mimic
 	tabs when displayed at the start of a new line.
 
-	Applications can synthesize exprs by constructing an 
-	array<ascii>.
+	Applications can synthesize exprs using any serial_
+	access<ascii> source.
 		
 	In a very general way, exprs provide a way to extend
 	the language.  Types can invent their own unique 
@@ -79,11 +79,11 @@ type expr -- intrinsic, conventional
 	Several forms pf delimitiation are supported.
 }}
 {
+	nom type serial<c> = serial_access<ascii><<c>>;
+
 	general 	
 	{
-		begin ( array<ascii> );  -- synthetic
-
-		begin<#> ( array<ascii><<#>> );  -- synthetic
+		begin<c> ( serial<<c>> source );  -- synthetic
 
 		begin ( expr other );	-- copy
 

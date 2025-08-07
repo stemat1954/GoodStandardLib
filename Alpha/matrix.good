@@ -6,19 +6,18 @@ type matrix<t><#r><#c>
 {{
 	rectangular algebraic matrix.
 	
-	<#r> rows, <#c> columns ( #r not equal #c )
-
 	numeric type <t> ( int, fp2, fp10 )
 
-	When filling a matrix from an array of individual 
-	entries, columns are filled row-by-row:
-	
-	for each ( ~n in entries, ai )
-	{
-		int:begin( ai ):div( #c )( int mi, int mj );
-		matrix:set_entry( mi, mj, ~n );
-	}
+	<#r> rows, <#c> columns 
 
+	Use sq_matrix<t><#n> when <#r> and <#c> are same.
+
+	When filling a matrix from a serial source, columns are
+	filled row-wise (row-by-row).  If the source is exhaust-
+	ed before the matrix is filled, remaining entries will
+	be zero.  The source type must be numeric. If it differs
+	from the matrix type, it's converted and possibly 
+	rounded using :rpn( '1.0' ).
 }}
 {
 	nom type row_vector = vector<<t>><<#c>>;
@@ -26,10 +25,6 @@ type matrix<t><#r><#c>
 	nom type col_vector = vector<<t>><<#r>>;
 
 	nom type matrix_trc = matrix<<t>><<#r>><<#c>>;  -- same shape
-
-	nom type matrix_tc<#n> = matrix<<t>><<#c>><<#n>>;  -- dot input
-
-	nom type matrix_tr<#n> = matrix<<t>><<#r>><<#n>>;  -- dot output
 
 
 	general method
@@ -39,13 +34,7 @@ type matrix<t><#r><#c>
 
 		begin ( matrix_trc other );					-- copy
 
-		begin ( matrix_trc other [upd] );			-- take
-
-		begin ( array<row_vector><<#r>> vectors );	-- row vector array
-
-		begin ( array<col_vector><<#c>> vectors );	-- col vector array
-
-		begin ( array<<t>> entries );				-- <t> array, see notes
+		begin<xt><c> ( serial_access<<xt>><<c>> source ); -- fill, see notes
 		
 		begin ( mediator m [upd], expr fex );		-- mediation
 
@@ -83,15 +72,17 @@ type matrix<t><#r><#c>
 
 		neg [upd];									-- io <= -io (negate)
 		neg [eval]()( matrix_trc m );
+				
+		dot<#n> [eval]( matrix<<t>><<#c>><<#n>> m1 )( matrix<<t>><<#r>><#n>> m2 );  -- dot product
 
-		
-		dot<#> [eval]( matrix_tc<<#>> )( matrix_tr<<#>> );
+		dot [eval]( row_vector v1 )( col_vector v2 );  -- io <= io dot v (transform v, #c -> #r)
+
 	}
 
 }
 
 
-type square_matrix<t><#> from matrix<<t>><<#>><#>>
+type sq_matrix<t><#> from matrix<<t>><<#>><<#>>
 {{
 	square algebraic matrix
 
@@ -99,7 +90,7 @@ type square_matrix<t><#> from matrix<<t>><<#>><#>>
 {
 	nom type vector_tn = vector<<t>><<#>>;
 
-	nom type sq_matrix_tn = square_matrix<<t>><<#>>;
+	nom type sq_matrix_tn = sq_matrix<<t>><<#>>;
 
 
 	general method
@@ -108,26 +99,25 @@ type square_matrix<t><#> from matrix<<t>><<#>><#>>
 
 		begin ( sq_matrix_tn other );				-- copy
 
-		begin ( sq_matrix_tn other [upd] );			-- take
-
-		begin ( array<vector_tn><<#>> vectors, );	-- vector array
-
-		begin ( array<<t>> entries );				-- <t> array, see notes
-		
+		begin<xt><c> ( serial_access<<xt>><<c>> source );	-- fill
 
 		begin ( mediator m [upd], expr fex )()( extra );	-- mediation
 
 		store ( mediator m [upd], expr fex )()( extra );	-- mediation
+
 		
-		is_zero?
+		is_zero? ()( bool );
 
-		is_diag?
+		is_diag? ()( bool );
 
-		is_ident?
+		is_ident? ()( bool );
+
 
 		set_diag [upd]( vector_tn v [opt] );		-- default = identity
+
 		get_diag [eval]()( vector_tn v );
 
-		invert [eval]()( sq_matrix_tn );		-- null if not invetible
+
+		invert [eval]()( sq_matrix_tn );		-- null if not invertible
 	}
 }

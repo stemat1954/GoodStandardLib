@@ -245,24 +245,24 @@ type text_mediator from mediator
 			io:write_one( c );
 		}
 				
-		write [upd]( array<unicode> arr )
+		write<c> [upd]( serial_access<unicode><<c>> source )
 		{
-			io:write_all( arr );
+			io:write_sequence( source );
 		}
 
-		write [upd]( array<ascii> arr )
+		write<c> [upd]( serial_access<ascii><<c>> source )
 		{
-			io:write_all( arr );
+			io:write_sequence( source );
 		}
 
 		write [upd]( string s ) 
 		{
-			io:write_all( s:extract()( =array<unicode> ) );
+			io:write_sequence( s:extract()( =array<unicode> ) );
 		}
 
 		write [upd]( expr e ) 
 		{
-			io:write_all( e:extract()( =array<ascii> ) );
+			io:write_sequence( e:extract()( =array<ascii> ) );
 		}
 			
 			
@@ -293,47 +293,47 @@ type text_mediator from mediator
 
 		read [upd]( unicode delim )( array<unicode> arr )
 		{
-			io:read_array( delim )( arr );
+			io:read_sequence( delim )( arr );
 		}
 
 		read [upd]( ascii delim )( array<ascii> arr )  
 		{
-			io:read_array( delim )( arr );
+			io:read_sequence( delim )( arr );
 		}
 
 		read [upd]( unicode delim )( string )
 		{
-			io:read_array( delim )( array<unicode> arr );
+			io:read_sequence( delim )( array<unicode> arr );
 			io:get_utf()( utf f ):get_endian()( endian e );
 			given\string:begin( arr, f, e );
 		}
 				
 		read [upd]( ascii delim )( expr )
 		{
-			io:read_array( delim )( array<ascii> arr );
+			io:read_sequence( delim )( array<ascii> arr );
 			given\expr:begin( arr );
 		}
 
 		read [upd]( int q [opt] )( array<unicode> arr ) -- null q -> all
 		{
-			io:read_array( q )( arr );
+			io:read_sequence( q )( arr );
 		}
 
 		read [upd]( int q [opt] )( array<ascii> arr )  
 		{
-			io:read_array( q )( arr );
+			io:read_sequence( q )( arr );
 		}
 
 		read [upd]( int q [opt] )( string )
 		{
-			io:read_array( q )( array<unicode> arr );
+			io:read_sequence( q )( array<unicode> arr );
 			io:get_utf()( utf f ):get_endian()( endian e );
 			given\string:begin( arr, f, e );
 		}
 
 		read [upd]( int q [opt] )( expr )
 		{
-			io:read_array( q )( array<ascii> arr );
+			io:read_sequence( q )( array<ascii> arr );
 			given\expr:begin( arr );
 		}
 
@@ -481,23 +481,17 @@ type text_mediator from mediator
 			c:use_code:store( *io, io.codepoint_fex );
 		}
 
-		write_all<t> [upd]( array<<t>> arr ) -- <t> ascii or unicode
+		write_sequence<t><c> [upd]( serial_access<<t>><<c>> source ) -- <t> ascii or unicode
 		{
-			for each ( ~c in arr ) ~c:use_code:store( *io, io.codepoint_fex );
+			for each ( ~c in source ) ~c:use_code:store( *io, io.codepoint_fex );
 		}
-
-		write_all<t><#> [upd]( array<<t>><<#>> arr ) -- <t> ascii or unicode
-		{
-			for each ( ~c in arr ) ~c:use_code:store( *io, io.codepoint_fex );
-		}
-
 
 		read_one<t> [upd]()( <t> c ) -- <t> ascii or unicode
 		{
 			c:begin( int:begin( *io, io.codepoint_fex ) ); -- int:fread
 		}
 
-		read_array<t> [upd]( <t> delim )( array<<t>> arr ) -- <t> ascii or unicode
+		read_sequence<t> [upd]( <t> delim )( array<<t>> arr ) -- <t> ascii or unicode
 		{
 			arr:begin;
 			if ( "rp_end?( io )" ) return;
@@ -511,7 +505,7 @@ type text_mediator from mediator
 			}
 		}
 
-		read_array<t> [upd]( int q [opt] )( array<<t>> arr ) -- <t> ascii or unicode
+		read_sequence<t> [upd]( int q [opt] )( array<<t>> arr ) -- <t> ascii or unicode
 		{
 			arr:begin;
 			if ( "rp_end?( io )" ) return;

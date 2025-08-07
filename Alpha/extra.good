@@ -9,8 +9,8 @@ type extra from direct_access<object> -- intrinsic, restricted
 	after inputs and outputs.
 	
 	Note: an extra collection is logically similar to an
-	array of objects, but array<object> isn't valid because
-	type object isn't complete.
+	array of objects, but array<object> isn't a valid type
+	because	type object isn't complete.
 
 	The compiler automatically creates and initializes an 
 	extra collection.

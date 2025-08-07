@@ -2,28 +2,28 @@
 page vector in AlphaByGood
 
 
-type vector<t><#>
+type vector<t><#n> from direct_access<<t>>
 {{
 	algebraic vector.
 	
-	<#> coordinates
-	
 	numeric type <t> = int,	fp2, fp10
+
+	<#n> dimension (number of coordinates)
 }}
 {
-	nom type vector_tn = vector<<t>><<#>>;
+	nom type vector_tn = vector<<t>><<#n>>;
 
 	general method
 	{
-		begin;										-- zero vector
+		begin;												-- zero vector
 
-		begin ( <t> x, <t> y, <t> z [opt], <t> w [opt] )()( extra );  -- coordinate list
+		begin ( vector_tn other );							-- copy
 
-		begin ( array<<t>><<#>> );					-- coordinate array
+		begin<xt><#xn> ( vector<<xt>><<#xn>> other );		-- conversion 
 
-		begin ( vector_tn other );					-- copy
+		begin ( <t> x, <t> y, <t> z [opt], <t> w [opt] )()( extra );	-- coordinate list
 
-		begin<u><#n> ( vector<<u>><<#n>> other );	-- conversion 
+		begin<xt><c> ( serial_access<<xt>><<c>> source );	-- coordinate source, numeric <xt> 
 
 
 		begin ( mediator m [upd], expr fex )()( extra );	-- mediation
@@ -42,25 +42,38 @@ type vector<t><#>
 
 		use_coord [eval]( int i ) = <t> proxy [eval,init];
 
-		get_coords [eval]()( array<<t>><<#>> );			
+		get_coords [eval]()( array<<t>><<#n>> );			
 
 
-		add [upd]( vector_tn v );					-- io <= io + v (add)
-		add [eval]( vector_tn v1 )( vector_tn v2 );
+		add [upd]( vector_tn v );					-- add: io.xi/v2.xi <= io.xi + v.xi 
+		add [eval]( vector_tn v )( vector_tn v2 );		
 
-		sub [upd]( vector_tn v );					-- io <= io - v (subtract)
-		sub [eval]( vector_tn v1 )( vector_tn v2 );
+		sub [upd]( vector_tn v );					-- subtract: io.xi/v2.xi <= io.xi - v.xi 
+		sub [eval]( vector_tn v )( vector_tn v2 );
 
-		mul [upd]( <t> n );							-- io <= io * n (multiply)
+		mul [upd]( <t> n );							-- multiply: io.xi/v.xi <= io.xi * n 
 		mul [eval]( <t> n )( vector_tn v );
 
-		div [upd]( <t> n );							-- io <= io / n (divide)
+		div [upd]( <t> n );							-- divide: io.xi/v.xi <= io.xi / n 
 		div [eval]( <t> n )( vector_tn v ); 
 
-		neg [upd];									-- io <= -io (negate)
+		neg [upd];									-- negate: io.xi/v.xi <= -io.xi 
 		neg [eval]()( vector_tn v );
 
-		dot [eval]( vector_tn v [opt] )( <t> n );	 -- n <= io . v (dot product) default = self-dot
+		dot [eval]( vector_tn v [opt] )( <t> n );	-- dot product: n <= sum io.xi * v.xi ( default v = io )
+
+		ltf [upd]( sq_matrix<<t>><<#n>> );			-- linear transform #n -> #n
+		ltf [eval]( sq_matrix<<t>><<#n>> )( vector_tn v );	
+
+		ltf<#xn> [eval]( matrix<<t>><<#xn>><<#n>> )( vector<<t>><<#xn>>);	-- linear transform #n -> #xn
+	}
+
+
+	abstract method in direct_access<<t>>
+	{
+		[final]	~count ()( int );	
+
+		[final] ~use@ ( int i ) = <t> proxy; 
 	}
 
 }
