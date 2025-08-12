@@ -41,6 +41,9 @@ type matrix<t><#r><#c>
 		store ( mediator m [upd], expr fex );		-- mediation
 
 	
+		is_zero? ()( bool );
+	
+
 		set_row [upd]( int i, row_vector rv );
 
 		get_row [eval]( int i )( row_vector rv );
@@ -73,7 +76,7 @@ type matrix<t><#r><#c>
 		neg [upd];									-- io <= -io (negate)
 		neg [eval]()( matrix_trc m );
 				
-		dot<#n> [eval]( matrix<<t>><<#c>><<#n>> m1 )( matrix<<t>><<#r>><#n>> m2 );  -- dot product
+		dot<#n> [eval]( matrix<<t>><<#c>><<#n>> m1 )( matrix<<t>><<#r>><<#n>> m2 );  -- dot product
 
 		dot [eval]( row_vector v1 )( col_vector v2 );  -- io <= io dot v (transform v, #c -> #r)
 
@@ -104,16 +107,14 @@ type sq_matrix<t><#> from matrix<<t>><<#>><<#>>
 		begin ( mediator m [upd], expr fex )()( extra );	-- mediation
 
 		store ( mediator m [upd], expr fex )()( extra );	-- mediation
-
-		
-		is_zero? ()( bool );
+				
 
 		is_diag? ()( bool );
 
 		is_ident? ()( bool );
 
 
-		set_diag [upd]( vector_tn v [opt] );		-- default = identity
+		set_diag [upd]( vector_tn v [opt] );	-- default = identity
 
 		get_diag [eval]()( vector_tn v );
 

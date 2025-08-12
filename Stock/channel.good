@@ -248,9 +248,9 @@ type channel [incomplete]
 	an atomic lock.  Once the open status flag is false, 
 	the instance is static.
 
-	The maximum wait time for synchronous i/o is max_int
+	The maximum wait time for synchronous i/o is int_max
 	millisecs, which means "wait forever".  Any etm wait
-	time greater than max_int will not properly convert to
+	time greater than int_max will not properly convert to
 	int and the app will be disrupted.
 
 
@@ -287,7 +287,7 @@ type channel [incomplete]
 			io:check()( note );
 			if ( "is_null?( note )" ) -- if not closed
 			{
-				fix( wait, max_int as etm ) is ~wait;
+				fix( wait, int_max as etm ) is ~wait;
 				format_request( request:begin( action, pdata, offset, size, seek, null ) )( addr pr );
 				kernel\channel_sync_io( io.hch, pr, ~wait:as_int );
 				io:finish( pr )( deficit, report, note );

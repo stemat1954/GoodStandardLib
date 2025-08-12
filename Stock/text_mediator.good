@@ -195,7 +195,7 @@ type text_mediator from mediator
 
 		import [upd]( text_mediator other [upd], int q [opt] ) 
 		{
-			fix( q, max_int ) is ~q;
+			fix( q, int_max ) is ~q;
 			other:set_rp( zero );
 			io:set_wp( zero );
 			int q2:begin;
@@ -208,7 +208,7 @@ type text_mediator from mediator
 
 		export [upd]( text_mediator other [upd], int q [opt] )
 		{
-			fix( q, max_int ) is ~q;
+			fix( q, int_max ) is ~q;
 			io:set_rp( zero );
 			other:set_wp( zero );
 			int q2:begin;
@@ -467,10 +467,6 @@ type text_mediator from mediator
 		word8 x20:begin( 'x:20' ) [const];
 		word8 x10:begin( 'x:10' ) [const];
 		word8 xC0:begin( 'x:C0' ) [const];
-
-		int	two:begin( '2' )   [const];
-		int three:begin( '3' ) [const];
-		int four:begin( '4' )  [const];
 	}
 
 
@@ -509,7 +505,7 @@ type text_mediator from mediator
 		{
 			arr:begin;
 			if ( "rp_end?( io )" ) return;
-			fix( q, max_int ) is ~q;
+			fix( q, int_max ) is ~q;
 			int n:begin;
 			loop ( "n |<| ~q" )
 			{
