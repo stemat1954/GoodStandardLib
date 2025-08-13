@@ -27,9 +27,9 @@ common -- bool
 
 common -- int
 {
-	int int_min:begin( 'min' as int_const ) [const];
+	int int_min:begin( 'min' ) [const];
 
-	int int_max:begin( 'max' as int_const ) [const];
+	int int_max:begin( 'max' ) [const];
 
 	int zero:begin( '0' ) [const];
 
@@ -58,29 +58,29 @@ common -- int
 	
 common -- fp2
 {
-	fp2 fp2_max:begin( 'max' as fp_const ) [const];
+	fp2 fp2_max:begin( 'max' ) [const];
 
-	fp2 fp2_min:begin( 'min' as fp_const ) [const];
+	fp2 fp2_min:begin( 'min' ) [const];
 
-	fp2 fp2_epsilon:begin( 'epsilon' as fp_const ) [const];
+	fp2 fp2_epsilon:begin( 'epsilon' ) [const];
 
-	fp2 fp2_nan:begin( 'nan' as fp_const ) [const];
+	fp2 fp2_nan:begin( 'nan' ) [const];
 
-	fp2 fp2_infinity:begin( '+infinity' as fp_const ) [const];
+	fp2 fp2_infinity:begin( '+infinity' ) [const];
 }
 
 
 common -- fp10
 {
-	fp10 fp10_max:begin( 'max' as fp_const ) [const];
+	fp10 fp10_max:begin( 'max' ) [const];
 
-	fp10 fp10_min:begin( 'min' as fp_const ) [const];
+	fp10 fp10_min:begin( 'min' ) [const];
 
-	fp10 fp10_epsilon:begin( 'epsilon' as fp_const ) [const];
+	fp10 fp10_epsilon:begin( 'epsilon' ) [const];
 
-	fp10 fp10_nan:begin( 'nan' as fp_const ) [const];
+	fp10 fp10_nan:begin( 'nan' ) [const];
 
-	fp10 fp10_infinity:begin( '+infinity' as fp_const ) [const];
+	fp10 fp10_infinity:begin( '+infinity' ) [const];
 }
 
 
@@ -258,11 +258,14 @@ operation	-- logical
 
 operation	-- arithmetic
 {
+	"-a"			= "neg( a )";
+
 	"a + b"			= "add( a, b )";
 	"a - b"			= "sub( a, b )";
 	"a * b"			= "mul( a, b )";
 	"a / b"			= "div( a, b )";
-	"-a"			= "neg( a )";
+
+	"a |^| b"		= "pow( a, b )";
 }
 
 

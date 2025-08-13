@@ -6,7 +6,7 @@ type vector<t><#n> from direct_access<<t>>
 {{
 	algebraic vector.
 	
-	numeric type <t> = int,	fp2, fp10
+	numeric type <t> = int,	fp2, fp10, cplx
 
 	<#n> dimension (number of coordinates)
 }}
@@ -45,19 +45,19 @@ type vector<t><#n> from direct_access<<t>>
 		get_coords [eval]()( array<<t>><<#n>> );			
 
 
-		add [upd]( vector_tn v );					-- add: io.xi/v2.xi <= io.xi + v.xi 
+		add [upd]( vector_tn v );					-- add: io.xi <= io.xi + v.xi 
 		add [eval]( vector_tn v )( vector_tn v2 );		
 
-		sub [upd]( vector_tn v );					-- subtract: io.xi/v2.xi <= io.xi - v.xi 
+		sub [upd]( vector_tn v );					-- subtract: io.xi <= io.xi - v.xi 
 		sub [eval]( vector_tn v )( vector_tn v2 );
 
-		mul [upd]( <t> n );							-- multiply: io.xi/v.xi <= io.xi * n 
+		mul [upd]( <t> n );							-- multiply: io.xi <= io.xi * n 
 		mul [eval]( <t> n )( vector_tn v );
 
-		div [upd]( <t> n );							-- divide: io.xi/v.xi <= io.xi / n 
+		div [upd]( <t> n );							-- divide: io.xi <= io.xi / n 
 		div [eval]( <t> n )( vector_tn v ); 
 
-		neg [upd];									-- negate: io.xi/v.xi <= -io.xi 
+		neg [upd];									-- negate: io.xi <= -io.xi 
 		neg [eval]()( vector_tn v );
 
 		dot [eval]( vector_tn v [opt] )( <t> n );	-- dot product: n <= sum io.xi * v.xi ( default v = io )

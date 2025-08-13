@@ -15,16 +15,21 @@ page float in AlphaByGood
 	only be used in applications that need precise decimal
 	fractions or powers of 10, such as financial and 
 	accounting applications.
+
+	These special values expressions are recognized:
+
+		'min'
+		'max'
+		'epsilon'
+		'+infinity'
+		'-infinity'
+		'nan' 
+
 	
 	See math.good for built-in functional subroutines
 	for numeric types.
 
 }}
-
-
-
-enum type fp_const ( 'min', 'max', 'epsilon', '+infinity', '-infinity', 'nan' );
-
 
 
 type fp2 -- elementary, compatible, conventional
@@ -41,8 +46,6 @@ type fp2 -- elementary, compatible, conventional
 	{
 		begin ( expr vex [opt] );				-- digital expr, default = 0
 
-		begin ( fp_const vex );					-- enumerated const
-
 		begin ( fp2 x );						-- copy
 
 		begin ( fp10 x );						-- fp10 conversion
@@ -57,72 +60,77 @@ type fp2 -- elementary, compatible, conventional
 		store ( mediator [upd], expr fex );		-- mediation
 
 
-		is_equal? ( fp2 x )( bool );
+		is_equal? ( fp2 x )( bool );			-- equality
 		
-		is_before? ( fp2 x )( bool );	
+		is_before? ( fp2 x )( bool );			-- ordinality
 
-		is_less? ( fp2 x )( bool );
+		is_less? ( fp2 x )( bool );				-- cardinality
 
 
-		is_precise? ( fp2 x )( bool );			-- not io/x fractional?
+		is_precise? ( fp2 x )( bool );			-- io/x not fractional?
 
 		
-		set [upd]( fp2 x );						-- io <= x (intrinsic assign)
+		set [upd]( fp2 x );						-- intrinsic assign: io <= x 
 
-		to_int [eval]()( int n );				-- n <= io (int conversion, if io not fractional)
+		to_int [eval]()( int n );				-- int conversion: n <= io (truncate fraction)
 
-		sgn [eval]()( int s );					-- s <= {-1,0,1} (sign) 
+		sgn [eval]()( int s );					-- sign:  s <= {-1,0,1}
 
 
-		add [upd]( fp2 x );						-- io <= io + x (add)	
+		add [upd]( fp2 x );						-- add: io <= io + x 
 		add [eval]( fp2 x )( fp2 y );	
 
-		sub [upd]( fp2 x );						-- io <= io - x (subtract)
+		sub [upd]( fp2 x );						-- subtract: io <= io - x 
 		sub [eval]( fp2 x )( fp2 y );
 
-		mul [upd]( fp2 x );						-- io <= io * x (multiply)
+		mul [upd]( fp2 x );						-- multiply: io <= io * x
 		mul [eval]( fp2 x )( fp2 y );		
 
-		div [upd]( fp2 x );						-- io <= io / x ( divide)
+		div [upd]( fp2 x );						-- divide: io <= io / x 
 		div [eval]( fp2 x )( fp2 y );
 
-		pow [upd]( fp2 x );						-- io <= io ^ x (power,real)
-		pow [eval]( fp2 x )( fp2 y );
-
-		pow [upd]( int n, int d );				-- io <= io ^ (n/d) (power,rational) 
-		pow [eval]( int n, int d )( fp2 y );
-
-		scl [upd]( int n );						-- io <= io * ( 2 ^ n ) (scale)
-		scl [eval]( int n )( fp2 y );
-
-		fma [upd]( fp2 m, fp2 b );				-- io <= ( m * io ) + b  (fused mul add, linear transform) 
-		fma [eval]( fp2 m, fp2 b )( fp2 y );
-
-		dis [upd]( fp2 x );						-- io <= | io - x | (distance, absolute diff)
-		dis [eval]( fp2 x )( fp2 y );
-
-		neg [upd];								-- io <= -io (negate)		
+	
+		neg [upd];								-- negate: io <= -io 
 		neg [eval]()( fp2 y );
 
-		abs [upd];								-- io <= |io| (abs value)
+		abs [upd];								-- abs value: io <= |io|
 		abs [eval]()( fp2 y );
 
-		rpu [upd]( fp2 x [opt] );				-- io <= io/x snap up/more (round to precision up)	
+		fma [upd]( fp2 m, fp2 b );				-- fused mul add: io <= ( m * io ) + b  (linear transform) 
+		fma [eval]( fp2 m, fp2 b )( fp2 y );
+
+		dis [upd]( fp2 x );						-- distance: io <= |(io - x)| (absolute diff)
+		dis [eval]( fp2 x )( fp2 y );
+
+		scl [upd]( int n );						-- scale: io <= io * ( 2 ^ n ) (exponent shift)
+		scl [eval]( int n )( fp2 y );
+
+		exp [upd]( int n, int d );				-- exponentiate: io <= io ^ (n/d) (rational) 
+		exp [eval]( int n, int d )( fp2 y );
+
+		exp [upd]( fp2 x );						-- exponentiate io <= io ^ x (real)
+		exp [eval]( fp2 x )( fp2 y );
+
+		log [upd]( fp2 b );						-- log: io <= log base b ( io )
+		log [eval]( fp2 b )( fp2 y );
+
+
+		rpu [upd]( fp2 x [opt] );				-- round to precision up: io <= io/x snap up/more (default = 1.0)
 		rpu [eval]( fp2 x [opt] )( fp2 y );
 
-		rpd [upd]( fp2 x [opt] );				-- io <= io/x snap down/less (round to precision down) 
+		rpd [upd]( fp2 x [opt] );				-- round to precision down: io <= io/x snap down/less (default = 1.0)
 		rpd [eval]( fp2 x [opt] )( fp2 y );
 
-		rpi [upd]( fp2 x [opt] );				-- io <= io/x snap toward zero (round to precision in)
+		rpi [upd]( fp2 x [opt] );				-- round to precision in: io <= io/x snap toward zero (default = 1.0)
 		rpi [eval]( fp2 x [opt] )( fp2 y );
 
-		rpo [upd]( fp2 x [opt] );				-- io <= io/x snap away from zero (round to precision out)
+		rpo [upd]( fp2 x [opt] );				-- round to precision out:  io <= io/x snap away from zero (default = 1.0)
 		rpo [eval]( fp2 x [opt] )( fp2 y );
 		
-		rpn [upd]( fp2 x [opt] );				-- io <= io/x snap closest (round to precision near, .5 round out)
+		rpn [upd]( fp2 x [opt] );				-- round to precision near: io <= io/x snap closest (.5 round out) (default = 1.0)
 		rpn [eval]( fp2 x [opt] )( fp2 y );	
 
-		rpn [upd]( fp2 x [opt] ) with helper ( fp2 v, fp2 x )( fp2 y );	-- io <= io/x snap closest (round to precision near, with .5 helper) 
+		rpn [upd]( fp2 x [opt] ) with helper ( fp2 v, fp2 x )( fp2 y );	-- round to precision near: io <= io/x snap closest ( with .5 helper) 
 		rpn [eval]( fp2 x [opt] )( fp2 y ) with helper  ( fp2 v, fp2 x )( fp2 y );
 	}
 
@@ -142,8 +150,6 @@ type fp10 -- elementary, compatible, conventional
 	general
 	{
 		begin ( expr vex [opt] );				-- digital expr, default = 0
-
-		begin ( fp_const vex );					-- enumerated const
 
 		begin ( fp10 x );						-- copy
 
@@ -165,67 +171,72 @@ type fp10 -- elementary, compatible, conventional
 
 		is_less? ( fp10 x )( bool );
 
-
 		is_precise? ( fp10 x )( bool );			-- not io/x fractional
 
-		
-		set [upd]( fp10 x );					-- io <= x (intrinsic assign)
 
-		to_int [eval]()( int n );				-- n <= io (int conversion, if io not fractional)
+		set [upd]( fp10 x );					-- intrinsic assign: io <= x 
 
-		sgn [eval]()( int s );					-- s <= {-1,0,1} (sign) 
+		to_int [eval]()( int n );				-- int conversion: n <= io (truncate fraction)
+
+		sgn [eval]()( int s );					-- sign:  s <= {-1,0,1}
 
 
-		add [upd]( fp10 x );					-- io <= io + x (add)	
+		add [upd]( fp10 x );					-- add: io <= io + x 
 		add [eval]( fp10 x )( fp10 y );	
 
-		sub [upd]( fp10 x );					-- io <= io - x (subtract)
+		sub [upd]( fp10 x );					-- subtract: io <= io - x 
 		sub [eval]( fp10 x )( fp10 y );
 
-		mul [upd]( fp10 x );					-- io <= io * x (multiply)
+		mul [upd]( fp10 x );					-- multiply: io <= io * x
 		mul [eval]( fp10 x )( fp10 y );		
 
-		div [upd]( fp10 x );					-- io <= io / x ( divide)
+		div [upd]( fp10 x );					-- divide: io <= io / x 
 		div [eval]( fp10 x )( fp10 y );
 
-		pow [upd]( fp10 x );					-- io <= io ^ x (power,real)
-		pow [eval]( fp10 x )( fp10 y );
-
-		pow [upd]( int n, int d );				-- io <= io ^ (n/d) (power,rational) 
-		pow [eval]( int n, int d )( fp10 y );
-
-		scl [upd]( int n );						-- io <= io * ( 10 ^ n ) (scale)
-		scl [eval]( int n )( fp10 y );
-
-		fma [upd]( fp10 m, fp10 b );			-- io <= ( m * io ) + b  (fused mul add, linear transform) 
-		fma [eval]( fp10 m, fp10 b )( fp10 y );
-
-		dis [upd]( fp10 x );					-- io <= | io - x | (distance, absolute diff)
-		dis [eval]( fp10 x )( fp10 y );
-
-		neg [upd];								-- io <= -io (negate)		
+	
+		neg [upd];								-- negate: io <= -io 
 		neg [eval]()( fp10 y );
 
-		abs [upd];								-- io <= |io| (abs value)
+		abs [upd];								-- abs value: io <= |io|
 		abs [eval]()( fp10 y );
 
-		rpu [upd]( fp10 x [opt] );				-- io <= io/x snap up/more (round to precision up)	
+		fma [upd]( fp10 m, fp10 b );			-- fused mul add: io <= ( m * io ) + b  (linear transform) 
+		fma [eval]( fp10 m, fp10 b )( fp10 y );
+
+		dis [upd]( fp10 x );					-- distance: io <= |(io - x)| (absolute diff)
+		dis [eval]( fp10 x )( fp10 y );
+
+		scl [upd]( int n );						-- scale: io <= io * ( 10 ^ n ) (exponent shift)
+		scl [eval]( int n )( fp10 y );
+
+		exp [upd]( int n, int d );				-- exponentiate: io <= io ^ (n/d) (rational) 
+		exp [eval]( int n, int d )( fp10 y );
+
+		exp [upd]( fp10 x );					-- exponentiate io <= io ^ x (real)
+		exp [eval]( fp10 x )( fp10 y );
+
+		log [upd]( fp10 b );					-- log: io <= log base b of io 
+		log [eval]( fp10 b )( fp10 y );
+
+
+		rpu [upd]( fp10 x [opt] );				-- round to precision up: io <= io/x snap up/more (default = 1.0)
 		rpu [eval]( fp10 x [opt] )( fp10 y );
 
-		rpd [upd]( fp10 x [opt] );				-- io <= io/x snap down/less (round to precision down) 
+		rpd [upd]( fp10 x [opt] );				-- round to precision down: io <= io/x snap down/less (default = 1.0)
 		rpd [eval]( fp10 x [opt] )( fp10 y );
 
-		rpi [upd]( fp10 x [opt] );				-- io <= io/x snap toward zero (round to precision in)
+		rpi [upd]( fp10 x [opt] );				-- round to precision in: io <= io/x snap toward zero (default = 1.0)
 		rpi [eval]( fp10 x [opt] )( fp10 y );
 
-		rpo [upd]( fp10 x [opt] );				-- io <= io/x snap away from zero (round to precision out)
+		rpo [upd]( fp10 x [opt] );				-- round to precision out:  io <= io/x snap away from zero (default = 1.0)
 		rpo [eval]( fp10 x [opt] )( fp10 y );
 		
-		rpn [upd]( fp10 x [opt] );				-- io <= io/x snap closest (round to precision near, .5 round out)
+		rpn [upd]( fp10 x [opt] );				-- round to precision near: io <= io/x snap closest (.5 round out) (default = 1.0)
 		rpn [eval]( fp10 x [opt] )( fp10 y );	
 
-		rpn [upd]( fp10 x [opt] ) with helper ( fp10 v, fp10 x )( fp10 y );	-- io <= io/x snap closest (round to precision near, with .5 helper) 
-		rpn [eval]( fp10 x [opt] )( fp10 y ) with helper ( fp10 v, fp10 x )( fp10 y );
+		rpn [upd]( fp10 x [opt] ) with helper ( fp10 v, fp10 x )( fp10 y );	-- round to precision near: io <= io/x snap closest ( with .5 helper) 
+		rpn [eval]( fp10 x [opt] )( fp10 y ) with helper  ( fp10 v, fp10 x )( fp10 y );
+		
 	}
 
 }

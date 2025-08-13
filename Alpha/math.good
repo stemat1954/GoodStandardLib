@@ -1,0 +1,89 @@
+
+page math in AlphaByGood
+
+{{
+	The functional subroutines on this page are
+	potentially hardware accelerated.
+}}
+
+
+common  -- fundamental constants
+{
+	fp2 pi [const];
+
+	-- euler's constant
+
+	-- euler-mascheroni constant
+}
+	
+
+
+subroutine  -- natural trig functions
+{{
+	angles measured in circular radians 
+}}
+{
+	sin ( fp2 x )( fp2 y );
+
+	cos ( fp2 x )( fp2 y );
+
+	tan ( fp2 x )( fp2 y );
+
+	csc ( fp2 x )( fp2 y );
+
+	sec ( fp2 x )( fp2 y );
+
+	cot ( fp2 x )( fp2 y );
+
+	arcsin ( fp2 x )( fp2 y );
+
+	arccos ( fp2 x )( fp2 y );
+
+	arctan ( fp2 x )( fp2 y );
+
+	arccsc ( fp2 x )( fp2 y );
+
+	arcsec ( fp2 x )( fp2 y );
+
+	arccot ( fp2 x )( fp2 y );
+}
+
+
+subroutine  -- hyperbolic trig functions
+{{
+	angles measured in hyperbolic radians
+}}
+{
+	sinh ( fp2 x )( fp2 y );
+
+	cosh ( fp2 x )( fp2 y );
+
+	tanh ( fp2 x )( fp2 y );
+
+	csch ( fp2 x )( fp2 y );
+
+	sech ( fp2 x )( fp2 y );
+
+	coth ( fp2 x )( fp2 y );
+}
+
+
+{{
+
+	-- exponentiation
+
+	pow<t> ( <t> base, int n, int d )( cplx y );  -- rational exponent, a can be negative
+
+	pow<t> ( <t> base, <t> x )( cplx y );		   -- any base and exponent, a can be negative
+
+	pow10 ( x )( cplx y );
+
+	powE ( x )( cplx y )
+
+	log ( base, x )( y );
+
+	log10 ( x )( y );
+
+	logE
+
+}}

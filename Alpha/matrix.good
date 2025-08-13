@@ -6,7 +6,7 @@ type matrix<t><#r><#c>
 {{
 	rectangular algebraic matrix.
 	
-	numeric type <t> ( int, fp2, fp10 )
+	numeric type <t> ( int, fp2, fp10, cplx )
 
 	<#r> rows, <#c> columns 
 
