@@ -11,19 +11,26 @@ type vector<t><#n> from direct_access<<t>>
 	<#n> dimension (number of coordinates)
 }}
 {
-	nom type vector_tn = vector<<t>><<#n>>;
+	nom type same_type = vector<<t>><<#n>>;
+
+	nom type sq_matrix = sq_matrix<<t>><<#n>>;  -- same dimesnions as this vector
+
+	nom type co_matrix<#r> = matrix<<t>><<#r>><<#n>>; -- same width as this vector, #r rows
+
+	nom type co_vector<#r> = vector<<t>><<#r>>; -- result of co_matrix ltf, dimension #r
+
 
 	general method
 	{
-		begin;												-- zero vector
+		begin;											-- zero vector
 
-		begin ( vector_tn other );							-- copy
+		begin ( same_type other );						-- copy
 
-		begin<xt><#xn> ( vector<<xt>><<#xn>> other );		-- conversion 
+		begin<xt><#xn> ( vector<<xt>><<#xn>> other );	-- conversion 
 
-		begin ( <t> x, <t> y, <t> z [opt], <t> w [opt] )()( extra );	-- coordinate list
+		begin ( <t> x, <t> y, <t> z [opt], <t> w [opt] )()( extra );	-- synthesis
 
-		begin<xt><c> ( serial_access<<xt>><<c>> source );	-- coordinate source, numeric <xt> 
+		begin<xt><c> ( serial_access<<xt>><<c>> source );	-- fill
 
 
 		begin ( mediator m [upd], expr fex )()( extra );	-- mediation
@@ -31,7 +38,7 @@ type vector<t><#n> from direct_access<<t>>
 		store ( mediator m [upd], expr fex )()( extra );	-- mediation
 
 	
-		is_equal? ( vector_tn v )( bool );
+		is_equal? ( same_type v )( bool );
 
 		is_zero? ()( bool );
 
@@ -45,27 +52,27 @@ type vector<t><#n> from direct_access<<t>>
 		get_coords [eval]()( array<<t>><<#n>> );			
 
 
-		add [upd]( vector_tn v );					-- add: io.xi <= io.xi + v.xi 
-		add [eval]( vector_tn v )( vector_tn v2 );		
+		add [upd]( same_type v );					-- add: io.xi <= io.xi + v.xi 
+		add [eval]( same_type v )( same_type v2 );		
 
-		sub [upd]( vector_tn v );					-- subtract: io.xi <= io.xi - v.xi 
-		sub [eval]( vector_tn v )( vector_tn v2 );
+		sub [upd]( same_type v );					-- subtract: io.xi <= io.xi - v.xi 
+		sub [eval]( same_type v )( same_type v2 );
 
 		mul [upd]( <t> n );							-- multiply: io.xi <= io.xi * n 
-		mul [eval]( <t> n )( vector_tn v );
+		mul [eval]( <t> n )( same_type v );
 
 		div [upd]( <t> n );							-- divide: io.xi <= io.xi / n 
-		div [eval]( <t> n )( vector_tn v ); 
+		div [eval]( <t> n )( same_type v ); 
 
 		neg [upd];									-- negate: io.xi <= -io.xi 
-		neg [eval]()( vector_tn v );
+		neg [eval]()( same_type v );
 
-		dot [eval]( vector_tn v [opt] )( <t> n );	-- dot product: n <= sum io.xi * v.xi ( default v = io )
+		dot [eval]( same_type v [opt] )( <t> n );	-- dot product: n <= sum io.xi * v.xi ( default v = io )
 
-		ltf [upd]( sq_matrix<<t>><<#n>> );			-- linear transform #n -> #n
-		ltf [eval]( sq_matrix<<t>><<#n>> )( vector_tn v );	
+		ltf [upd]( sq_matrix );						-- linear transform #n -> #n
+		ltf [eval]( sq_matrix )( same_type );	
 
-		ltf<#xn> [eval]( matrix<<t>><<#xn>><<#n>> )( vector<<t>><<#xn>>);	-- linear transform #n -> #xn
+		ltf<#r> [eval]( co_matrix<<#r>> )( co_vector<<#r>> );	-- linear transform #n -> #r
 	}
 
 

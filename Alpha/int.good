@@ -49,7 +49,7 @@ type int -- elementary, compatible, conventional
 {
 	general 		
 	{
-		begin ( expr vex [opt] );				-- default '0'
+		begin ( expr vex [opt] );				-- description, default '0'
 
 		begin ( int other );					-- copy
 
@@ -61,62 +61,66 @@ type int -- elementary, compatible, conventional
 		store ( mediator [upd], expr fex );		-- ditto
 
 
-		is_equal? ( int x )( bool );			-- equality
+		is_equal? ( int n )( bool );			-- equality
 				
-		is_before? ( int x )( bool );			-- ordinality ( same as is_less? )
+		is_before? ( int n )( bool );			-- ordinality ( same as is_less? )
 
-		is_less? ( int x )( bool );				-- cardinality ( same as is_before? )
+		is_less? ( int n )( bool );				-- cardinality ( same as is_before? )
 
-	
-		set [upd]( int x );						-- intrinsic assign: io <= x 
+
+		set [upd]( int n );						-- intrinsic replace
+
+
+		-- arithmetic
+
+		add [upd]( int n );						-- add:  io <= io + n 
+		add [eval] ( int n )( int x );			
+
+		sub [upd]( int n );						-- subtract: io <= io - n
+		sub [eval] ( int n )( int x );
+
+		mul [upd]( int n );						-- multiply: io <= io * n  
+		mul [eval] ( int n )( int x );	
+
+		div [upd]( int n );						-- divide: io <= io \ n (round-in)
+		div [upd]( int n )( int r );			-- divide: io <= io \ n, r <= mod(io,n) 
+		div [eval]( int n )( int x, int r );	
+		
+		inc [upd];								-- increment: io <= io + 1 
+		inc [eval]()( int x );	
+
+		dec [upd];								-- decrement: io <= io - 1 
+		dec [eval]()( int x );
+
+		inf [upd];								-- inflate: io <= io + sgn(io) (to infinity)
+		inf [eval]()( int x );
+
+		def [upd];								-- deflate: io <= io - sgn(io) (to zero)
+		def [eval]()( int x );
+
+		neg [upd];								-- negate: io <= -io 
+		neg [eval]()( int x );
+
+
+		-- other functions 
 
 		sgn [upd];								-- sign: io <= {-1,0,1}
 		sgn [eval]()( int s );
 
-
-		add [upd]( int x );						-- add:  io <= io + x 
-		add [eval] ( int x )( int y );			
-
-		sub [upd]( int x );						-- subtract: io <= io - x
-		sub [eval] ( int x )( int y );
-
-		mul [upd]( int x );						-- multiply: io <= io * x  
-		mul [eval] ( int x )( int y );	
-
-		div [upd]( int x );						-- divide: io <= io \ x (round-in)
-		div [upd]( int x )( int r );			-- divide: io <= io \ x, r <= mod(io,x) 
-		div [eval]( int x )( int y, int r );	-- divide: y <= io \ x, r <= mod(io,x)
-
-		
-		inc [upd];								-- increment: io <= io + 1 
-		inc [eval]()( int y );	
-
-		dec [upd];								-- decrement: io <= io - 1 
-		dec [eval]()( int y );
-
-		inf [upd];								-- inflate: io <= io + sgn(io) (to infinity)
-		inf [eval]()( int y );
-
-		def [upd];								-- deflate: io <= io - sgn(io) (to zero)
-		def [eval]()( int y );
-
-		neg [upd];								-- negate: io <= -io 
-		neg [eval]()( int y );
-
 		abs [upd];								-- absolute value:  io <= |io|
 		abs [eval]()( int y );	
 
-		dis [upd]( int x );						-- distance: io <= |(io - x)| (absolute diff)
-		dis [eval]( int x )( int y );
+		dis [upd]( int n );						-- distance: io <= |(io - n)| (aka absolute diff)
+		dis [eval]( int n )( int y );
 
-		fma [upd]( int m, int b );				-- fused multiply add:  io <= m * io + b (linear transform)
-		fma [eval]( int m, int b )( int y );
+		ltf [upd]( int m, int b );				-- linear transform:  io <= m * io + b (aka fused multiply add)
+		ltf [eval]( int m, int b )( int y );
 
-		mod [upd]( int x );						-- modulo: io <= residual of io \ x
-		mod [eval]( int x )( int y );	
+		mod [upd]( int n );						-- modulo: io <= remainder of io \ n
+		mod [eval]( int n )( int y );	
 
-		exp [upd]( int x );						-- exponentiate: io <= io ^ x 
-		exp [eval]( int x )( int y );
+		pow [upd]( int n );						-- power: io <= io ^ n 
+		pow [eval]( int n )( int y );
 
 		log [upd]( int b );						-- log: io <= log base b of io
 		log [eval]( int b )( int y );

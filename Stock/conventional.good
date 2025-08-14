@@ -266,6 +266,7 @@ operation	-- arithmetic
 	"a / b"			= "div( a, b )";
 
 	"a |^| b"		= "pow( a, b )";
+	"a |.| b"		= "dot( a, b )";
 }
 
 

@@ -1,4 +1,54 @@
 
 page complex in AlphaByGood
 
-type cplx;  -- to do
+type cplx  
+{
+	general method
+	{
+		begin ( expr vex [opt] );				-- description, default = 0,0
+
+		begin ( fp2 rx, fp2 ix );				-- synthesis
+
+		begin ( cplx n );						-- copy
+
+
+		begin ( mediator [upd], expr fex );		-- mediation
+
+		store ( mediator [upd], expr fex );		-- mediation
+
+
+		is_equal? ( cplx n )( bool );			-- equality
+
+
+		get_rx [eval]()( fp2 rx );
+
+		set_rx [upd]( fp2 rx );
+
+		use_rx [eval] = fp2 proxy [eval,init];
+
+		
+		get_ix [eval]()( fp2 ix );
+
+		set_ix [upd]( fp2 ix );
+
+		use_ix [eval] = fp2 proxy [eval,init];
+
+
+		-- arithmetic
+		
+		add [upd]( cplx n );					-- add: io <= io + n 
+		add [eval]( cplx n )( cplx x );	
+
+		sub [upd]( cplx n );					-- subtract: io <= io - n 
+		sub [eval]( cplx n )( cplx x );
+
+		mul [upd]( cplx n );					-- multiply: io <= io * n
+		mul [eval]( cplx n )( cplx x );		
+
+		div [upd]( cplx n );					-- divide: io <= io / n 
+		div [eval]( cplx n )( cplx x );
+			
+		neg [upd];								-- negate: io <= -io 
+		neg [eval]()( cplx x );
+	}
+}

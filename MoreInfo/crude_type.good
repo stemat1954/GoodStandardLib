@@ -1,19 +1,14 @@
 
+crude type thing
+{
+	gadget;  -- unnamed
+	int		width;
+	int		height; 
+}
 
-type thing
-{{
-	This is a sample type definition typical of what the
-	Good compiler generatea from a crude type definition.
-	
-	This particular example is fabricated from:
-	
-		crude type thing
-		{
-			gadget;  -- unnamed
-			int		width;
-			int		height; 
-		}
-}}
+
+
+type thing  -- fabricated from crude type def
 {
 	general method
 	{
