@@ -3,17 +3,25 @@ page math in AlphaByGood
 
 {{
 	The functional subroutines on this page are
-	potentially hardware accelerated.
+	potentially hardware accelerated. 
+	
+	This page is a work in progress
 }}
+
+
+enum type coord2 ( 'cartesian', 'polar' );
+
+enum type coord3 ( 'cartesion', 'cylindrical', 'spherical' );  -- for now
+
 
 
 common  -- fundamental constants
 {
 	fp2 pi [const];
 
-	-- euler's constant
+	-- fp2 euler's number e
 
-	-- euler-mascheroni constant
+	-- fp2 euler-mascheroni gamma 
 }
 	
 
@@ -68,22 +76,3 @@ subroutine  -- hyperbolic trig functions
 }
 
 
-{{
-
-	-- exponentiation
-
-	pow<t> ( <t> base, int n, int d )( cplx y );  -- rational exponent, a can be negative
-
-	pow<t> ( <t> base, <t> x )( cplx y );		   -- any base and exponent, a can be negative
-
-	pow10 ( x )( cplx y );
-
-	powE ( x )( cplx y )
-
-	log ( base, x )( y );
-
-	log10 ( x )( y );
-
-	logE
-
-}}

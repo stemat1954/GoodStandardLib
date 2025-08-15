@@ -185,6 +185,7 @@ subroutine  --  coroutines
 	{
 		a:is_before?( b )( yes );
 	}
+
 }
 
 
@@ -199,7 +200,7 @@ subroutine  --  coroutines
 	Logical operators are backed by :and, :or, :xor, :not.
 
 	Arithmetic operators are backed by :add, :sub, :mul,
-	:div, :neg.
+	:div, :neg, :pow, :dot.
 
 
 	Following example demonstrates how operations and 

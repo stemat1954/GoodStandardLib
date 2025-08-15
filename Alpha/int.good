@@ -82,27 +82,15 @@ type int -- elementary, compatible, conventional
 		mul [upd]( int n );						-- multiply: io <= io * n  
 		mul [eval] ( int n )( int x );	
 
-		div [upd]( int n );						-- divide: io <= io \ n (round-in)
-		div [upd]( int n )( int r );			-- divide: io <= io \ n, r <= mod(io,n) 
-		div [eval]( int n )( int x, int r );	
-		
-		inc [upd];								-- increment: io <= io + 1 
-		inc [eval]()( int x );	
-
-		dec [upd];								-- decrement: io <= io - 1 
-		dec [eval]()( int x );
-
-		inf [upd];								-- inflate: io <= io + sgn(io) (to infinity)
-		inf [eval]()( int x );
-
-		def [upd];								-- deflate: io <= io - sgn(io) (to zero)
-		def [eval]()( int x );
+		div [upd]( int n );						-- divide: io <= io\n (round-in)
+		div [upd]( int n )( int r );			-- divide: io <= io\n, r <= mod(io,n) 
+		div [eval]( int n )( int x, int r );	-- divide: x <= io\n (round-in), r <= mod(io,n)
 
 		neg [upd];								-- negate: io <= -io 
 		neg [eval]()( int x );
 
-
-		-- other functions 
+				
+		-- common  
 
 		sgn [upd];								-- sign: io <= {-1,0,1}
 		sgn [eval]()( int s );
@@ -116,14 +104,33 @@ type int -- elementary, compatible, conventional
 		ltf [upd]( int m, int b );				-- linear transform:  io <= m * io + b (aka fused multiply add)
 		ltf [eval]( int m, int b )( int y );
 
-		mod [upd]( int n );						-- modulo: io <= remainder of io \ n
-		mod [eval]( int n )( int y );	
-
-		pow [upd]( int n );						-- power: io <= io ^ n 
-		pow [eval]( int n )( int y );
+		pow [upd]( int n, int d [opt] );		-- power: io <= io ^ n/d (default d = 1)
+		pow [eval]( int n, int d [opt] )( int y );  -- round in
 
 		log [upd]( int b );						-- log: io <= log base b of io
 		log [eval]( int b )( int y );
+
+
+		-- other
+		
+		inc [upd];								-- increment: io <= io + 1 
+		inc [eval]()( int x );	
+
+		dec [upd];								-- decrement: io <= io - 1 
+		dec [eval]()( int x );
+
+		inf [upd];								-- inflate: io <= io + sgn(io) (to infinity)
+		inf [eval]()( int x );
+
+		def [upd];								-- deflate: io <= io - sgn(io) (to zero)
+		def [eval]()( int x );
+
+		mod [upd]( int n );						-- modulo: io <= remainder of io \ n
+		mod [eval]( int n )( int y );	
+
+		sp2 [upd]( int n );						-- scale by power of 2: io <= io * ( 2 ^ n ) 
+		sp2 [eval]( int n )( int x );
+
 	}
 }
 

@@ -13,11 +13,11 @@ type vector<t><#n> from direct_access<<t>>
 {
 	nom type same_type = vector<<t>><<#n>>;
 
-	nom type sq_matrix = sq_matrix<<t>><<#n>>;  -- same dimesnions as this vector
+	nom type sq_matrix = sq_matrix<<t>><<#n>>;  -- same dimensions as this vector
 
-	nom type co_matrix<#r> = matrix<<t>><<#r>><<#n>>; -- same width as this vector, #r rows
+	nom type lt_matrix<#r> = matrix<<t>><<#r>><<#n>>; -- same width as this vector, #r rows
 
-	nom type co_vector<#r> = vector<<t>><<#r>>; -- result of co_matrix ltf, dimension #r
+	nom type lt_vector<#r> = vector<<t>><<#r>>; -- result of ltf
 
 
 	general method
@@ -67,12 +67,12 @@ type vector<t><#n> from direct_access<<t>>
 		neg [upd];									-- negate: io.xi <= -io.xi 
 		neg [eval]()( same_type v );
 
-		dot [eval]( same_type v [opt] )( <t> n );	-- dot product: n <= sum io.xi * v.xi ( default v = io )
+		dot [eval]( same_type v [opt] )( <t> n );	-- dot product: n <= sum(io.xi * v.xi) ( default v = io )
 
 		ltf [upd]( sq_matrix );						-- linear transform #n -> #n
 		ltf [eval]( sq_matrix )( same_type );	
 
-		ltf<#r> [eval]( co_matrix<<#r>> )( co_vector<<#r>> );	-- linear transform #n -> #r
+		ltf<#r> [eval]( lt_matrix<<#r>> )( lt_vector<<#r>> );	-- linear transform #n -> #r
 	}
 
 

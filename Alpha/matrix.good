@@ -8,7 +8,7 @@ type matrix<t><#r><#c>
 	
 	numeric type <t> ( int, fp2, fp10, cplx )
 
-	<#r> rows, <#c> columns 
+	<#r> rows (height), <#c> columns (width)
 
 	Use sq_matrix<t><#n> when <#r> and <#c> are same.
 
@@ -25,9 +25,9 @@ type matrix<t><#r><#c>
 
 	nom type col_vector = vector<<t>><<#r>>;
 
-	nom type co_matrix_w<#n> = matrix<<t>><<#c>><<#n>>; -- same width (cols), #n rows
+	nom type co_matrix<#n> = matrix<<t>><<#c>><<#n>>; --  #n cols
 
-	nom type co_matrix_h<#n> = matrix<<t>><<#r>><<#n>>;  -- same height (rows), #n cols
+	nom type dot_matrix<#n> = matrix<<t>><<#r>><<#n>>;  -- #n cols
 
 
 
@@ -80,7 +80,7 @@ type matrix<t><#r><#c>
 		neg [upd];									-- negate: io <= -io
 		neg [eval]()( same_type m );
 				
-		dot<#n> [eval]( co_matrix_w<<#n>> m1 )( co_matrix_h<<#n>> m2 );  -- dot product: m2 <= io dot m1 
+		dot<#n> [eval]( co_matrix<<#n>> m1 )( dot_matrix<<#n>> m2 );  -- dot product: m2 <= io dot m1 
 
 		dot [eval]( row_vector v1 )( col_vector v2 );  -- dot product: v2 <= io dot v1 
 
