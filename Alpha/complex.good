@@ -12,15 +12,17 @@ type cplx
 	{
 		begin ( expr vex [opt] );			-- description, default = zero
 
-		begin ( coord2, fp2 a, fp2 b );		-- synthesis 'cartesion' (real,imag) 'polar' (mod,arg)
+		begin ( coord2_tag, fp2 a, fp2 b );		-- synthesis: 'cartesion' (rx,iy) 'polar' (mod,arg)
+
+		begin ( coord2_tag, vector<fp2><'2'> v ); -- synthesis: 'cartesion' (rx,iy) 'polar' (mod,arg)
 
 		begin ( cplx n );					-- copy
 
-		begin ( int n );					-- int conversion (x=n,y=0)
+		begin ( int n );					-- int conversion (rx=n,iy=0)
 
-		begin ( fp2 n );					-- fp2 conversion (x=n,y=0)
+		begin ( fp2 n );					-- fp2 conversion (rx=n,iy=0)
 
-		begin ( fp10 n );					-- fp10 conversion (x=n,y=0)
+		begin ( fp10 n );					-- fp10 conversion (rx=n,iy=0)
 
 
 		begin ( mediator [upd], expr fex );	-- mediation
@@ -37,11 +39,22 @@ type cplx
 		is_zero? ()( bool );
 
 
-		set [upd]( cplx n );				-- intrinsic replace
+		get_rx ()( fp2 rx );
 
-		get_cartesian ()( fp2 x, fp2 y );	-- (real,imaginary)
+		get_iy ()( fp2 iy );
 
-		get_polar ()( fp2 r, fp2 th );		-- (modulus,argument)
+		get_cartesian ()( fp2 rx, fp2 iy );
+
+		get_cartesian ()( vector<fp2><'2'> v );
+
+
+		get_mod ()( fp2 mod );
+
+		get_arg ()( fp2 arg );
+
+		get_polar ()( fp2 mod, fp2 arg );	
+
+		get_polar ()( vector<fp2><'2'> v );
 
 
 		-- arithmetic
@@ -68,7 +81,7 @@ type cplx
 		abs [eval]()( cplx y );					-- imaginary part = 0
 
 		dis [upd]( cplx n );					-- distance: io <= |(io - n)| (aka absolute diff)
-		dis [eval]( cplx n )( cplx y );			-- ix = 0
+		dis [eval]( cplx n )( cplx y );			-- imaginary part = 0
 
 		ltf [upd]( cplx m, cplx b );			-- linear transform: io <= ( m * io ) + b  (aka fused multiply add) 
 		ltf [eval]( cplx m, cplx b )( cplx y );
@@ -92,7 +105,7 @@ type cplx
 		-- special 
 
 		
-		cnj	[upd];								-- conjugate: (negate ix only)
+		cnj	[upd];								-- conjugate: (negate imaginary part)
 		cnj [eval]()( cplx x );
 
 

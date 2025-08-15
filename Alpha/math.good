@@ -9,9 +9,9 @@ page math in AlphaByGood
 }}
 
 
-enum type coord2 ( 'cartesian', 'polar' );
+enum type coord2_tag ( 'cartesian', 'polar' );
 
-enum type coord3 ( 'cartesion', 'cylindrical', 'spherical' );  -- for now
+enum type coord3_tag ( 'cartesion', 'cylindrical', 'spherical' );  -- for now
 
 
 
