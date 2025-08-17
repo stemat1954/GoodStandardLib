@@ -138,8 +138,8 @@ type console
 					else quit with fault:begin( 'bug', 'unexpected code unit value' );
 				}
 
-				if ( "bom |=| unicode_bom_FEFF" ) io.endian:begin ( 'big_endian' )
-				else if ( "bom |=| unicode_bom_FFFE" ) io.endian:begin ( 'little_endian' )
+				if ( "bom |=| unicode_bom_FEFF" ) io.endian:begin ( 'big-endian' )
+				else if ( "bom |=| unicode_bom_FFFE" ) io.endian:begin ( 'little-endian' )
 				else if ( "not( is_zero?( bom ) )" ) quit with fault:begin( 'bug', 'invalid byte order mark' );
 
 				io.ready:begin( true );
