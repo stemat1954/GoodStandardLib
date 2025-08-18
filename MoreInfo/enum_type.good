@@ -14,12 +14,12 @@ type foo from enumerated  -- fabricated from enum type def
 	Note: An enum type name can't be generic, so the
 	type name can be used in lieu of an object name.
 
-	An enum type's int value can be used to compare 
+	An enum type's code value can be used to compare 
 	relative order and other arithmetic relationships. 
-	However, note that the enumerated value can change 
+	However, note that the enumeration code can change 
 	if the definition order is changed, so any code 
 	that depends on definition order may be impacted 
-	by ab enum type change.
+	by an enum type change.
 
 	Code that compares two enum types for equality and/or 
 	evaluates them in a select instruction is safe.  That 

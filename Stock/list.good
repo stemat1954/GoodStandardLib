@@ -82,7 +82,7 @@ type node1 [incomplete]
 			io.link1:recycle;  
 		}
 
-		as_node1 = node1 proxy  ~n
+		use_node = node1 proxy  ~n
 		{
 			if ( "is_not_null?( io.link1 )" ) ~n -> io.link1:deref; 
 		}
@@ -318,7 +318,7 @@ type list from serial_access<node1><list_cursor>
 
 		[final] ~use@ ( list_cursor c ) = node1 proxy ~n   
 		{
-			~n -> c:as_node1;
+			~n -> c:use_node;
 		}
 	}
 	
@@ -330,6 +330,8 @@ type list from serial_access<node1><list_cursor>
 	}
 }
 
+
+-- typed lists
 
 	
 [page] type <t>node1 from ( <t>, node1 )
@@ -349,7 +351,7 @@ type list<t> from list
 {
 	nom type list_t = list<<t>>;
 
-	nom type t_node = <<t>>node1;
+	nom type t_node1 = <<t>>node1;
 
 
 	general method
@@ -367,70 +369,71 @@ type list<t> from list
 
 		begin ( list_t other )  -- with <t> copy
 		{
-			for each ( node1 proxy ~other_node in other )  
+			for each ( node1 proxy ~n in other )  
 			{
-				link1 nl:begin<t_node>:begin is <t> proxy [init] ~new_node;
-				~new_node:begin( ~other_node:as<<t>> );  
+				link1 nl:begin<t_node1>:begin is <t> proxy [init] ~new_t;
+				~new_t:begin( ~n:as<<t>> );  
 				io:as_base<list>:insert( nl ):go_next;
 			}
 		}
 
 		begin ( list_t other ) with copier ( <t> )( <t> ) -- with copier
 		{
-			for each ( node1 proxy ~other_node in other ) 
+			for each ( node1 proxy ~n in other ) 
 			{
-				link1 nl:begin<t_node>:begin is <t> proxy [init] ~new_node;  
-				copier( ~other_node:as<<t>> )( ~new_node );
+				link1 nl:begin<t_node1>:begin is <t> proxy [init] ~new_t;  
+				
+				copier( ~n:as<<t>> )( ~new_t );
 				io:as_base<list>:insert( nl ):go_next;
 			}
 		}
 
-		insert [upd] = <t> proxy [init] ~node  -- after current
+		insert [upd] = <t> proxy [init] ~t  -- after current
 		{
-			~node -> link1 nl:begin<t_node>:begin; -- null
+			~t -> link1 nl:begin<t_node1>:begin; -- null
 			io:as_base<list>:insert( nl );
 		}
 
-		use_first = <t> proxy [eval,init] ~node  -- may be void
+		use_first = <t> proxy [eval,init] ~t  -- may be void
 		{
 			io:as_base<list>:get_first()( link1 nl );
-			if ( "is_not_null?( nl )" ) ~node -> nl:deref:as<<t>>;
+			if ( "is_not_null?( nl )" ) ~t -> nl:deref:as<<t>>;
 		}
 
-		use_last = <t> proxy [eval,init] ~node -- may be void
+		use_last = <t> proxy [eval,init] ~t -- may be void
 		{
 			io:as_base<list>:get_last()( link1 nl );
-			if ( "is_not_null?( nl )" ) ~node -> nl:deref:as<<t>>;
+			if ( "is_not_null?( nl )" ) ~t -> nl:deref:as<<t>>;
 		}
 
-		use_current = <t> proxy [eval,init] ~node -- may be void
+		use_current = <t> proxy [eval,init] ~t -- may be void
 		{
 			io:as_base<list>:get_current()( link1 nl );
-			if ( "is_not_null?( nl )" ) ~node -> nl:deref:as<<t>>;
+			if ( "is_not_null?( nl )" ) ~t -> nl:deref:as<<t>>;
 		}
 
-		use_next = <t> proxy [eval,init] ~node -- may be void
+		use_next = <t> proxy [eval,init] ~t -- may be void
 		{
 			io:as_base<list>:get_next()( link1 nl );
-			if ( "is_not_null?( nl )" ) ~node -> nl:deref:as<<t>>;
+			if ( "is_not_null?( nl )" ) ~t -> nl:deref:as<<t>>;
 		}
 
-		remove_next [upd] ()( <t> node ) with copier ( <t> )( <t> )
+		remove_next [upd] ()( <t> next ) with copier ( <t> )( <t> )
 		{
 			io:as_base<list>:get_next()( link1 nl );
 			if ( "is_not_null?( nl )" ) 
 			{
-				copier( nl:deref:as<<t>> )( node );
+				copier( nl:deref:as<<t>> )( next );
 				io:as_base<list>:remove_next;
 			}
 		}
 				
-		remove_next [upd] ()( <t> node ) with taker ( <t> [upd] )( <t> )
+		remove_next [upd] ()( <t> next ) with taker ( <t> [upd] )( <t> )
 		{
 			io:as_base<list>:get_next()( link1 nl );
 			if ( "is_not_null?( nl )" ) 
 			{
-				taker( *nl:deref:as<<t>> )( node );
+				taker( *nl:deref:as<<t>> )( next );
 				io:as_base<list>:remove_next;
 			}
 		}
@@ -453,50 +456,48 @@ type stack<t>
 {
 	nom type stack_t = stack<<t>>;
 
-	nom type list_t = list<<t>>;
-
 	general method
 	{
 		begin  -- empty
 		{
-			io.list_t:begin;
+			io.list:begin;
 		}
 
 		begin ( stack_t other [upd] ) -- take
 		{
-			io.list_t:begin( *other.list_t );
+			io.list:begin( *other.list );
 		}
 
 		begin ( stack_t other ) with copier ( <t> )( <t> ) -- copy
 		{
-			io.list_t:begin( other.list_t ) with copier;
+			io.list:begin( other.list ) with copier;
 		}
 
 
 		is_empty? ()( bool yes )
 		{
-			io.list_t:is_empty?()( yes );
+			io.list:is_empty?()( yes );
 		}
 
-		push [upd] = <t> proxy [init]  ~node
+		push [upd] = <t> proxy [init]  ~t
 		{
-			~node -> io.list_t:insert;
+			~t -> io.list:insert;
 		}
 
 		pop [upd ]
 		{
-			io.list_t:remove_next;
+			io.list:remove_next;
 		}
 		
-		use_top = <t> proxy [eval,init] ~node  -- top 
+		use_top = <t> proxy [eval,init] ~t  -- top 
 		{
-			~node -> io.list_t:use_first;
+			~t -> io.list:use_first;
 		}
 	}
 
 	instance
 	{
-		list_t;
+		list<<t>> list;
 	}
 }
 
@@ -514,57 +515,55 @@ type queue<t>
 {
 	nom type queue_t = queue<<t>>;
 
-	nom type list_t = list<<t>>;
-
 	general method
 	{
 		begin  -- empty
 		{
-			io.list_t:begin;
+			io.list:begin;
 		}
 
 		begin ( queue_t other [upd] ) -- take
 		{
-			io.list_t:begin( *other.list_t );
+			io.list:begin( *other.list );
 		}
 
 		begin ( queue_t other ) with copier ( <t> )( <t> ) -- copy
 		{
-			io.list_t:begin( other.list_t ) with copier;
+			io.list:begin( other.list ) with copier;
 		}
 
 		is_empty? ()( bool yes )
 		{
-			io.list_t:is_empty?()( yes );
+			io.list:is_empty?()( yes );
 		}
 
-		push [upd] = <t> proxy [init] ~node 
+		push [upd] = <t> proxy [init] ~t 
 		{
-			~node -> io.list_t:go_last:insert;
+			~t -> io.list:go_last:insert;
 		}
 
 
-		pull [upd]()( <t> node ) with copier ( <t> )( <t> )
+		pull [upd]()( <t> first ) with copier ( <t> )( <t> )
 		{
-			if ( io.list_t:is_empty?()( =bool ):not )
-				io.list_t:go_front:remove_next()( node ) with copier;
+			if ( io.list:is_empty?()( =bool ):not )
+				io.list:go_front:remove_next()( first ) with copier;
 		}
 
-		pull [upd]()( <t> node ) with taker ( <t> [upd] )( <t> )
+		pull [upd]()( <t> first ) with taker ( <t> [upd] )( <t> )
 		{
-			if ( io.list_t:is_empty?()( =bool ):not )
-				io.list_t:go_front:remove_next()( node ) with taker;
+			if ( io.list:is_empty?()( =bool ):not )
+				io.list:go_front:remove_next()( first ) with taker;
 		}
 
-		use_first = <t> proxy [eval,init] ~node 
+		use_first = <t> proxy [eval,init] ~t 
 		{
-			~node -> io.list_t:use_first;
+			~t -> io.list:use_first;
 		}
 	}
 
 	instance
 	{
-		list_t;
+		list<<t>> list;
 	}
 }
 

@@ -38,3 +38,4 @@ type thing  -- fabricated from crude type def
 		int		width;
 		int		height;
 	}
+}

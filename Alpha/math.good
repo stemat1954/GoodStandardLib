@@ -2,8 +2,7 @@
 page math in AlphaByGood
 
 {{
-	The functional subroutines on this page are
-	potentially hardware accelerated. 
+	The subroutines on this page are potentially hardware accelerated. 
 	
 	This page is a work in progress
 }}
@@ -19,60 +18,75 @@ common  -- fundamental constants
 {
 	fp2 pi [const];
 
-	-- fp2 euler's number e
+	fp2 euler [const];
 
-	-- fp2 euler-mascheroni gamma 
+	-- <t> euler-mascheroni gamma 
 }
 	
+
+subroutine  -- cross-type powers and roots
+{
+	fp2_pow<t> ( <t> a, int n, int d )( fp2 y );		-- any base, rational exponent, fp2 result
+
+	fp2_pow<t><u> ( <t> a, <u> x )( fp2 y );			-- any base, any exponent, fp2 result
+
+	cplx_pow<t> ( <t> a, int n, int d )( cplx y );		-- any base, rational exponent, cplx result
+
+	cplx_pow<t><u> ( <t> a, <u> x )( cplx y );			-- any base, any exponent, cplx result
+}
 
 
 subroutine  -- natural trig functions
 {{
 	angles measured in circular radians 
+
+	<t> = fp2, fp10, cplx
 }}
 {
-	sin ( fp2 x )( fp2 y );
+	sin<t> ( <t> x )( <t> y );
 
-	cos ( fp2 x )( fp2 y );
+	cos<t> ( <t> x )( <t> y );
 
-	tan ( fp2 x )( fp2 y );
+	tan<t> ( <t> x )( <t> y );
 
-	csc ( fp2 x )( fp2 y );
+	csc<t> ( <t> x )( <t> y );
 
-	sec ( fp2 x )( fp2 y );
+	sec<t> ( <t> x )( <t> y );
 
-	cot ( fp2 x )( fp2 y );
+	cot<t> ( <t> x )( <t> y );
 
-	arcsin ( fp2 x )( fp2 y );
+	arcsin<t> ( <t> x )( <t> y );
 
-	arccos ( fp2 x )( fp2 y );
+	arccos<t> ( <t> x )( <t> y );
 
-	arctan ( fp2 x )( fp2 y );
+	arctan<t> ( <t> x )( <t> y );
 
-	arccsc ( fp2 x )( fp2 y );
+	arccsc<t> ( <t> x )( <t> y );
 
-	arcsec ( fp2 x )( fp2 y );
+	arcsec<t> ( <t> x )( <t> y );
 
-	arccot ( fp2 x )( fp2 y );
+	arccot<t> ( <t> x )( <t> y );
 }
 
 
 subroutine  -- hyperbolic trig functions
 {{
 	angles measured in hyperbolic radians
+
+	<t> = fp2, fp10, cplx
 }}
 {
-	sinh ( fp2 x )( fp2 y );
+	sinh<t> ( <t> x )( <t> y );
 
-	cosh ( fp2 x )( fp2 y );
+	cosh<t> ( <t> x )( <t> y );
 
-	tanh ( fp2 x )( fp2 y );
+	tanh<t> ( <t> x )( <t> y );
 
-	csch ( fp2 x )( fp2 y );
+	csch<t> ( <t> x )( <t> y );
 
-	sech ( fp2 x )( fp2 y );
+	sech<t> ( <t> x )( <t> y );
 
-	coth ( fp2 x )( fp2 y );
+	coth<t> ( <t> x )( <t> y );
 }
 
 

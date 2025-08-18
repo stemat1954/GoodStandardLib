@@ -22,8 +22,6 @@ general method -- intrinsic in every type
 
 	get_typeid [eval]()( typeid );	-- copy
 
-	use_addr [eval] = addr proxy [eval];	-- access
-
 	get_addr [eval]()( addr );  -- copy
 	
 	is<t>? [eval]()( bool );  

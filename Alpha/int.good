@@ -105,7 +105,7 @@ type int -- elementary, compatible, conventional
 		ltf [eval]( int m, int b )( int y );
 
 		pow [upd]( int n, int d [opt] );		-- power: io <= io ^ n/d (default d = 1)
-		pow [eval]( int n, int d [opt] )( int y );  -- round in
+		pow [eval]( int n, int d [opt] )( int y );  
 
 		log [upd]( int b );						-- log: io <= log base b of io
 		log [eval]( int b )( int y );
@@ -128,7 +128,7 @@ type int -- elementary, compatible, conventional
 		mod [upd]( int n );						-- modulo: io <= remainder of io \ n
 		mod [eval]( int n )( int y );	
 
-		sp2 [upd]( int n );						-- scale by power of 2: io <= io * ( 2 ^ n ) 
+		sp2 [upd]( int n );						-- scale by power of 2: io <= "io * pow( 2, n )" 
 		sp2 [eval]( int n )( int x );
 
 	}
