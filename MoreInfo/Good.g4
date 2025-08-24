@@ -610,9 +610,12 @@ infer_block				: LEFT_CURLY INFER RIGHT_CURLY
 
 
 
-proxy_attribute			: EVAL ( COMMA ( UPD | INIT ) )?
+proxy_attribute			: EVAL 
 						| UPD
 						| INIT
+						| EVAL COMMA UPD
+						| EVAL COMMA INIT
+						| EVAL COMMA UPD COMMA INIT  // reserved 
 						;
 
 proxy_attribution		: LEFT_SQUARE proxy_attribute RIGHT_SQUARE
