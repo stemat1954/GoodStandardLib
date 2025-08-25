@@ -4,7 +4,7 @@ gsl_build =
 	alpha =
 	{
 		source_dir = "C:\Steve\Dev\GoodStandardLib\Alpha"
-		product_dir = "C:\Steve\Dev\temp\alpha"
+		product_dir = "C:\Steve\Dev\GoodStandardLib\output\alpha"
 		major_version = 1
 		minor_version = 0
 		build_number = 1
@@ -13,7 +13,7 @@ gsl_build =
 	kernel =
 	{
 		source_dir = "C:\Steve\Dev\GoodStandardLib\Kernel"
-		product_dir = "C:\Steve\Dev\temp\kernel"
+		product_dir = "C:\Steve\Dev\GoodStandardLib\output\kernel"
 		major_version = 1
 		minor_version = 0
 		build_number = 1
@@ -22,7 +22,7 @@ gsl_build =
 	stock =
 	{
 		source_dir = "C:\Steve\Dev\GoodStandardLib\Stock"
-		product_dir = "C:\Steve\Dev\temp\stock"
+		product_dir = "C:\Steve\Dev\GoodStandardLib\output\stock"
 		major_version = 1
 		minor_version = 0
 		build_number = 1
